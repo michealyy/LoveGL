@@ -9,9 +9,9 @@ int main(int, char**) {
 	if (!glfwInit())
 		return -1;
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	// glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	// glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	// glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	GLFWwindow* window = glfwCreateWindow(static_cast<int>(WINDOW_SIZE.x), static_cast<int>(WINDOW_SIZE.y), "kdRenderStudio", NULL, NULL);
 	if (!window)
@@ -22,7 +22,13 @@ int main(int, char**) {
 	
 	glfwMakeContextCurrent(window);
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-	//glfwSwapInterval(1);
+	glfwSwapInterval(0);
+
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	if (LINE_Polygon)
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
 	
 	Engine::GetInstance()->SetMainWindow(window);
 	Engine::GetInstance()->OnSetup();

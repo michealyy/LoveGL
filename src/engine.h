@@ -7,6 +7,8 @@
 #include "material.h"
 #include "texture.h"
 
+#include "entity_box.h"
+
 namespace kd {
 	class Engine final : public Singleton<Engine> {
 		//friend Singleton<Engine>;
@@ -31,6 +33,8 @@ namespace kd {
 		std::map<std::string, Texture*> textures_;
 		std::map<std::string, Shader*> shaders_;
 		std::map<std::string, Material*> materials_;
+
+		Box* box1 = nullptr;
 
 		void LoadTextures();
 		void LoadShaders();

@@ -1,40 +1,33 @@
-#include "node.h"
+#include "entity.h"
 
 using namespace std;
-using namespace kd;
 
-Node::Node() {
+namespace kd
+{
+
+Entity::Entity() {
 }
 
-Node::~Node() {
+Entity::~Entity() {
 	for (auto child : children_) {
 		SafeDelete(child);
 	}
 }
 
-void Node::Setup() {
-	OnSetup();
-
+void Entity::Setup() {
 	for (auto child : children_) {
 		child->Setup();
 	}
 }
 
-void Node::Update() {
-	OnUpdate();
-
+void Entity::Update(float deltaTime)
+{
 	for (auto child : children_) {
-		child->Update();
+		child->Update(deltaTime);
 	}
 }
 
-void Node::OnSetup() {
-}
-
-void Node::OnUpdate() {
-}
-
-void Node::AddChild(Node * child) {
+void Entity::AddChild(Entity * child) {
 	if (child == nullptr) {
 		return;
 	}
@@ -44,7 +37,7 @@ void Node::AddChild(Node * child) {
 	dirty_ = true;
 }
 
-Node * Node::FindChild(const string& name) {
+Entity * Entity::FindChild(const string& name) {
 	for (auto child : children_) {
 		if (child->GetName() == name) {
 			return child;
@@ -54,9 +47,11 @@ Node * Node::FindChild(const string& name) {
 	return nullptr;
 }
 
-void Node::RemoveChild(const string& name) {
+void Entity::RemoveChild(const string& name) {
 }
 
-void Node::RemoveAllChild() {
+void Entity::RemoveAllChild() {
 	children_.clear();
+}
+
 }

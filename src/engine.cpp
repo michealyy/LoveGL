@@ -16,9 +16,16 @@ void Engine::OnSetup() {
 	//LoadTextures();
 	LoadShaders();
 	LoadMaterials();
+
+	auto mat1 = new Material("test");
+	mat1->SetShader("test");
+
+	box1 = new Box(mat1);
+	box1->Setup();
 }
 
 void Engine::OnUpdate() {
+	box1->Update(0);
 }
 
 Shader* Engine::GetShader(const std::string& name) {
