@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.8.0)
 
 project(kdRenderStudio)
 
@@ -21,7 +21,7 @@ link_libraries(glfw)
 set(GLAD "glfw/deps/glad/glad.h"
          "glfw/deps/glad.c")
 
-include_directories("glm/glm")
+include_directories("deps")
 
 #源代码文件夹所有文件输出到DIR_SRC
 aux_source_directory(src DIR_SRC)

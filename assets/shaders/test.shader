@@ -7,11 +7,12 @@ layout (location = 1) in vec3 aColor;
 
 out vec4 color;
 
+uniform float a;
 uniform mat4 mvp;
 
 void main()
 {
-    gl_Position = vec4(aPos, 1.0); //mvp * vec4(aPos, 1.0, 1.0);
+    gl_Position = mvp * vec4(aPos, 1.0);
     color = vec4(aColor, 1.0);
 }
 

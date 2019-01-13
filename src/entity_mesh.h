@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <glm.hpp>
+#include <glm/glm.hpp>
 #include "common.h"
 #include "entity.h"
 #include "material.h"
@@ -44,18 +44,20 @@ class Mesh : public Entity
 
     virtual void Setup() override;
     virtual void Update(float deltaTime) override;
-    virtual void AddVertices() = 0;
+
+    Material *material = nullptr;
 
   protected:
+    virtual void AddVertices() = 0;
+    //virtual void TransferVertexAttribute() = 0;
     unsigned vao = 0;
     unsigned vbo = 0;
     unsigned ebo = 0;
     std::vector<va::P_C> vertices_p_c;
     std::vector<unsigned int> indices;
-
-    Material *material = nullptr;
-
+    
   private:
     DISALLOW_COPY_AND_ASSIGN(Mesh)
 };
+
 } // namespace kd

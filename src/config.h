@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <glm.hpp>
+#include <glm/glm.hpp>
 
 namespace kd {
 	static std::string ASSET_PATH = "assets";

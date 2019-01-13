@@ -26,6 +26,10 @@ void Engine::OnSetup() {
 
 void Engine::OnUpdate() {
 	box1->Update(0);
+	if (box1->material)
+	{
+		box1->material->SetMatrix("mvp", box1->localTransform);
+	}
 }
 
 Shader* Engine::GetShader(const std::string& name) {

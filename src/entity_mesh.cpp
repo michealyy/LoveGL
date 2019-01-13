@@ -64,14 +64,9 @@ void Mesh::Update(float deltaTime)
 
     glBindVertexArray(vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    //TODO: 绘制线框
     glDrawElements(GL_TRIANGLES, (int)indices.size(), GL_UNSIGNED_INT, 0);
 
     Entity::Update(deltaTime);
-}
-
-namespace va
-{
 }
 
 } // namespace kd

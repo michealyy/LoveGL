@@ -2,7 +2,7 @@
 
 #include <string>
 #include <vector>
-#include <glm.hpp>
+#include <glm/glm.hpp>
 #include "common.h"
 #include "shader.h"
 
