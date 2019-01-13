@@ -1,4 +1,5 @@
 #include "scene.h"
+#include "engine.h"
 
 using namespace std;
 
@@ -11,14 +12,32 @@ Scene::Scene()
 
 Scene::~Scene()
 {
+    for (auto entity : entities_)
+    {
+        if (!entity->notDeleteByScene)
+            SafeDelete(entity);
+    }
 }
 
-void Scene::OnSetup()
+void Scene::Setup()
 {
+    for (auto entity : entities_)
+    {
+        entity->Setup();
+    }
 }
 
-void Scene::OnUpdate()
+void Scene::Update(float deltaTime)
 {
+    if (Engine::GetInstance()->mainCamera == nullptr)
+    {
+        fprintf(stderr, "not find mainCamera. pls set Engine::GetInstance()->mainCamera!");
+    }
+
+    for (auto entity : entities_)
+    {
+        entity->Update(deltaTime);
+    }
 }
 
 } // namespace kd

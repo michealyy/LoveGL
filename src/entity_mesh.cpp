@@ -1,5 +1,6 @@
 #include "entity_mesh.h"
 #include <glad/glad.h>
+#include "engine.h"
 
 using namespace std;
 
@@ -19,7 +20,7 @@ Mesh::~Mesh()
 
 void Mesh::Setup()
 {
-    glDisable(GL_CULL_FACE);
+    Entity::Setup();
 
     AddVertices();
 
@@ -49,24 +50,25 @@ void Mesh::Setup()
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(va::P_C, Color));
     }
-
-    Entity::Setup();
 }
 
 void Mesh::Update(float deltaTime)
 {
-    if (material == nullptr)
+    Entity::Update(deltaTime);
+
+    auto camera = Engine::GetInstance()->mainCamera;
+
+    if (material == nullptr || camera == nullptr)
     {
         return;
     }
 
     material->Bind();
+    material->SetMatrix("mvp", camera->projectMatrix * camera->GetViewMatrix() * worldTransform);
 
     glBindVertexArray(vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glDrawElements(GL_TRIANGLES, (int)indices.size(), GL_UNSIGNED_INT, 0);
-
-    Entity::Update(deltaTime);
 }
 
 } // namespace kd

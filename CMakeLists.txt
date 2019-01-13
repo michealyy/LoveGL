@@ -23,7 +23,8 @@ set(GLAD "glfw/deps/glad/glad.h"
 
 include_directories("deps")
 
-#源代码文件夹所有文件输出到DIR_SRC
+#源代码文件夹
 aux_source_directory(src DIR_SRC)
+aux_source_directory(src/scene DIR_SRC_SCENE)
 
-add_executable(kdRenderStudio ${GLAD} ${DIR_SRC})
+add_executable(kdRenderStudio ${GLAD} ${DIR_SRC} ${DIR_SRC_SCENE})

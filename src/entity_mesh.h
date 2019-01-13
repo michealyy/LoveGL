@@ -49,7 +49,7 @@ class Mesh : public Entity
 
   protected:
     virtual void AddVertices() = 0;
-    //virtual void TransferVertexAttribute() = 0;
+    
     unsigned vao = 0;
     unsigned vbo = 0;
     unsigned ebo = 0;

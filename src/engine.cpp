@@ -1,38 +1,39 @@
 #include <filesystem>
 #include "config.h"
 #include "engine.h"
+#include "scene/scene_geometry.h"
 
 using namespace std;
-using namespace kd;
 
-Engine::Engine() {
+namespace kd {
+	
+Engine::Engine()
+{
 }
 
 Engine::~Engine() {
-	//SafeDelete(ui_root_);
+	SafeDelete(currentScene);
 }
 
 void Engine::OnSetup() {
 	//LoadTextures();
 	LoadShaders();
 	LoadMaterials();
-
-	auto mat1 = new Material("test");
-	mat1->SetShader("test");
-
-	box1 = new Box(mat1);
-	box1->Setup();
+	
+	this->currentScene =  new SceneGeometry();
+	this->currentScene->Setup();
 }
 
-void Engine::OnUpdate() {
-	box1->Update(0);
-	if (box1->material)
-	{
-		box1->material->SetMatrix("mvp", box1->localTransform);
-	}
+void Engine::OnUpdate(){
+	float _time = (float)glfwGetTime();
+	float deltaTime = _time - lastTime;
+	lastTime = _time;
+	
+	this->currentScene->Update(deltaTime);
 }
 
-Shader* Engine::GetShader(const std::string& name) {
+Shader *Engine::GetShader(const std::string &name)
+{
 	auto it = shaders_.find(name);
 	if (it != shaders_.end()) {
 		return (*it).second;
@@ -116,4 +117,6 @@ void Engine::HandleUIRootInput() {
 	// 		ui_control->OnMouseLeftButtonRelease();
 	// 	}
 	// }
+}
+
 }

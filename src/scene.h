@@ -2,19 +2,29 @@
 
 #include <vector>
 #include "common.h"
+#include "entity.h"
 
 namespace kd
 {
 
 class Scene
 {
-  public:
+public:
 	explicit Scene();
 	virtual ~Scene();
-	virtual void OnSetup();
-	virtual void OnUpdate();
 
-  private:
+	virtual void Setup();
+	virtual void Update(float deltaTime);
+
+	inline void AddEntity(Entity *entity)
+	{
+		entities_.push_back(entity);
+		entity->scene = this;
+	}
+
+private:
+	std::vector<Entity *> entities_;
+
 	DISALLOW_COPY_AND_ASSIGN(Scene)
 };
 

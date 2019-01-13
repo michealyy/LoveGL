@@ -1,6 +1,7 @@
 #include "entity.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include "scene.h"
 
 using namespace std;
 using namespace glm;
@@ -14,25 +15,17 @@ Entity::Entity()
 
 Entity::~Entity()
 {
-	for (auto child : children_)
-	{
-		SafeDelete(child);
-	}
 }
 
 void Entity::Setup()
 {
-	for (auto child : children_)
-	{
-		child->Setup();
-	}
+	UpdateModelMatrix();
 }
 
 void Entity::Update(float deltaTime)
 {
-	for (auto child : children_)
-	{
-		child->Update(deltaTime);
+	if (!isStatic){
+		UpdateModelMatrix();
 	}
 }
 
@@ -44,15 +37,18 @@ void Entity::AddChild(Entity *child)
 	}
 	child->parent_ = this;
 	children_.push_back(child);
-
-	//dirty_ = true;
+	
+	if (scene != nullptr)
+	{
+		scene->AddEntity(child);
+	}
 }
 
 Entity *Entity::FindChild(const string &name)
 {
 	for (auto child : children_)
 	{
-		if (child->GetName() == name)
+		if (child->name == name)
 		{
 			return child;
 		}
@@ -72,14 +68,18 @@ void Entity::RemoveAllChild()
 
 void Entity::UpdateModelMatrix()
 {
-	//return translate(mat4(1.0f), position) * scale(mat4(1.0f), scale) * mat4_cast(quat(glm::radians(eulerAngles)));
-
-	translate(mat4(1.0f), position);
-	glm::scale(mat4(1.0f), this->scale);
-	//mat4_cast(quat(glm::radians(eulerAngles)));
-
-	//return translate(mat4(1.0f), position) * glm::scale(mat4(1.0f), this->scale);
-	localTransform = mat4(1.0f);
+	mat4 temp(1.0f);
+	localTransform = translate(temp, position) * glm::scale(temp, scale) * mat4_cast(quat(glm::radians(-eulerAngles)));
+	
+	if (parent_ != nullptr)
+	{
+		//TODO: Rotate Local
+		worldTransform = parent_->worldTransform * localTransform;
+	}
+	else
+	{
+		worldTransform = localTransform;
+	}
 }
 
  }// namespace kdpace kd

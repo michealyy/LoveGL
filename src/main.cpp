@@ -22,10 +22,18 @@ int main(int, char**) {
 	
 	glfwMakeContextCurrent(window);
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-	glfwSwapInterval(0);
+
+	if (Vsync)
+	{
+		glfwSwapInterval(1);
+	}
+	else
+	{
+		glfwSwapInterval(0);
+	}
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	if (LINE_Polygon)
+	if (Line_Polygon)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
