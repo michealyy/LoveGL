@@ -24,7 +24,7 @@ void Mesh::Setup()
 
     AddVertices();
 
-    if (vertices_p_c.size() < 2)
+    if (vertices_p_c.size() < 2 && vertices_pos_tex.size() < 2)
     {
         fprintf(stderr, "[mesh] vertices size < 2");
         return;
@@ -49,6 +49,20 @@ void Mesh::Setup()
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void *)0);
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(va::P_C, Color));
+    }
+    else if(vertices_pos_tex.size() > 1)
+    {
+        GLsizei stride = sizeof(va::Pos_Tex);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, vertices_pos_tex.size() * stride, &vertices_pos_tex[0], GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void *)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(va::Pos_Tex, TexCoords));
     }
 }
 

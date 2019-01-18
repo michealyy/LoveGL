@@ -18,11 +18,10 @@ struct P_C
     glm::vec3 Color;
 };
 
-struct P_T_C
+struct Pos_Tex
 {
     glm::vec3 Position;
     glm::vec2 TexCoords;
-    glm::vec3 Color;
 };
 
 struct P_T_N_T_B
@@ -53,8 +52,9 @@ class Mesh : public Entity
     unsigned vao = 0;
     unsigned vbo = 0;
     unsigned ebo = 0;
-    std::vector<va::P_C> vertices_p_c;
     std::vector<unsigned int> indices;
+    std::vector<va::P_C> vertices_p_c;
+    std::vector<va::Pos_Tex> vertices_pos_tex;
     
   private:
     DISALLOW_COPY_AND_ASSIGN(Mesh)
