@@ -62,7 +62,7 @@ void Mesh::Update(float deltaTime)
     {
         return;
     }
-
+    
     material->Bind();
     material->SetMatrix("mvp", camera->projectMatrix * camera->GetViewMatrix() * worldTransform);
 

@@ -30,8 +30,8 @@ public:
   glm::mat4 projectMatrix{1.0f};
 
   bool canController = false;
-  float moveSpeed = 4.0f;
-  float rotateSpeed = 0.1f;
+  float moveSpeed = 0.1f;
+  float rotateSpeed = 10.f;
 
 protected:
   virtual void UpdateControl(float deltaTime);

@@ -24,7 +24,8 @@ void Entity::Setup()
 
 void Entity::Update(float deltaTime)
 {
-	if (!isStatic){
+	if (!isStatic)
+	{
 		UpdateModelMatrix();
 	}
 }
@@ -37,7 +38,7 @@ void Entity::AddChild(Entity *child)
 	}
 	child->parent_ = this;
 	children_.push_back(child);
-	
+
 	if (scene != nullptr)
 	{
 		scene->AddEntity(child);
@@ -70,10 +71,9 @@ void Entity::UpdateModelMatrix()
 {
 	mat4 temp(1.0f);
 	localTransform = translate(temp, position) * glm::scale(temp, scale) * mat4_cast(quat(glm::radians(-eulerAngles)));
-	
+
 	if (parent_ != nullptr)
 	{
-		//TODO: Rotate Local
 		worldTransform = parent_->worldTransform * localTransform;
 	}
 	else
@@ -82,4 +82,4 @@ void Entity::UpdateModelMatrix()
 	}
 }
 
- }// namespace kdpace kd
+} // namespace kd

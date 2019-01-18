@@ -49,7 +49,7 @@ void Camera::SetOrtho(vec2 size)
 
 mat4 Camera::GetViewMatrix()
 {
-    return inverse(mat4_cast(quat(this->eulerAngles))) * translate(mat4(1.0f), this->position);
+    return inverse(worldTransform);
 }
 
 void Camera::UpdateControl(float deltaTime)
@@ -66,24 +66,29 @@ void Camera::UpdateControl(float deltaTime)
     {
         double mousePosX, mousePosY;
         glfwGetCursorPos(window, &mousePosX, &mousePosY);
-        float x = (float)(lastMousePosY - mousePosY);
-        float y = (float)(lastMousePosX - mousePosX);
+        float x = (float)(mousePosY - lastMousePosY);
+        float y = (float)(mousePosX - lastMousePosX);
         eulerAngles += vec3(x * rotateSpeed * deltaTime, y * rotateSpeed * deltaTime, 0);
-
-        //mat4 modelMatrix = transform->GetModelMatrix();
-        //#include <glm/gtc/matrix_access.hpp>
-        //column(modelMatrix, 0);
+        
         if (glfwGetKey(window, GLFW_KEY_W))
         {
+            auto movedelta = worldTransform * vec4(0, 0, -1, 0) * moveSpeed;
+            position = position + vec3(movedelta.x, movedelta.y, movedelta.z);
         }
         if (glfwGetKey(window, GLFW_KEY_S))
         {
+            auto movedelta = worldTransform * vec4(0, 0, 1, 0) * moveSpeed;
+            position = position + vec3(movedelta.x, movedelta.y, movedelta.z);
         }
         if (glfwGetKey(window, GLFW_KEY_A))
         {
+            auto movedelta = worldTransform * vec4(-1, 0, 0, 0) * moveSpeed;
+            position = position + vec3(movedelta.x, movedelta.y, movedelta.z);
         }
         if (glfwGetKey(window, GLFW_KEY_D))
         {
+            auto movedelta = worldTransform * vec4(1, 0, 0, 0) * moveSpeed;
+            position = position + vec3(movedelta.x, movedelta.y, movedelta.z);
         }
     }
     else

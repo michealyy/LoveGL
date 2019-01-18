@@ -12,7 +12,7 @@ class Scene;
 
 class Entity
 {
-  public:
+public:
 	explicit Entity();
 	virtual ~Entity();
 
@@ -30,7 +30,7 @@ class Entity
 
 	bool notDeleteByScene = false;
 	Scene *scene = nullptr;
-	
+
 	bool isStatic = false;
 	glm::vec3 position{0.0f};
 	glm::vec3 scale{1.0f};
@@ -40,11 +40,11 @@ class Entity
 
 	bool isTransparent = false;
 
-  protected:
+protected:
 	std::vector<Entity *> children_;
 	Entity *parent_ = nullptr;
 
-  private:
+private:
 	DISALLOW_COPY_AND_ASSIGN(Entity)
 };
 
