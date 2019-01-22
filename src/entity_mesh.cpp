@@ -1,6 +1,7 @@
 #include "entity_mesh.h"
 #include <glad/glad.h>
 #include "engine.h"
+#include "renderer.h"
 
 using namespace std;
 
@@ -70,19 +71,14 @@ void Mesh::Update(float deltaTime)
 {
     Entity::Update(deltaTime);
 
-    auto camera = Engine::GetInstance()->mainCamera;
-
-    if (material == nullptr || camera == nullptr)
+    if (isTransparent)
     {
-        return;
+        Renderer::GetInstance()->AddTransparent(this);
     }
-    
-    material->Bind();
-    material->SetMatrix("mvp", camera->projectMatrix * camera->GetViewMatrix() * worldTransform);
-
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glDrawElements(GL_TRIANGLES, (int)indices.size(), GL_UNSIGNED_INT, 0);
+    else
+    {
+        Renderer::GetInstance()->AddOpaque(this);
+    }
 }
 
 } // namespace kd

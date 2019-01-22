@@ -2,6 +2,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include "scene.h"
+#include "engine.h"
 
 using namespace std;
 using namespace glm;
@@ -27,6 +28,11 @@ void Entity::Update(float deltaTime)
 	if (!isStatic)
 	{
 		UpdateModelMatrix();
+	}
+
+	if (Engine::GetInstance()->mainCamera)
+	{
+    	localToCameraTransform = Engine::GetInstance()->mainCamera->GetViewMatrix() * worldTransform;
 	}
 }
 

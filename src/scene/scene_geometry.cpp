@@ -25,8 +25,7 @@ void SceneGeometry::Setup()
     auto camera = new Camera();
     camera->name = "SceneGeometry camera";
     camera->canController = true;
-    camera->position = glm::vec3(1.5, 0, 5);
-    camera->eulerAngles = glm::vec3(0, 0, 45);
+    camera->position = glm::vec3(1.5f, 0, 5);
     Engine::GetInstance()->mainCamera = camera;
     AddEntity(camera);
 
@@ -35,9 +34,9 @@ void SceneGeometry::Setup()
 
     auto box1 = new Box(mat1, 1, 1, 1, vec3(1, 0, 0));
     box1->name = "box1";
-    box1->position = glm::vec3(3.f, 0, 0);
+    box1->position = glm::vec3(1.5f, 0, -2);
     // box1->scale = glm::vec3(0.5f, 0.5f, 1);
-    // box1->eulerAngles = glm::vec3(0, 0, 30);
+    box1->eulerAngles = glm::vec3(0, 0, 45);
     AddEntity(box1);
 
     auto box2 = new Box(mat1, 1.f, 1.f, 1, vec3(0, 1, 0));
@@ -63,8 +62,7 @@ void SceneGeometry::Setup()
     auto cone1 = new Cone(mat1);
     cone1->color = vec3(0, 1, 0);
     cone1->name = "cone1";
-    cone1->position = glm::vec3(1.5, 0, 0);
-    cone1->eulerAngles = glm::vec3(0, 0, 45);
+    cone1->position = glm::vec3(1.5f, 0, 0);
     AddEntity(cone1);
 
     Scene::Setup();

@@ -45,17 +45,17 @@ class Mesh : public Entity
     virtual void Update(float deltaTime) override;
 
     Material *material = nullptr;
+    unsigned vao = 0;
+    unsigned ebo = 0;
+    std::vector<unsigned int> indices;
 
   protected:
     virtual void AddVertices() = 0;
-    
-    unsigned vao = 0;
+
     unsigned vbo = 0;
-    unsigned ebo = 0;
-    std::vector<unsigned int> indices;
     std::vector<va::P_C> vertices_p_c;
     std::vector<va::Pos_Tex> vertices_pos_tex;
-    
+
   private:
     DISALLOW_COPY_AND_ASSIGN(Mesh)
 };

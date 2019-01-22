@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <string>
 #include <vector>
@@ -31,13 +31,17 @@ public:
 	bool notDeleteByScene = false;
 	Scene *scene = nullptr;
 
-	bool isStatic = false;
 	glm::vec3 position{0.0f};
 	glm::vec3 scale{1.0f};
 	glm::vec3 eulerAngles{0.0f};
 	glm::mat4 localTransform{1.0f};
 	glm::mat4 worldTransform{1.0f};
-
+	//给顶点着色器传mvp矩阵时候用到；在透明物体排序时候用到，取离摄像机距离。
+	glm::mat4 localToCameraTransform{1.0f};
+	
+	//静态实体，不会发生变换，不需要每帧运算变换矩阵
+	bool isStatic = false;
+	//半透明物体，渲染进行混合
 	bool isTransparent = false;
 
 protected:
@@ -45,6 +49,8 @@ protected:
 	Entity *parent_ = nullptr;
 
 private:
+	
+
 	DISALLOW_COPY_AND_ASSIGN(Entity)
 };
 

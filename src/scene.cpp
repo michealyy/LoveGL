@@ -1,5 +1,6 @@
 #include "scene.h"
 #include "engine.h"
+#include "renderer.h"
 
 using namespace std;
 
@@ -38,6 +39,8 @@ void Scene::Update(float deltaTime)
     {
         entity->Update(deltaTime);
     }
+    
+    Renderer::GetInstance()->Render();
 }
 
 } // namespace kd
