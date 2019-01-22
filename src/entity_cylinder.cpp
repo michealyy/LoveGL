@@ -2,7 +2,6 @@
 #include <cmath>
 
 using namespace glm;
-using namespace kd::va;
 
 namespace kd
 {
@@ -33,10 +32,9 @@ void Cylinder::GenerateCap(bool isTop, int startIndex)
         halfHeight = -height / 2.0f;
 
     //center point
-    P_C vertex0;
+    va::Pos vertex0;
     vertex0.Position = vec3(0, halfHeight, 0);
-    vertex0.Color = color;
-    this->vertices_p_c.push_back(vertex0);
+    this->vertices_pos.push_back(vertex0);
 
     for (int i = 0; i <= segments; i++)
     {
@@ -44,10 +42,9 @@ void Cylinder::GenerateCap(bool isTop, int startIndex)
         float x = radius * cos(segmentAngle);
         float y = radius * sin(segmentAngle);
 
-        P_C vertex;
+        va::Pos vertex;
         vertex.Position = vec3(x, halfHeight, y);
-        vertex.Color = color;
-        this->vertices_p_c.push_back(vertex);
+        this->vertices_pos.push_back(vertex);
     }
 
     for (int i = startIndex + 1; i <= startIndex + segments; i++)

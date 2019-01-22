@@ -17,6 +17,17 @@ Renderer::~Renderer()
 {
 }
 
+void Renderer::AddMesh(Mesh *mesh)
+{
+    if (mesh != nullptr && mesh->material != nullptr)
+    {
+        if (mesh->material->isTransparent)
+            AddTransparent(mesh);
+        else
+            AddOpaque(mesh);
+    }
+}
+
 void Renderer::Render()
 {
     //渲染非透明物体，开启深度测试，自动抛弃离摄像机远的片段
@@ -36,7 +47,7 @@ void Renderer::Render()
         DrawMesh(transparent_mesh);
     }
     glDisable(GL_BLEND);
-
+    
     opaque_meshes_.clear();
     transparent_meshes_.clear();
 }
@@ -52,7 +63,8 @@ void Renderer::DrawMesh(Mesh *mesh)
     }
 
     material->Bind();
-    material->SetMatrix("mvp", camera->projectMatrix * mesh->localToCameraTransform);
+    material->TransferUniformsToShader();
+    material->GetShader()->SetMatrix("mvp", camera->projectMatrix * mesh->localToCameraTransform);
 
     glBindVertexArray(mesh->vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);

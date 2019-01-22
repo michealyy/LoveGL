@@ -16,7 +16,7 @@ Engine::~Engine() {
 }
 
 void Engine::OnSetup() {
-	//LoadTextures();
+	LoadTextures();
 	LoadShaders();
 	LoadMaterials();
 	

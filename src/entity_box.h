@@ -10,7 +10,7 @@ namespace kd
 class Box : public Mesh
 {
   public:
-    explicit Box(Material *mat, float width, float height, float length, glm::vec3 color);
+    explicit Box(Material *mat, float width, float height, float length);
     virtual ~Box();
 
     virtual void AddVertices() override;

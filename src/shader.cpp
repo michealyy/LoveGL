@@ -8,14 +8,16 @@ using namespace std;
 using namespace glm;
 using namespace kd;
 
-Shader::Shader(const string& name, const string& path){
+Shader::Shader(const string &name, const string &path)
+{
 	this->name_ = name;
 	this->path_ = path;
 
 	ifstream file;
 	stringstream stream;
 	file.open(path);
-	if (!file.good()) {
+	if (!file.good())
+	{
 		string msg = "Shader file not find:";
 		msg.append(path);
 		fprintf(stderr, msg.c_str());
@@ -34,7 +36,8 @@ Shader::Shader(const string& name, const string& path){
 
 	stringstream uniformsStream(uniformsStr);
 	string uniform;
-	while (std::getline(uniformsStream, uniform)) {
+	while (std::getline(uniformsStream, uniform))
+	{
 		stringstream _uniform(uniform);
 		string name;
 		_uniform >> name;
@@ -45,11 +48,13 @@ Shader::Shader(const string& name, const string& path){
 
 		std::any _value;
 
-		if (type == "float") {
+		if (type == "float")
+		{
 			_value = std::stof(value);
 		}
-		else if (type == "texture") {
-			_value = value;//StringCast<unsigned int>(value);
+		else if (type == "texture")
+		{
+			_value = value; //StringCast<unsigned int>(value);
 		}
 
 		this->uniforms_[name] = _value;
@@ -76,48 +81,66 @@ Shader::Shader(const string& name, const string& path){
 	glDeleteShader(fragmentShader);
 }
 
-Shader::~Shader(){
+Shader::~Shader()
+{
 	glDeleteProgram(program_);
 }
 
-unsigned Shader::CreateGLShader(int type, const char* source){
-    unsigned shader;
-    shader = glCreateShader(type);
-    glShaderSource(shader, 1, &source, NULL);
-    glCompileShader(shader);
+unsigned Shader::CreateGLShader(int type, const char *source)
+{
+	unsigned shader;
+	shader = glCreateShader(type);
+	glShaderSource(shader, 1, &source, NULL);
+	glCompileShader(shader);
 
 	int status;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-    if(status != GL_TRUE)
-    {
-        GLchar infoLog[1024];
-        glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+	if (status != GL_TRUE)
+	{
+		GLchar infoLog[1024];
+		glGetShaderInfoLog(shader, 1024, NULL, infoLog);
 		fprintf(stderr, infoLog);
 	}
 
-    return shader;
+	return shader;
 }
 
-void Shader::Bind(){
+void Shader::Bind()
+{
 	glUseProgram(program_);
 }
 
-void Shader::SetFloat(const char * name, float value){
+void Shader::SetFloat(const char *name, float value)
+{
 	auto location = glGetUniformLocation(program_, name);
-	glUniform1f(location, value);
+	if (location != -1)
+		glUniform1f(location, value);
 }
 
-void Shader::SetInt(const char * name, int value){
+void Shader::SetInt(const char *name, int value)
+{
 	auto location = glGetUniformLocation(program_, name);
-	glUniform1i(location, value);
+	if (location != -1)
+		glUniform1i(location, value);
 }
 
-void Shader::SetVector3(const char * name, vec3 vec3){
+void Shader::SetVector3(const char *name, vec3 vec3)
+{
 	auto location = glGetUniformLocation(program_, name);
-	glUniform3f(location, vec3.x, vec3.y, vec3.z);
+	if (location != -1)
+		glUniform3f(location, vec3.x, vec3.y, vec3.z);
 }
 
-void Shader::SetMatrix(const char * name, mat4 matrix){
+void Shader::SetVector4(const char *name, vec4 vec4)
+{
 	auto location = glGetUniformLocation(program_, name);
-	glUniformMatrix4fv(location, 1, GL_FALSE, &matrix[0][0]);
+	if (location != -1)
+		glUniform4f(location, vec4.x, vec4.y, vec4.z, vec4.w);
+}
+
+void Shader::SetMatrix(const char *name, mat4 matrix)
+{
+	auto location = glGetUniformLocation(program_, name);
+	if (location != -1)
+		glUniformMatrix4fv(location, 1, GL_FALSE, &matrix[0][0]);
 }

@@ -41,8 +41,6 @@ public:
 	
 	//静态实体，不会发生变换，不需要每帧运算变换矩阵
 	bool isStatic = false;
-	//半透明物体，渲染进行混合
-	bool isTransparent = false;
 
 protected:
 	std::vector<Entity *> children_;

@@ -16,6 +16,7 @@ namespace kd {
 		void SetFloat(const char* name, float value);
 		void SetInt(const char* name,int value);
 		void SetVector3(const char* name, glm::vec3 vec3);
+		void SetVector4(const char* name, glm::vec4 vec4);
 		void SetMatrix(const char* name, glm::mat4 matrix);
 
 		inline unsigned GetGLProgramId() { return program_; }

@@ -13,6 +13,7 @@ class Renderer final : public Singleton<Renderer>
 public:
   explicit Renderer();
   ~Renderer();
+  void AddMesh(Mesh *mesh);
   inline void AddOpaque(Mesh *mesh) { opaque_meshes_.push_back(mesh); }
   inline void AddTransparent(Mesh *mesh) { transparent_meshes_.push_back(mesh); }
   void Render();

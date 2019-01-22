@@ -12,10 +12,9 @@ namespace kd
 namespace va
 {
 
-struct P_C
+struct Pos
 {
     glm::vec3 Position;
-    glm::vec3 Color;
 };
 
 struct Pos_Tex
@@ -53,7 +52,7 @@ class Mesh : public Entity
     virtual void AddVertices() = 0;
 
     unsigned vbo = 0;
-    std::vector<va::P_C> vertices_p_c;
+    std::vector<va::Pos> vertices_pos;
     std::vector<va::Pos_Tex> vertices_pos_tex;
 
   private:

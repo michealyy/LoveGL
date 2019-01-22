@@ -25,7 +25,7 @@ void Mesh::Setup()
 
     AddVertices();
 
-    if (vertices_p_c.size() < 2 && vertices_pos_tex.size() < 2)
+    if (vertices_pos.size() < 2 && vertices_pos_tex.size() < 2)
     {
         fprintf(stderr, "[mesh] vertices size < 2");
         return;
@@ -37,21 +37,19 @@ void Mesh::Setup()
 
     glBindVertexArray(vao);
 
-    if (vertices_p_c.size() > 1)
+    if (vertices_pos.size() > 1)
     {
-        GLsizei stride = sizeof(va::P_C);
+        GLsizei stride = sizeof(va::Pos);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, vertices_p_c.size() * stride, &vertices_p_c[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertices_pos.size() * stride, &vertices_pos[0], GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void *)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(va::P_C, Color));
     }
-    else if(vertices_pos_tex.size() > 1)
+    else if (vertices_pos_tex.size() > 1)
     {
         GLsizei stride = sizeof(va::Pos_Tex);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -63,7 +61,7 @@ void Mesh::Setup()
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void *)0);
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(va::Pos_Tex, TexCoords));
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(va::Pos_Tex, TexCoords));
     }
 }
 
@@ -71,14 +69,7 @@ void Mesh::Update(float deltaTime)
 {
     Entity::Update(deltaTime);
 
-    if (isTransparent)
-    {
-        Renderer::GetInstance()->AddTransparent(this);
-    }
-    else
-    {
-        Renderer::GetInstance()->AddOpaque(this);
-    }
+    Renderer::GetInstance()->AddMesh(this);
 }
 
 } // namespace kd

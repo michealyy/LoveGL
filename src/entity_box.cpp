@@ -6,8 +6,8 @@ using namespace kd::va;
 namespace kd
 {
 
-Box::Box(Material *mat, float width, float height, float depth, glm::vec3 color)
-    : Mesh(mat), width(width), height(height), depth(depth), color(color)
+Box::Box(Material *mat, float width, float height, float depth)
+    : Mesh(mat), width(width), height(height), depth(depth)
 {
 }
 
@@ -21,45 +21,45 @@ void Box::AddVertices()
     float halfHeight = height / 2.0f;
     float halfDepth = depth / 2.0f;
 
-    P_C vertex0;
+    Pos_Tex vertex0;
     vertex0.Position = vec3(halfWidth, halfHeight, halfDepth);
-    vertex0.Color = color;
-    this->vertices_p_c.push_back(vertex0);
+    vertex0.TexCoords = vec2(1.0f, 1.0f);
+    this->vertices_pos_tex.push_back(vertex0);
 
-    P_C vertex1;
+    Pos_Tex vertex1;
     vertex1.Position = vec3(halfWidth, -halfHeight, halfDepth);
-    vertex1.Color = color;
-    this->vertices_p_c.push_back(vertex1);
+    vertex1.TexCoords = vec2(1.0f, 0.0f);
+    this->vertices_pos_tex.push_back(vertex1);
 
-    P_C vertex2;
+    Pos_Tex vertex2;
     vertex2.Position = vec3(-halfWidth, -halfHeight, halfDepth);
-    vertex2.Color = color;
-    this->vertices_p_c.push_back(vertex2);
+    vertex2.TexCoords = vec2(0.0f, 0.0f);
+    this->vertices_pos_tex.push_back(vertex2);
 
-    P_C vertex3;
+    Pos_Tex vertex3;
     vertex3.Position = vec3(-halfWidth, halfHeight, halfDepth);
-    vertex3.Color = color;
-    this->vertices_p_c.push_back(vertex3);
+    vertex3.TexCoords = vec2(0.0f, 1.0f);
+    this->vertices_pos_tex.push_back(vertex3);
 
-    P_C vertex4;
+    Pos_Tex vertex4;
     vertex4.Position = vec3(halfWidth, halfHeight, -halfDepth);
-    vertex4.Color = color;
-    this->vertices_p_c.push_back(vertex4);
+    vertex4.TexCoords = vec2(1.0f, 1.0f);
+    this->vertices_pos_tex.push_back(vertex4);
 
-    P_C vertex5;
+    Pos_Tex vertex5;
     vertex5.Position = vec3(halfWidth, -halfHeight, -halfDepth);
-    vertex5.Color = color;
-    this->vertices_p_c.push_back(vertex5);
+    vertex5.TexCoords = vec2(1.0f, 0.0f);
+    this->vertices_pos_tex.push_back(vertex5);
 
-    P_C vertex6;
+    Pos_Tex vertex6;
     vertex6.Position = vec3(-halfWidth, -halfHeight, -halfDepth);
-    vertex6.Color = color;
-    this->vertices_p_c.push_back(vertex6);
+    vertex6.TexCoords = vec2(0.0f, 0.0f);
+    this->vertices_pos_tex.push_back(vertex6);
 
-    P_C vertex7;
+    Pos_Tex vertex7;
     vertex7.Position = vec3(-halfWidth, halfHeight, -halfDepth);
-    vertex7.Color = color;
-    this->vertices_p_c.push_back(vertex7);
+    vertex7.TexCoords = vec2(0.0f, 1.0f);
+    this->vertices_pos_tex.push_back(vertex7);
 
     //front
     this->indices.push_back(0);

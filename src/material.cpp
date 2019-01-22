@@ -1,4 +1,4 @@
-#include <glad/glad.h>
+﻿#include <glad/glad.h>
 #include "material.h"
 #include "engine.h"
 
@@ -8,9 +8,11 @@ using namespace kd;
 
 unsigned Material::MAX_ID = 1;
 
-Material::Material(const string & name) {
+Material::Material(const string &name)
+{
 	auto mat = Engine::GetInstance()->GetMaterial(name);
-	if (mat != nullptr) {
+	if (mat != nullptr)
+	{
 		fprintf(stderr, "[Material] have same name material: %s\n", name.c_str());
 		return;
 	}
@@ -20,60 +22,106 @@ Material::Material(const string & name) {
 	Engine::GetInstance()->AddMaterial(name, this);
 }
 
-Material::~Material() {
+Material::~Material()
+{
 }
 
-void Material::Bind() {
-	if (shader_ != nullptr) {
+void Material::Bind()
+{
+	if (shader_ != nullptr)
+	{
 		shader_->Bind();
 	}
-	else {
+	else
+	{
 		fprintf(stderr, "[Material] bind nil shader");
 	}
 
-	for (int i = 0; i < textures_.size(); i++) {
+	for (int i = 0; i < textures_.size(); i++)
+	{
 		auto texture_unit = textures_[i];
 		glActiveTexture(GL_TEXTURE0 + texture_unit.Index);
 		auto texture = Engine::GetInstance()->GetTexture(texture_unit.Name);
-		if (texture != nullptr) {
+		if (texture != nullptr)
+		{
 			texture->Bind();
 		}
-		else {
+		else
+		{
 			fprintf(stderr, "[Material] can not find texture by name: %s\n", texture_unit.Name.c_str());
 		}
 	}
 }
 
-void Material::LoadFormFile(const string & path) {
+void Material::LoadFormFile(const string &path)
+{
+	//TODO: 定义材质格式
 }
 
-void Material::SetShader(const string & shader_name) {
+void Material::SetShader(const string &shader_name)
+{
 	auto shader = Engine::GetInstance()->GetShader(shader_name);
-	if (shader == nullptr) {
+	if (shader == nullptr)
+	{
 		fprintf(stderr, "[Material] can not find shader by name: %s\n", shader_name.c_str());
 	}
-	else {
+	else
+	{
 		shader_ = shader;
 		shader_name_ = shader_name;
 	}
 }
 
-void Material::SetFloat(const char * name, float value) {
-	shader_->SetFloat(name, value);
+void Material::SetFloat(const char *name, float value)
+{
+	uniforms_[name] = ShaderUniform{"float", value};
 }
 
-void Material::SetInt(const char * name, int value) {
-	shader_->SetInt(name, value);
+void Material::SetVector3(const char *name, vec3 vec3)
+{
+	uniforms_[name] = ShaderUniform{"vector3", vec3};
 }
 
-void Material::SetVector3(const char * name, vec3 vec3) {
-	shader_->SetVector3(name, vec3);
+void Material::SetVector4(const char *name, vec4 vec4)
+{
+	uniforms_[name] = ShaderUniform{"vector4", vec4};
 }
 
-void Material::SetMatrix(const char * name, mat4 matrix) {
-	shader_->SetMatrix(name, matrix);
+void Material::SetColor(vec3 color)
+{
+	uniforms_["color"] = ShaderUniform{"vector3", color};
 }
 
-bool Material::operator==(const Material & other) {
+void Material::SetAlpha(float alpha)
+{
+	if (alpha < 1.0f)
+		isTransparent = true;
+	else
+		isTransparent = false;
+
+	uniforms_["alpha"] = ShaderUniform{"float", alpha};
+}
+
+void Material::TransferUniformsToShader()
+{
+	for (auto iter = uniforms_.begin(); iter != uniforms_.end(); iter++)
+	{
+		if (iter->second.Type == "float")
+		{
+			shader_->SetFloat(iter->first.c_str(), any_cast<float>(iter->second.Value));
+		}
+		else if (iter->second.Type == "vector3")
+		{
+			shader_->SetVector3(iter->first.c_str(), any_cast<vec3>(iter->second.Value));
+		}
+		else if (iter->second.Type == "vector4")
+		{
+			shader_->SetVector4(iter->first.c_str(), any_cast<vec4>(iter->second.Value));
+		}
+	}
+}
+
+bool Material::operator==(const Material &other)
+{
 	return current_id_ == other.current_id_;
 }
