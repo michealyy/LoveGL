@@ -30,13 +30,13 @@ void Renderer::AddMesh(Mesh *mesh)
 
 void Renderer::Render()
 {
-    //渲染非透明物体，开启深度测试，自动抛弃离摄像机远的片段
+    //开启深度测试，自动抛弃离摄像机远的片段
     glEnable(GL_DEPTH_TEST);
+
     for (auto opaque_mesh : opaque_meshes_)
     {
         DrawMesh(opaque_mesh);
     }
-    glDisable(GL_DEPTH_TEST);
 
     //渲染透明物体，开启混合，需要自己处理渲染次序不一样造成不一样的效果
     SortTransparent();
@@ -47,6 +47,8 @@ void Renderer::Render()
         DrawMesh(transparent_mesh);
     }
     glDisable(GL_BLEND);
+    
+    glDisable(GL_DEPTH_TEST);
     
     opaque_meshes_.clear();
     transparent_meshes_.clear();

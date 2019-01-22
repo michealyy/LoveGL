@@ -95,7 +95,7 @@ void Camera::UpdateControl(float deltaTime)
             auto movedelta = worldTransform * vec4(0, 1, 0, 0) * moveSpeed;
             position = position + vec3(movedelta.x, movedelta.y, movedelta.z);
         }
-        if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL))
+        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT))
         {
             auto movedelta = worldTransform * vec4(0, -1, 0, 0) * moveSpeed;
             position = position + vec3(movedelta.x, movedelta.y, movedelta.z);

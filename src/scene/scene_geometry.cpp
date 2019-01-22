@@ -61,6 +61,15 @@ void SceneGeometry::Setup()
     box2->position = glm::vec3(0, 0, -2);
     root->AddChild(box2);
 
+    auto mat4 = new Material("unlit_pos_3");
+    mat4->SetShader("unlit_pos");
+    mat4->SetColor(vec3(0, 0, 1));
+    mat4->SetAlpha(0.2f);
+    auto box3 = new Box(mat4, 1, 1, 1);
+    box3->name = "box3";
+    box3->position = glm::vec3(0, 0, 2);
+    root->AddChild(box3);
+
     Scene::Setup();
 }
 
