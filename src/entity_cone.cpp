@@ -7,8 +7,9 @@ namespace kd
 {
 
 Cone::Cone(Material *mat, float radius, int segments, int height)
-    : Mesh(mat), radius(radius), segments(segments), height(height)
+    : radius(radius), segments(segments), height(height)
 {
+    this->material = mat;
 }
 
 Cone::~Cone()

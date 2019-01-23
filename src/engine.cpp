@@ -1,6 +1,7 @@
 #include <filesystem>
 #include "config.h"
 #include "engine.h"
+#include "renderer.h"
 #include "scene/scene_geometry.h"
 
 using namespace std;
@@ -20,6 +21,8 @@ void Engine::OnSetup() {
 	LoadShaders();
 	LoadMaterials();
 	
+	Renderer::GetInstance()->SetupUIBatchRender();
+
 	this->currentScene =  new SceneGeometry();
 	this->currentScene->Setup();
 }
@@ -97,6 +100,9 @@ void Engine::LoadShaders() {
 }
 
 void Engine::LoadMaterials() {
+	auto ui_default = new Material("ui_default");
+    ui_default->SetShader("unlit_pos_tex");
+	ui_default->SetTexture(0, "white");
 }
 
 void Engine::HandleUIRootInput() {

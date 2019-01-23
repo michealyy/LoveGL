@@ -7,8 +7,9 @@ namespace kd
 {
 
 Box::Box(Material *mat, float width, float height, float depth)
-    : Mesh(mat), width(width), height(height), depth(depth)
+    : width(width), height(height), depth(depth)
 {
+    this->material = mat;
 }
 
 Box::~Box()

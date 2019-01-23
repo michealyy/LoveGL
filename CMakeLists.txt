@@ -26,5 +26,6 @@ include_directories("deps")
 #源代码文件夹
 aux_source_directory(src DIR_SRC)
 aux_source_directory(src/scene DIR_SRC_SCENE)
+aux_source_directory(src/ui DIR_SRC_UI)
 
-add_executable(kdRenderStudio ${GLAD} ${DIR_SRC} ${DIR_SRC_SCENE})
+add_executable(kdRenderStudio ${GLAD} ${DIR_SRC} ${DIR_SRC_SCENE} ${DIR_SRC_UI})

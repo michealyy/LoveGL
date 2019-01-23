@@ -8,7 +8,7 @@ using namespace std;
 namespace kd
 {
 
-Mesh::Mesh(Material *mat) : material(mat)
+Mesh::Mesh()
 {
 }
 

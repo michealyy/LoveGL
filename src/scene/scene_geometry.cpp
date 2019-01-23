@@ -6,6 +6,7 @@
 #include "../entity_box.h"
 #include "../entity_cylinder.h"
 #include "../entity_cone.h"
+#include "../ui/ui_rect.h"
 
 using namespace glm;
 
@@ -29,7 +30,7 @@ void SceneGeometry::Setup()
     auto camera = new Camera();
     camera->name = "SceneGeometry camera";
     camera->canController = true;
-    camera->position = glm::vec3(0, 1, 5);
+    camera->position = vec3(0, 1, 5);
     Engine::GetInstance()->mainCamera = camera;
     AddEntity(camera);
 
@@ -50,15 +51,22 @@ void SceneGeometry::Setup()
     auto cone1 = new Cone(mat2);
     cone1->color = vec3(0, 1, 0);
     cone1->name = "cone1";
-    cone1->position = glm::vec3(-2, 0, 0);
+    cone1->position = vec3(-2, 0, 0);
     root->AddChild(cone1);
+
+    auto ui1 = new UIRect();
+    ui1->name = "ui1";
+    ui1->position = vec3(200, 200, 0);
+    //ui1->eulerAngles = vec3(0, 0, 45);
+    //ui1->scale = vec3(2, 2, 2);
+    cone1->AddChild(ui1);
 
     auto mat3 = new Material("unlit_pos_tex_1");
     mat3->SetShader("unlit_pos_tex");
     mat3->SetTexture(0, "wood");
     auto box2 = new Box(mat3, 1, 1, 1);
     box2->name = "box2";
-    box2->position = glm::vec3(0, 0, -2);
+    box2->position = vec3(0, 0, -2);
     root->AddChild(box2);
 
     auto mat4 = new Material("unlit_pos_3");
@@ -67,7 +75,7 @@ void SceneGeometry::Setup()
     mat4->SetAlpha(0.2f);
     auto box3 = new Box(mat4, 1, 1, 1);
     box3->name = "box3";
-    box3->position = glm::vec3(0, 0, 2);
+    box3->position = vec3(0, 0, 2);
     root->AddChild(box3);
 
     Scene::Setup();

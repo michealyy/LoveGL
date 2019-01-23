@@ -1,6 +1,7 @@
 ﻿#include "renderer.h"
 #include <algorithm>
 #include <glad/glad.h>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include "engine.h"
 
@@ -17,6 +18,35 @@ Renderer::~Renderer()
 {
 }
 
+void Renderer::SetupUIBatchRender()
+{
+    //2DUI投影矩阵
+    int width, height;
+    glfwGetWindowSize(Engine::GetInstance()->GetMainWindow(), &width, &height);
+    glm::mat4 projectionMatrix = glm::ortho(0.f, (float)width, 0.f, (float)height, -10.f, 10.f);
+    glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0, 0, 1), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    ui_project_view_matrix_ = projectionMatrix * viewMatrix;
+
+    //批渲染支持。先申请一个buffer，后面累积完顶点数据再复制到这个buffer
+    glGenVertexArrays(1, &ui_vao_);
+    glBindVertexArray(ui_vao_);
+    glGenBuffers(2, ui_vbo_);
+    glBindBuffer(GL_ARRAY_BUFFER, ui_vbo_[0]);
+    //Position
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(va::Pos_Tex), (void *)0);
+    //Texture Coords
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(va::Pos_Tex), (void *)offsetof(va::Pos_Tex, TexCoords));
+    //element
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ui_vbo_[1]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ui_indices_[0]) * INDEX_VBO_SIZE, ui_indices_, GL_STATIC_DRAW);
+    //unbind
+    glBindVertexArray(0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 void Renderer::AddMesh(Mesh *mesh)
 {
     if (mesh != nullptr && mesh->material != nullptr)
@@ -29,6 +59,17 @@ void Renderer::AddMesh(Mesh *mesh)
 }
 
 void Renderer::Render()
+{
+    RenderSkyBox();
+    //Render3DObjects();
+    BatchRenderUI();
+}
+
+void Renderer::RenderSkyBox()
+{
+}
+
+void Renderer::Render3DObjects()
 {
     //开启深度测试，自动抛弃离摄像机远的片段
     glEnable(GL_DEPTH_TEST);
@@ -47,9 +88,9 @@ void Renderer::Render()
         DrawMesh(transparent_mesh);
     }
     glDisable(GL_BLEND);
-    
+
     glDisable(GL_DEPTH_TEST);
-    
+
     opaque_meshes_.clear();
     transparent_meshes_.clear();
 }
@@ -81,6 +122,84 @@ void Renderer::SortTransparent()
         auto b_z = glm::column(b->localToCameraTransform, 3).z;
         return a_z < b_z;
     });
+}
+
+void Renderer::BatchRenderUI()
+{
+    //glEnable(GL_CULL_FACE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    bool first_flag = true;
+    for (auto rect : rect_list_)
+    {
+        //不同材质生成一个DrawCall
+        unsigned current_material_id = rect.material_id;
+        if (!first_flag && ui_last_material_id_ != current_material_id)
+        {
+            GenerateUIDrawCall();
+        }
+        //Buffer满了
+        if (ui_vertex_index_ + sizeof(va::Pos_Tex) * 4 >= VBO_SIZE)
+        {
+            GenerateUIDrawCall();
+        }
+        //叠加rect顶点信息
+        ui_vertices_[ui_vertex_index_].Position = rect.right_bottom;
+        ui_vertices_[ui_vertex_index_].TexCoords = glm::vec2(1, 1);
+        ui_vertices_[ui_vertex_index_ + 1].Position = rect.right_top;
+        ui_vertices_[ui_vertex_index_ + 1].TexCoords = glm::vec2(1, 0);
+        ui_vertices_[ui_vertex_index_ + 2].Position = rect.left_top;
+        ui_vertices_[ui_vertex_index_ + 2].TexCoords = glm::vec2(0, 0);
+        ui_vertices_[ui_vertex_index_ + 3].Position = rect.left_bottom;
+        ui_vertices_[ui_vertex_index_ + 3].TexCoords = glm::vec2(0, 1);
+        //叠加顶点绘制索引
+        ui_indices_[ui_element_index_] = ui_vertex_index_;
+        ui_indices_[ui_element_index_ + 1] = ui_vertex_index_ + 1;
+        ui_indices_[ui_element_index_ + 2] = ui_vertex_index_ + 2;
+        ui_indices_[ui_element_index_ + 3] = ui_vertex_index_;
+        ui_indices_[ui_element_index_ + 4] = ui_vertex_index_ + 2;
+        ui_indices_[ui_element_index_ + 5] = ui_vertex_index_ + 3;
+
+        ui_vertex_index_ = ui_vertex_index_ + 4;
+        ui_element_index_ = ui_element_index_ + 6;
+        ui_last_material_id_ = current_material_id;
+        first_flag = false;
+    }
+    //绘制最后剩余的rects
+    GenerateUIDrawCall();
+
+    rect_list_.clear();
+
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_BLEND);
+}
+
+void Renderer::GenerateUIDrawCall()
+{
+    auto material = Engine::GetInstance()->GetMaterialById(ui_last_material_id_);
+	material->Bind();
+    material->GetShader()->SetMatrix("mvp", ui_project_view_matrix_);
+
+	glBindVertexArray(ui_vao_);
+
+    //复制顶点数据到Buffer
+	glBindBuffer(GL_ARRAY_BUFFER, ui_vbo_[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(ui_vertices_[0]) * ui_vertex_index_, nullptr, GL_STATIC_DRAW);
+	void *buf = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+	memcpy(buf, ui_vertices_, sizeof(ui_vertices_[0]) * ui_vertex_index_);
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ui_vbo_[1]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ui_indices_[0]) * ui_element_index_, ui_indices_, GL_STATIC_DRAW);
+	glDrawElements(GL_TRIANGLES, ui_element_index_, GL_UNSIGNED_SHORT, 0);
+
+	// Engine::GetInstance()->ui_vertices_ = Engine::GetInstance()->ui_vertices_ + vertex_index;
+	// Engine::GetInstance()->ui_draw_call_++;
+
+	ui_vertex_index_ = 0;
+	ui_element_index_ = 0;
 }
 
 } // namespace kd
