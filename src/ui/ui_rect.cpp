@@ -19,31 +19,39 @@ UIRect::~UIRect()
 {
 }
 
+void UIRect::SetImage(const std::string &name)
+{
+    std::string mat_name("ui_");
+    mat_name.append(name);
+
+    material = Engine::GetInstance()->GetMaterial(mat_name);
+    if (material == nullptr)
+    {
+        material = new Material(mat_name);
+        material->SetShader("unlit_pos_tex");
+        material->SetTexture(0, name);
+    }
+}
+
 void UIRect::Update(float deltaTime)
 {
     Entity::Update(deltaTime);
-    
-    auto a= translate(mat4(1.f), vec3(100.f,100.f,0)) * vec4(100.f, 100.f, 0.f, 0.f);
 
     RectData rect;
-    rect.right_bottom = worldTransform * vec4(width, 0, 0, 0);
-    rect.right_top = worldTransform * vec4(width, height, 0, 0);
-    rect.left_top = worldTransform * vec4(0, height, 0, 0);
-    rect.left_bottom = worldTransform * vec4(0, 0, 0, 0);
-    
+    rect.right_bottom = worldTransform * vec4(width, 0, 0, 1);
+    rect.right_top = worldTransform * vec4(width, height, 0, 1);
+    rect.left_top = worldTransform * vec4(0, height, 0, 1);
+    rect.left_bottom = worldTransform * vec4(0, 0, 0, 1);
+
     rect.depth = depth;
-    
-    if (material && material->GetShader())
-    {
-        rect.material_id = material->GetID();
-        material->GetShader()->SetVector3("color", this->color);
-        material->GetShader()->SetFloat("alpha", this->alpha);
-    }
-    else
-    {
-        rect.material_id = Engine::GetInstance()->GetMaterial("ui_default")->GetID();
-    }
-    
+
+    if (material == nullptr || material->GetShader() == nullptr)
+        material = Engine::GetInstance()->GetMaterial("ui_default");
+
+    rect.material_id = material->GetID();
+    material->GetShader()->SetVector3("color", this->color);
+    material->GetShader()->SetFloat("alpha", this->alpha);
+
     Renderer::GetInstance()->AddUIRect(rect);
 }
 

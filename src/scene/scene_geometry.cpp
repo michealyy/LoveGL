@@ -23,6 +23,21 @@ SceneGeometry::~SceneGeometry()
 
 void SceneGeometry::Setup()
 {
+    auto ui_root = new Entity();
+    ui_root->name = "UIRoot";
+    AddEntity(ui_root);
+
+    auto ui1 = new UIRect();
+    ui1->SetImage("demo");
+    ui1->position = vec3(0, 200, 0);
+    ui_root->AddChild(ui1);
+    
+    auto ui2 = new UIRect();
+    ui2->SetImage("demo");
+    ui2->position = vec3(200, 0, 0);
+    ui1->AddChild(ui2);
+
+
     auto root = new Entity();
     root->name = "Root";
     AddEntity(root);
@@ -53,13 +68,6 @@ void SceneGeometry::Setup()
     cone1->name = "cone1";
     cone1->position = vec3(-2, 0, 0);
     root->AddChild(cone1);
-
-    auto ui1 = new UIRect();
-    ui1->name = "ui1";
-    ui1->position = vec3(200, 200, 0);
-    //ui1->eulerAngles = vec3(0, 0, 45);
-    //ui1->scale = vec3(2, 2, 2);
-    cone1->AddChild(ui1);
 
     auto mat3 = new Material("unlit_pos_tex_1");
     mat3->SetShader("unlit_pos_tex");

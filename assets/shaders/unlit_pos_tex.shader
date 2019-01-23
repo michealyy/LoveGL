@@ -27,5 +27,5 @@ uniform float alpha;
 
 void main()
 {
-    FragColor = vec4(1,0,0,1);//texture(uTexture, texCoord) * vec4(color, alpha);
+    FragColor = texture(uTexture, texCoord) * vec4(color, alpha);
 } 

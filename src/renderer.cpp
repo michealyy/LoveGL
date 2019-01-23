@@ -23,6 +23,7 @@ void Renderer::SetupUIBatchRender()
     //2DUI投影矩阵
     int width, height;
     glfwGetWindowSize(Engine::GetInstance()->GetMainWindow(), &width, &height);
+    //坐下为原点，分辨率为大小
     glm::mat4 projectionMatrix = glm::ortho(0.f, (float)width, 0.f, (float)height, -10.f, 10.f);
     glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0, 0, 1), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
     ui_project_view_matrix_ = projectionMatrix * viewMatrix;
@@ -61,7 +62,7 @@ void Renderer::AddMesh(Mesh *mesh)
 void Renderer::Render()
 {
     RenderSkyBox();
-    //Render3DObjects();
+    Render3DObjects();
     BatchRenderUI();
 }
 

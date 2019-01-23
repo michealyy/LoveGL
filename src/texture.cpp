@@ -35,7 +35,7 @@ void Texture::Bind()
 
 void Texture::LoadFormFile(const std::string &path)
 {
-	stbi_set_flip_vertically_on_load(true);
+	//stbi_set_flip_vertically_on_load(true);
 
 	unsigned texture(0);
 	glGenTextures(1, &texture);

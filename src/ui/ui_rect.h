@@ -16,7 +16,8 @@ public:
   virtual ~UIRect();
 
   virtual void Update(float deltaTime) override;
-  //void SetImage(const std::string& name);
+  //方便创建材质用。如果要设置不同color，alpha需要创建新材质
+  void SetImage(const std::string& name);
 
   float width = 0.0f;
   float height = 0.0f;
