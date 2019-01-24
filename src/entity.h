@@ -34,6 +34,8 @@ public:
 	glm::vec3 position{0.0f};
 	glm::vec3 scale{1.0f};
 	glm::vec3 eulerAngles{0.0f};
+	glm::vec3 worldPosition{0.0f};
+	glm::vec3 worldScale{0.0f};
 	glm::mat4 localTransform{1.0f};
 	glm::mat4 worldTransform{1.0f};
 	//给顶点着色器传mvp矩阵时候用到；在透明物体排序时候用到，取离摄像机距离。

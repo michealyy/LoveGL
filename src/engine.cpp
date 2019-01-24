@@ -6,76 +6,106 @@
 
 using namespace std;
 
-namespace kd {
-	
+namespace kd
+{
+
 Engine::Engine()
 {
 }
 
-Engine::~Engine() {
+Engine::~Engine()
+{
 	SafeDelete(currentScene);
+	SafeDelete(ui_root);
 }
 
-void Engine::OnSetup() {
+void Engine::OnSetup()
+{
 	LoadTextures();
 	LoadShaders();
 	LoadMaterials();
-	
+
 	Renderer::GetInstance()->SetupUIBatchRender();
 
-	this->currentScene =  new SceneGeometry();
+	this->currentScene = new SceneGeometry();
 	this->currentScene->Setup();
+
+	ui_root = new ui::UIRoot();
+	ui_root->Setup();
 }
 
-void Engine::OnUpdate(){
+void Engine::OnUpdate()
+{
 	float _time = (float)glfwGetTime();
 	float deltaTime = _time - lastTime;
 	lastTime = _time;
-	
+
 	this->currentScene->Update(deltaTime);
+
+	if (ui_root)
+	{
+		HandleUIRootInput();
+		ui_root->Update(deltaTime);
+	}
+
+	ui_draw_call = 0;
+	ui_vertices = 0;
+	Renderer::GetInstance()->Render();
 }
 
 Shader *Engine::GetShader(const std::string &name)
 {
 	auto it = shaders_.find(name);
-	if (it != shaders_.end()) {
+	if (it != shaders_.end())
+	{
 		return (*it).second;
 	}
 	return nullptr;
 }
 
-Texture* Engine::GetTexture(const std::string& name) {
+Texture *Engine::GetTexture(const std::string &name)
+{
 	auto it = textures_.find(name);
-	if (it != textures_.end()) {
+	if (it != textures_.end())
+	{
 		return (*it).second;
 	}
 	return nullptr;
 }
 
-Material* Engine::GetMaterial(const std::string& name) {
+Material *Engine::GetMaterial(const std::string &name)
+{
 	auto it = materials_.find(name);
-	if (it != materials_.end()) {
+	if (it != materials_.end())
+	{
 		return (*it).second;
 	}
 	return nullptr;
 }
 
-Material* Engine::GetMaterialById(unsigned id) {
-	for (auto material : materials_) {
-		if (id == material.second->GetID()) {
+Material *Engine::GetMaterialById(unsigned id)
+{
+	for (auto material : materials_)
+	{
+		if (id == material.second->GetID())
+		{
 			return material.second;
 		}
 	}
 	return nullptr;
 }
 
-void Engine::LoadTextures() {
+void Engine::LoadTextures()
+{
 	filesystem::path aPath(ASSET_PATH);
 	auto path = aPath / "textures";
-	if (filesystem::exists(path) && filesystem::is_directory(path)) {
-		for (auto entry : filesystem::directory_iterator(path)) {
+	if (filesystem::exists(path) && filesystem::is_directory(path))
+	{
+		for (auto entry : filesystem::directory_iterator(path))
+		{
 			auto _path = entry.path();
-			if (!filesystem::is_directory(_path)) {
+			if (!filesystem::is_directory(_path))
+			{
 				auto texture = new Texture(_path.stem().string());
 				texture->LoadFormFile(_path.string());
 			}
@@ -83,14 +113,19 @@ void Engine::LoadTextures() {
 	}
 }
 
-void Engine::LoadShaders() {
+void Engine::LoadShaders()
+{
 	filesystem::path aPath(ASSET_PATH);
 	auto path = aPath / "shaders";
-	if (filesystem::exists(path) && filesystem::is_directory(path)) {
-		for (auto entry : filesystem::directory_iterator(path)) {
+	if (filesystem::exists(path) && filesystem::is_directory(path))
+	{
+		for (auto entry : filesystem::directory_iterator(path))
+		{
 			auto _path = entry.path();
-			if (!filesystem::is_directory(_path)) {
-				if (_path.extension().string() == ".shader") {
+			if (!filesystem::is_directory(_path))
+			{
+				if (_path.extension().string() == ".shader")
+				{
 					auto shader = new Shader(_path.stem().string(), _path.string());
 					shaders_[shader->GetName()] = shader;
 				}
@@ -99,30 +134,44 @@ void Engine::LoadShaders() {
 	}
 }
 
-void Engine::LoadMaterials() {
+void Engine::LoadMaterials()
+{
 	auto ui_default = new Material("ui_default");
-    ui_default->SetShader("unlit_pos_tex");
+	ui_default->SetShader("unlit_pos_tex");
 	ui_default->SetTexture(0, "white");
 }
 
-void Engine::HandleUIRootInput() {
-	// auto left_mouse_btn_stat = glfwGetMouseButton(main_window_, GLFW_MOUSE_BUTTON_1);
-	// if (left_mouse_btn_stat == GLFW_PRESS) {
-	// 	double x, y;
-	// 	glfwGetCursorPos(main_window_, &x, &y);
-	// 	auto ui_control = ui_root_->FindChildControl(static_cast<float>(x), static_cast<float>(y));
-	// 	if (ui_control) {
-	// 		ui_control->OnMouseLeftButtonPress();
-	// 	}
-	// }
-	// else if (left_mouse_btn_stat == GLFW_RELEASE) {
-	// 	double x, y;
-	// 	glfwGetCursorPos(main_window_, &x, &y);
-	// 	auto ui_control = ui_root_->FindChildControl(static_cast<float>(x), static_cast<float>(y));
-	// 	if (ui_control) {
-	// 		ui_control->OnMouseLeftButtonRelease();
-	// 	}
-	// }
+void Engine::HandleUIRootInput()
+{
+	double x, y;
+	glfwGetCursorPos(main_window_, &x, &y);
+	int width, height;
+	glfwGetWindowSize(main_window_, &width, &height);
+	//fprintf(stderr, "mouse pos %f,%f\n", x, y);
+
+	float mouseX = static_cast<float>(x);
+	float mouseY = static_cast<float>(height - y);
+
+	//left mouse btn
+	auto left_mouse_btn_stat = glfwGetMouseButton(main_window_, GLFW_MOUSE_BUTTON_1);
+	if (left_mouse_btn_stat == GLFW_PRESS)
+	{
+		is_left_mouse_btn_press = true;
+		auto ui_rect = ui_root->FindChild(mouseX, mouseY);
+		if (ui_rect)
+		{
+			ui_rect->OnMouseLeftButtonPress();
+		}
+	}
+	if (is_left_mouse_btn_press && left_mouse_btn_stat == GLFW_RELEASE)
+	{
+		is_left_mouse_btn_press = false;
+		auto ui_rect = ui_root->FindChild(mouseX, mouseY);
+		if (ui_rect)
+		{
+			ui_rect->OnMouseLeftButtonRelease();
+		}
+	}
 }
 
-}
+} // namespace kd

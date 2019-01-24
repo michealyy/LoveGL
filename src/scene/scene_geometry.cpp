@@ -23,21 +23,6 @@ SceneGeometry::~SceneGeometry()
 
 void SceneGeometry::Setup()
 {
-    auto ui_root = new Entity();
-    ui_root->name = "UIRoot";
-    AddEntity(ui_root);
-
-    auto ui1 = new UIRect();
-    ui1->SetImage("demo");
-    ui1->position = vec3(0, 200, 0);
-    ui_root->AddChild(ui1);
-    
-    auto ui2 = new UIRect();
-    ui2->SetImage("demo");
-    ui2->position = vec3(200, 0, 0);
-    ui1->AddChild(ui2);
-
-
     auto root = new Entity();
     root->name = "Root";
     AddEntity(root);

@@ -39,10 +39,6 @@ int main(int, char**) {
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
-	if (Cull_Back_Face)
-	{
-		glEnable(GL_CULL_FACE);
-	}
 
 	Engine::GetInstance()->SetMainWindow(window);
 	Engine::GetInstance()->OnSetup();

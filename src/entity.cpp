@@ -1,5 +1,7 @@
 #include "entity.h"
 #include <glm/gtc/matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include "scene.h"
 #include "engine.h"
@@ -86,6 +88,12 @@ void Entity::UpdateModelMatrix()
 	{
 		worldTransform = localTransform;
 	}
+	
+	quat rotation;
+	vec3 skew;
+	vec4 perspective;
+	decompose(worldTransform, worldScale, rotation, worldPosition, skew, perspective);
+	//TODO: worldEulerAngles
 }
 
 } // namespace kd

@@ -8,6 +8,7 @@
 #include "texture.h"
 #include "scene.h"
 #include "entity_camera.h"
+#include "ui/ui_root.h"
 
 namespace kd
 {
@@ -34,13 +35,20 @@ class Engine final : public Singleton<Engine>
 	Scene *currentScene = nullptr;
 	Camera *mainCamera = nullptr;
 
+	ui::UIRoot *ui_root = nullptr;;
+	//statistics
+	unsigned ui_draw_call = 0;
+	unsigned ui_vertices = 0;
+
   private:
 	GLFWwindow *main_window_;
 	float lastTime = 0.0f;
 	std::map<std::string, Texture *> textures_;
 	std::map<std::string, Shader *> shaders_;
 	std::map<std::string, Material *> materials_;
-	
+	//input control
+	bool is_left_mouse_btn_press = false;
+
 	void LoadTextures();
 	void LoadShaders();
 	void LoadMaterials();

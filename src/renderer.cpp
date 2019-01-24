@@ -98,6 +98,8 @@ void Renderer::Render3DObjects()
 
 void Renderer::DrawMesh(Mesh *mesh)
 {
+    //glEnable(GL_CULL_FACE);
+
     auto material = mesh->material;
     auto camera = Engine::GetInstance()->mainCamera;
 
@@ -127,12 +129,13 @@ void Renderer::SortTransparent()
 
 void Renderer::BatchRenderUI()
 {
-    //glEnable(GL_CULL_FACE);
+    //glDisable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     bool first_flag = true;
-    for (auto rect : rect_list_)
+    for (auto rect : ui_rect_list_)
     {
         //不同材质生成一个DrawCall
         unsigned current_material_id = rect.material_id;
@@ -168,9 +171,10 @@ void Renderer::BatchRenderUI()
         first_flag = false;
     }
     //绘制最后剩余的rects
-    GenerateUIDrawCall();
+    if (ui_rect_list_.size() > 0)
+        GenerateUIDrawCall();
 
-    rect_list_.clear();
+    ui_rect_list_.clear();
 
     glDisable(GL_CULL_FACE);
     glDisable(GL_BLEND);
@@ -179,28 +183,28 @@ void Renderer::BatchRenderUI()
 void Renderer::GenerateUIDrawCall()
 {
     auto material = Engine::GetInstance()->GetMaterialById(ui_last_material_id_);
-	material->Bind();
+    material->Bind();
     material->GetShader()->SetMatrix("mvp", ui_project_view_matrix_);
 
-	glBindVertexArray(ui_vao_);
+    glBindVertexArray(ui_vao_);
 
     //复制顶点数据到Buffer
-	glBindBuffer(GL_ARRAY_BUFFER, ui_vbo_[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(ui_vertices_[0]) * ui_vertex_index_, nullptr, GL_STATIC_DRAW);
-	void *buf = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-	memcpy(buf, ui_vertices_, sizeof(ui_vertices_[0]) * ui_vertex_index_);
-	glUnmapBuffer(GL_ARRAY_BUFFER);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, ui_vbo_[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(ui_vertices_[0]) * ui_vertex_index_, nullptr, GL_STATIC_DRAW);
+    void *buf = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+    memcpy(buf, ui_vertices_, sizeof(ui_vertices_[0]) * ui_vertex_index_);
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ui_vbo_[1]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ui_indices_[0]) * ui_element_index_, ui_indices_, GL_STATIC_DRAW);
-	glDrawElements(GL_TRIANGLES, ui_element_index_, GL_UNSIGNED_SHORT, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ui_vbo_[1]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ui_indices_[0]) * ui_element_index_, ui_indices_, GL_STATIC_DRAW);
+    glDrawElements(GL_TRIANGLES, ui_element_index_, GL_UNSIGNED_SHORT, 0);
 
-	// Engine::GetInstance()->ui_vertices_ = Engine::GetInstance()->ui_vertices_ + vertex_index;
-	// Engine::GetInstance()->ui_draw_call_++;
+    Engine::GetInstance()->ui_vertices = Engine::GetInstance()->ui_vertices + ui_vertex_index_;
+    Engine::GetInstance()->ui_draw_call++;
 
-	ui_vertex_index_ = 0;
-	ui_element_index_ = 0;
+    ui_vertex_index_ = 0;
+    ui_element_index_ = 0;
 }
 
 } // namespace kd

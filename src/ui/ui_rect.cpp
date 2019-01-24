@@ -9,14 +9,20 @@ using namespace glm;
 namespace kd
 {
 
+namespace ui
+{
+
 UIRect::UIRect(float width, float height)
     : width(width), height(height)
 {
-    notDeleteByScene = true;
 }
 
 UIRect::~UIRect()
 {
+    for (auto child : children_)
+    {
+        SafeDelete(child);
+    }
 }
 
 void UIRect::SetImage(const std::string &name)
@@ -33,17 +39,28 @@ void UIRect::SetImage(const std::string &name)
     }
 }
 
+void UIRect::Setup()
+{
+    Entity::Setup();
+    for (auto child : children_)
+    {
+        child->Setup();
+    }
+}
+
 void UIRect::Update(float deltaTime)
 {
     Entity::Update(deltaTime);
-
+    for (auto child : children_)
+    {
+        child->Update(deltaTime);
+    }
+    
     RectData rect;
     rect.right_bottom = worldTransform * vec4(width, 0, 0, 1);
     rect.right_top = worldTransform * vec4(width, height, 0, 1);
     rect.left_top = worldTransform * vec4(0, height, 0, 1);
     rect.left_bottom = worldTransform * vec4(0, 0, 0, 1);
-
-    rect.depth = depth;
 
     if (material == nullptr || material->GetShader() == nullptr)
         material = Engine::GetInstance()->GetMaterial("ui_default");
@@ -54,5 +71,42 @@ void UIRect::Update(float deltaTime)
 
     Renderer::GetInstance()->AddUIRect(rect);
 }
+
+void UIRect::OnMouseLeftButtonPress()
+{}
+
+void UIRect::OnMouseLeftButtonRelease()
+{}
+
+UIRect *UIRect::FindChild(float x, float y)
+{
+    for (auto _child : children_)
+    {
+        auto child = dynamic_cast<UIRect *>(_child);
+        if (child)
+        {
+            auto posX= child->worldPosition.x;
+            auto posY= child->worldPosition.y;
+            auto width = child->width * child->worldScale.x;
+            auto height = child->height * child->worldScale.y;
+            if (x > posX && x < posX + width && y > posY && y < posY + height)
+            {
+                return child;
+            }
+            else
+            {
+                auto __child = child->FindChild(x, y);
+                if (__child)
+                {
+                    return __child;
+                }
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+} // namespace ui
 
 } // namespace kd
