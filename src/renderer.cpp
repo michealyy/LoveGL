@@ -129,24 +129,25 @@ void Renderer::SortTransparent()
 
 void Renderer::BatchRenderUI()
 {
-    //glDisable(GL_DEPTH_TEST);
+    glDisable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     bool first_flag = true;
+    int last_rect_index = -1;
     for (auto rect : ui_rect_list_)
     {
         //不同材质生成一个DrawCall
         unsigned current_material_id = rect->material->GetID();
         if (!first_flag && ui_last_material_id_ != current_material_id)
         {
-            GenerateUIDrawCall();
+            GenerateUIDrawCall(last_rect_index);
         }
         //Buffer满了
         if (ui_vertex_index_ + sizeof(va::Pos_Tex) * 4 >= VBO_SIZE)
         {
-            GenerateUIDrawCall();
+            GenerateUIDrawCall(last_rect_index);
         }
         //叠加rect顶点信息
         ui_vertices_[ui_vertex_index_].Position = rect->right_bottom;
@@ -169,10 +170,12 @@ void Renderer::BatchRenderUI()
         ui_element_index_ = ui_element_index_ + 6;
         ui_last_material_id_ = current_material_id;
         first_flag = false;
+
+        last_rect_index++;
     }
     //绘制最后剩余的rects
     if (ui_rect_list_.size() > 0)
-        GenerateUIDrawCall();
+        GenerateUIDrawCall(last_rect_index);
 
     ui_rect_list_.clear();
 
@@ -180,10 +183,10 @@ void Renderer::BatchRenderUI()
     glDisable(GL_BLEND);
 }
 
-void Renderer::GenerateUIDrawCall()
+void Renderer::GenerateUIDrawCall(unsigned last_rect_index)
 {
     //取累积最后rect的材质
-    auto rect = ui_rect_list_[ui_vertex_index_ / 4 - 1];
+    auto rect = ui_rect_list_[last_rect_index];
     auto material = rect->material;
     material->Bind();
     material->GetShader()->SetMatrix("mvp", ui_project_view_matrix_);

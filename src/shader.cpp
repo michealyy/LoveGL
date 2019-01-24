@@ -27,7 +27,7 @@ Shader::Shader(const string &name, const string &path)
 	stream << file.rdbuf();
 	file.close();
 	string shader = stream.str();
-
+	
 	auto vertexIndex = shader.find("#vertex");
 	auto fragmentIndex = shader.find("#fragment");
 	auto uniformsStr = shader.substr(9, vertexIndex - 10);

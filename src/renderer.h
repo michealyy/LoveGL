@@ -38,7 +38,7 @@ private:
   unsigned short ui_indices_[INDEX_VBO_SIZE];
   unsigned ui_vertex_index_ = 0;
   unsigned ui_element_index_ = 0;
-  unsigned int ui_last_material_id_ = 0;
+  unsigned ui_last_material_id_ = 0;
   glm::mat4 ui_project_view_matrix_{1.0f};
 
   void RenderSkyBox();
@@ -46,7 +46,7 @@ private:
   void DrawMesh(Mesh *mesh);
   void SortTransparent();
   void BatchRenderUI();
-  void GenerateUIDrawCall();
+  void GenerateUIDrawCall(unsigned last_rect_index);
 
   DISALLOW_COPY_AND_ASSIGN(Renderer)
 };

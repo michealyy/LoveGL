@@ -1,8 +1,9 @@
+#include "engine.h"
 #include <filesystem>
 #include "config.h"
-#include "engine.h"
 #include "renderer.h"
 #include "scene/scene_geometry.h"
+#include "ui/font_manager.h"
 
 using namespace std;
 
@@ -24,6 +25,8 @@ void Engine::OnSetup()
 	LoadTextures();
 	LoadShaders();
 	LoadMaterials();
+	
+	FontManager::GetInstance()->Setup("FreeSans.ttf");
 
 	Renderer::GetInstance()->SetupUIBatchRender();
 
