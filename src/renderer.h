@@ -21,15 +21,23 @@ public:
   void AddMesh(Mesh *mesh);
   inline void AddOpaque(Mesh *mesh) { opaque_meshes_.push_back(mesh); }
   inline void AddTransparent(Mesh *mesh) { transparent_meshes_.push_back(mesh); }
-  inline void AddUIRect(ui::UIRect* rect) { ui_rect_list_.push_back(rect); }
+  inline void AddUIRect(ui::UIRect *rect) { ui_rect_list_.push_back(rect); }
   void Render();
 
 private:
+  void RenderSkyBox();
+  void Render3DObjects();
+  void DrawMesh(Mesh *mesh);
+  void SortTransparent();
+  void SortUIRectByWorldZAndHandleInput();
+  void BatchRenderUI();
+  void GenerateUIDrawCall(unsigned last_rect_index);
+
   std::vector<Mesh *> opaque_meshes_;
   std::vector<Mesh *> transparent_meshes_;
 
   //ui batch control
-  std::vector<ui::UIRect*> ui_rect_list_;
+  std::vector<ui::UIRect *> ui_rect_list_;
   unsigned ui_vao_;
   unsigned ui_vbo_[2];
   static const int VBO_SIZE = 65536;
@@ -41,12 +49,8 @@ private:
   unsigned ui_last_material_id_ = 0;
   glm::mat4 ui_project_view_matrix_{1.0f};
 
-  void RenderSkyBox();
-  void Render3DObjects();
-  void DrawMesh(Mesh *mesh);
-  void SortTransparent();
-  void BatchRenderUI();
-  void GenerateUIDrawCall(unsigned last_rect_index);
+  //ui input control
+  bool is_left_mouse_btn_press = false;
 
   DISALLOW_COPY_AND_ASSIGN(Renderer)
 };

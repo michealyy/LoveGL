@@ -82,35 +82,18 @@ void UIRoot::Setup()
     bg->position = vec3(0, 0, -1);
     AddChild(bg);
 
-    // //切换检视器显示
-    // title_btn->SetClickCallback([this, title_btn, bg] {
-    //     show_inspector = !show_inspector;
-    //     if (show_inspector)
-    //     {
-    //         title_btn->color = vec3(0.2, 0.2, 0.2);
-    //         title_btn->alpha = 1.f;
-    //         bg->visible = true;
-    //     }
-    //     else
-    //     {
-    //         title_btn->color = vec3(0, 0, 0);
-    //         title_btn->alpha = 0.6f;
-    //         bg->visible = false;
-    //     }
-    // });
-
     //测试按钮
     auto btn_1 = new Button();
-    btn_1->position = vec3(10, height - 100, 0);
-    bg->AddChild(btn_1);
+    btn_1->position = vec3(10, height - 100, -1);
+    AddChild(btn_1);
 
     auto btn_2 = new Button();
     btn_2->position = vec3(10, height - 150, 0);
-    bg->AddChild(btn_2);
+    AddChild(btn_2);
 
     auto btn_3 = new Button();
     btn_3->position = vec3(10, height - 200, 0);
-    bg->AddChild(btn_3);
+    AddChild(btn_3);
 
     UIRect::Setup();
 }
@@ -123,47 +106,12 @@ void UIRoot::Update(float deltaTime)
         if (child->visible)
             child->Update(deltaTime);
     }
-    HandleInput();
 
     if (show_stat_label)
     {
         fps_label_->SetText(std::string("FPS: ").append(std::to_string(Engine::GetInstance()->fps)));
         draw_call_label_->SetText(std::string("Draw call: ").append(std::to_string(Engine::GetInstance()->draw_call)));
         ui_draw_call_label_->SetText(std::string("UI Draw call: ").append(std::to_string(Engine::GetInstance()->ui_draw_call)));
-    }
-}
-
-void UIRoot::HandleInput()
-{
-    auto main_window = Engine::GetInstance()->GetMainWindow();
-    double x, y;
-    glfwGetCursorPos(main_window, &x, &y);
-    int width, height;
-    glfwGetWindowSize(main_window, &width, &height);
-
-    float mouseX = static_cast<float>(x);
-    float mouseY = static_cast<float>(height - y);
-
-    auto button = dynamic_cast<ui::Button *>(this->FindButton(mouseX, mouseY));
-    if (button)
-    {
-        if (glfwGetMouseButton(main_window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
-        {
-            is_left_mouse_btn_press = true;
-            button->OnMouseLeftButtonPress();
-        }
-        else
-        {
-            if (is_left_mouse_btn_press)
-            {
-                is_left_mouse_btn_press = false;
-                button->OnMouseLeftButtonRelease();
-            }
-            else
-            {
-                button->OnMouseHover();
-            }
-        }
     }
 }
 

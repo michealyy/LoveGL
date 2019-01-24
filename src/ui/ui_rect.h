@@ -20,11 +20,11 @@ public:
   virtual ~UIRect();
   //方便创建材质用。如果要设置不同color，alpha需要创建新材质
   void SetImage(const std::string &name);
-
   virtual void Setup() override;
   virtual void Update(float deltaTime) override;
-  //实现鼠标事件用
-  UIRect *FindButton(float x, float y);
+  virtual void OnMouseLeftButtonPress();
+  virtual void OnMouseLeftButtonRelease();
+  virtual void OnMouseHover();
 
   float width = 0.0f;
   float height = 0.0f;

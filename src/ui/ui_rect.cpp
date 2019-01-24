@@ -68,34 +68,16 @@ void UIRect::Update(float deltaTime)
     Renderer::GetInstance()->AddUIRect(this);
 }
 
-UIRect *UIRect::FindButton(float x, float y)
+void UIRect::OnMouseLeftButtonPress()
 {
-    for (auto _child : children_)
-    {
-        auto child = dynamic_cast<UIRect *>(_child);
-        auto button = dynamic_cast<Button *>(child);
-        if (button)
-        {
-            auto posX = child->worldPosition.x;
-            auto posY = child->worldPosition.y;
-            auto width = child->width * child->worldScale.x;
-            auto height = child->height * child->worldScale.y;
-            if (x > posX && x < posX + width && y > posY && y < posY + height)
-            {
-                return child;
-            }
-        }
-        else
-        {
-            auto __child = child->FindButton(x, y);
-            if (__child)
-            {
-                return __child;
-            }
-        }
-    }
+}
 
-    return nullptr;
+void UIRect::OnMouseLeftButtonRelease()
+{
+}
+
+void UIRect::OnMouseHover()
+{
 }
 
 } // namespace ui

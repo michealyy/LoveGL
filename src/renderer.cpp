@@ -63,6 +63,7 @@ void Renderer::Render()
 {
     RenderSkyBox();
     Render3DObjects();
+    SortUIRectByWorldZAndHandleInput();
     BatchRenderUI();
 }
 
@@ -129,13 +130,60 @@ void Renderer::SortTransparent()
     });
 }
 
-void Renderer::BatchRenderUI()
+void Renderer::SortUIRectByWorldZAndHandleInput()
 {
-    //按z轴排序
+    //按z轴排序。影响渲染和事件响应先后
     sort(ui_rect_list_.begin(), ui_rect_list_.end(), [](ui::UIRect *a, ui::UIRect *b) -> bool {
         return a->worldPosition.z < b->worldPosition.z;
     });
 
+    //处理UI事件 TODO:解耦render负责渲染
+    auto main_window = Engine::GetInstance()->GetMainWindow();
+    double x, y;
+    glfwGetCursorPos(main_window, &x, &y);
+    int width, height;
+    glfwGetWindowSize(main_window, &width, &height);
+    float mouseX = static_cast<float>(x);
+    float mouseY = static_cast<float>(height - y);
+    //反向遍历，z越近越早接受事件
+    ui::UIRect* first_rect = nullptr;
+    for (auto iter = ui_rect_list_.rbegin(); iter != ui_rect_list_.rend(); ++iter)
+    {
+        auto ui_rect = *iter;
+        auto posX = ui_rect->worldPosition.x;
+        auto posY = ui_rect->worldPosition.y;
+        auto width = ui_rect->width * ui_rect->worldScale.x;
+        auto height = ui_rect->height * ui_rect->worldScale.y;
+        if (mouseX > posX && mouseX < posX + width && mouseY > posY && mouseY < posY + height)
+        {
+            first_rect = ui_rect;
+            break;
+        }
+    }
+    if (first_rect)
+    {
+        if (glfwGetMouseButton(main_window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
+        {
+            is_left_mouse_btn_press = true;
+            first_rect->OnMouseLeftButtonPress();
+        }
+        else
+        {
+            if (is_left_mouse_btn_press)
+            {
+                is_left_mouse_btn_press = false;
+                first_rect->OnMouseLeftButtonRelease();
+            }
+            else
+            {
+                first_rect->OnMouseHover();
+            }
+        }
+    }
+}
+
+void Renderer::BatchRenderUI()
+{
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
