@@ -1,5 +1,4 @@
 #include "ui_rect.h"
-#include "rect_data.h"
 #include "../renderer.h"
 #include "../engine.h"
 #include <glm/gtc/matrix_transform.hpp>
@@ -51,25 +50,21 @@ void UIRect::Setup()
 void UIRect::Update(float deltaTime)
 {
     Entity::Update(deltaTime);
+
     for (auto child : children_)
     {
         child->Update(deltaTime);
     }
-    
-    RectData rect;
-    rect.right_bottom = worldTransform * vec4(width, 0, 0, 1);
-    rect.right_top = worldTransform * vec4(width, height, 0, 1);
-    rect.left_top = worldTransform * vec4(0, height, 0, 1);
-    rect.left_bottom = worldTransform * vec4(0, 0, 0, 1);
+
+    right_bottom = worldTransform * vec4(width, 0, 0, 1);
+    right_top = worldTransform * vec4(width, height, 0, 1);
+    left_top = worldTransform * vec4(0, height, 0, 1);
+    left_bottom = worldTransform * vec4(0, 0, 0, 1);
 
     if (material == nullptr || material->GetShader() == nullptr)
         material = Engine::GetInstance()->GetMaterial("ui_default");
 
-    rect.material_id = material->GetID();
-    material->GetShader()->SetVector3("color", this->color);
-    material->GetShader()->SetFloat("alpha", this->alpha);
-
-    Renderer::GetInstance()->AddUIRect(rect);
+    Renderer::GetInstance()->AddUIRect(this);
 }
 
 void UIRect::OnMouseLeftButtonPress()

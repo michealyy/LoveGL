@@ -5,7 +5,7 @@
 #include "common.h"
 #include "entity_mesh.h"
 #include "vertex_attribute.h"
-#include "ui/rect_data.h"
+#include "ui/ui_rect.h"
 
 namespace kd
 {
@@ -21,7 +21,7 @@ public:
   void AddMesh(Mesh *mesh);
   inline void AddOpaque(Mesh *mesh) { opaque_meshes_.push_back(mesh); }
   inline void AddTransparent(Mesh *mesh) { transparent_meshes_.push_back(mesh); }
-  inline void AddUIRect(RectData rect) { ui_rect_list_.push_back(rect); }
+  inline void AddUIRect(ui::UIRect* rect) { ui_rect_list_.push_back(rect); }
   void Render();
 
 private:
@@ -29,7 +29,7 @@ private:
   std::vector<Mesh *> transparent_meshes_;
 
   //ui batch control
-  std::vector<RectData> ui_rect_list_;
+  std::vector<ui::UIRect*> ui_rect_list_;
   unsigned ui_vao_;
   unsigned ui_vbo_[2];
   static const int VBO_SIZE = 65536;

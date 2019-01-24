@@ -12,7 +12,7 @@ namespace kd
 namespace ui
 {
 
-//UIRect不添加到场景，添加到ui_root下面。不要使用scale，直接设置高宽即可，影响事件点击。
+//UIRect不添加到场景，添加到ui_root下面
 class UIRect : public Entity
 {
 public:
@@ -31,6 +31,15 @@ public:
   float height = 0.0f;
   glm::vec3 color{1};
   float alpha = 1.0f;
+
+  glm::vec3 right_bottom;
+  glm::vec3 right_top;
+  glm::vec3 left_top;
+  glm::vec3 left_bottom;
+  glm::vec2 uv_right_bottom{1, 1};
+  glm::vec2 uv_right_top{1, 0};
+  glm::vec2 uv_left_top{0, 0};
+  glm::vec2 uv_left_bottom{0, 1};
 
   Material *material = nullptr;
 

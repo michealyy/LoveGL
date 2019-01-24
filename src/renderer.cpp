@@ -138,7 +138,7 @@ void Renderer::BatchRenderUI()
     for (auto rect : ui_rect_list_)
     {
         //不同材质生成一个DrawCall
-        unsigned current_material_id = rect.material_id;
+        unsigned current_material_id = rect->material->GetID();
         if (!first_flag && ui_last_material_id_ != current_material_id)
         {
             GenerateUIDrawCall();
@@ -149,14 +149,14 @@ void Renderer::BatchRenderUI()
             GenerateUIDrawCall();
         }
         //叠加rect顶点信息
-        ui_vertices_[ui_vertex_index_].Position = rect.right_bottom;
-        ui_vertices_[ui_vertex_index_].TexCoords = glm::vec2(1, 1);
-        ui_vertices_[ui_vertex_index_ + 1].Position = rect.right_top;
-        ui_vertices_[ui_vertex_index_ + 1].TexCoords = glm::vec2(1, 0);
-        ui_vertices_[ui_vertex_index_ + 2].Position = rect.left_top;
-        ui_vertices_[ui_vertex_index_ + 2].TexCoords = glm::vec2(0, 0);
-        ui_vertices_[ui_vertex_index_ + 3].Position = rect.left_bottom;
-        ui_vertices_[ui_vertex_index_ + 3].TexCoords = glm::vec2(0, 1);
+        ui_vertices_[ui_vertex_index_].Position = rect->right_bottom;
+        ui_vertices_[ui_vertex_index_].TexCoords = rect->uv_right_bottom;
+        ui_vertices_[ui_vertex_index_ + 1].Position = rect->right_top;
+        ui_vertices_[ui_vertex_index_ + 1].TexCoords = rect->uv_right_top;
+        ui_vertices_[ui_vertex_index_ + 2].Position = rect->left_top;
+        ui_vertices_[ui_vertex_index_ + 2].TexCoords = rect->uv_left_top;
+        ui_vertices_[ui_vertex_index_ + 3].Position = rect->left_bottom;
+        ui_vertices_[ui_vertex_index_ + 3].TexCoords = rect->uv_left_bottom;
         //叠加顶点绘制索引
         ui_indices_[ui_element_index_] = ui_vertex_index_;
         ui_indices_[ui_element_index_ + 1] = ui_vertex_index_ + 1;
@@ -182,9 +182,13 @@ void Renderer::BatchRenderUI()
 
 void Renderer::GenerateUIDrawCall()
 {
-    auto material = Engine::GetInstance()->GetMaterialById(ui_last_material_id_);
+    //取累积最后rect的材质
+    auto rect = ui_rect_list_[ui_vertex_index_ / 4 - 1];
+    auto material = rect->material;
     material->Bind();
     material->GetShader()->SetMatrix("mvp", ui_project_view_matrix_);
+    material->GetShader()->SetVector3("color", rect->color);
+    material->GetShader()->SetFloat("alpha", rect->alpha);
 
     glBindVertexArray(ui_vao_);
 
