@@ -115,6 +115,8 @@ void Renderer::DrawMesh(Mesh *mesh)
     glBindVertexArray(mesh->vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
     glDrawElements(GL_TRIANGLES, (int)mesh->indices.size(), GL_UNSIGNED_INT, 0);
+
+    Engine::GetInstance()->draw_call++;
 }
 
 void Renderer::SortTransparent()

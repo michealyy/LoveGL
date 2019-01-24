@@ -37,6 +37,8 @@ class Engine final : public Singleton<Engine>
 
 	ui::UIRoot *ui_root = nullptr;;
 	//statistics
+	int fps = 0;
+	unsigned draw_call = 0;
 	unsigned ui_draw_call = 0;
 	unsigned ui_vertices = 0;
 

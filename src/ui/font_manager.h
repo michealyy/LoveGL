@@ -44,7 +44,7 @@ class FontManager final : public Singleton<FontManager>
 
   private:
 	unsigned current_texture_count_ = 0;
-	float font_size_ = 24; //24
+	float font_size_ = 22; //24
 	stbtt_bakedchar glyph_info_[END_CHAR - START_CHAR];
 	std::vector<Material *> materials_;
 

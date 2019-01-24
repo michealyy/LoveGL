@@ -25,7 +25,7 @@ void Engine::OnSetup()
 	LoadTextures();
 	LoadShaders();
 	LoadMaterials();
-	
+
 	FontManager::GetInstance()->Setup("FreeSans.ttf");
 
 	Renderer::GetInstance()->SetupUIBatchRender();
@@ -42,6 +42,7 @@ void Engine::OnUpdate()
 	float _time = (float)glfwGetTime();
 	float deltaTime = _time - lastTime;
 	lastTime = _time;
+	fps = (int)(1.f / deltaTime);
 
 	this->currentScene->Update(deltaTime);
 
@@ -51,6 +52,7 @@ void Engine::OnUpdate()
 		ui_root->Update(deltaTime);
 	}
 
+	draw_call = 0;
 	ui_draw_call = 0;
 	ui_vertices = 0;
 	Renderer::GetInstance()->Render();

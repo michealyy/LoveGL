@@ -29,12 +29,6 @@ void Label::SetText(const std::string &text)
 
 void Label::Update(float deltaTime)
 {
-    Entity::Update(deltaTime);
-    for (auto child : children_)
-    {
-        child->Update(deltaTime);
-    }
-
     if (is_update_text_)
     {
         for (auto child : children_)
@@ -43,6 +37,12 @@ void Label::Update(float deltaTime)
 
         GenCharNode();
         is_update_text_ = false;
+    }
+
+    Entity::Update(deltaTime);
+    for (auto child : children_)
+    {
+        child->Update(deltaTime);
     }
 }
 
