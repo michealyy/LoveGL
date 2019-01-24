@@ -162,19 +162,29 @@ void Engine::HandleUIRootInput()
 	if (left_mouse_btn_stat == GLFW_PRESS)
 	{
 		is_left_mouse_btn_press = true;
-		auto ui_rect = ui_root->FindChild(mouseX, mouseY);
+		auto ui_rect = ui_root->FindRect(mouseX, mouseY);
 		if (ui_rect)
 		{
 			ui_rect->OnMouseLeftButtonPress();
 		}
 	}
-	if (is_left_mouse_btn_press && left_mouse_btn_stat == GLFW_RELEASE)
+	else
 	{
-		is_left_mouse_btn_press = false;
-		auto ui_rect = ui_root->FindChild(mouseX, mouseY);
-		if (ui_rect)
+		auto ui_rect = ui_root->FindRect(mouseX, mouseY);
+		if (is_left_mouse_btn_press)
 		{
-			ui_rect->OnMouseLeftButtonRelease();
+			is_left_mouse_btn_press = false;
+			if (ui_rect)
+			{
+				ui_rect->OnMouseLeftButtonRelease();
+			}
+		}
+		else
+		{
+			if (ui_rect)
+			{
+				ui_rect->OnMouseHover();
+			}
 		}
 	}
 }

@@ -68,20 +68,26 @@ void UIRect::Update(float deltaTime)
 }
 
 void UIRect::OnMouseLeftButtonPress()
-{}
+{
+}
 
 void UIRect::OnMouseLeftButtonRelease()
-{}
+{
+}
 
-UIRect *UIRect::FindChild(float x, float y)
+void UIRect::OnMouseHover()
+{
+}
+
+UIRect *UIRect::FindRect(float x, float y)
 {
     for (auto _child : children_)
     {
         auto child = dynamic_cast<UIRect *>(_child);
         if (child)
         {
-            auto posX= child->worldPosition.x;
-            auto posY= child->worldPosition.y;
+            auto posX = child->worldPosition.x;
+            auto posY = child->worldPosition.y;
             auto width = child->width * child->worldScale.x;
             auto height = child->height * child->worldScale.y;
             if (x > posX && x < posX + width && y > posY && y < posY + height)
@@ -90,7 +96,7 @@ UIRect *UIRect::FindChild(float x, float y)
             }
             else
             {
-                auto __child = child->FindChild(x, y);
+                auto __child = child->FindRect(x, y);
                 if (__child)
                 {
                     return __child;

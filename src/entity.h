@@ -43,8 +43,10 @@ public:
 	
 	//静态实体，不会发生变换，不需要每帧运算变换矩阵
 	bool isStatic = false;
+	//是否显示
+	bool visible = true;
 
-protected:
+  protected:
 	std::vector<Entity *> children_;
 	Entity *parent_ = nullptr;
 

@@ -2,6 +2,7 @@
 
 #include "ui_rect.h"
 #include "ui_label.h"
+#include "../material.h"
 
 namespace kd
 {
@@ -17,6 +18,10 @@ public:
   virtual void Setup() override;
   virtual void Update(float deltaTime) override;
 
+  Material* ui_button_normal_mat = nullptr;
+  Material *ui_button_hover_mat = nullptr;
+
+  bool show_inspector = true;
   bool show_stat_label = true;
 
 private:
