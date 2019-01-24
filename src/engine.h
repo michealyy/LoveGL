@@ -48,13 +48,11 @@ class Engine final : public Singleton<Engine>
 	std::map<std::string, Texture *> textures_;
 	std::map<std::string, Shader *> shaders_;
 	std::map<std::string, Material *> materials_;
-	//input control
-	bool is_left_mouse_btn_press = false;
 
 	void LoadTextures();
 	void LoadShaders();
 	void LoadMaterials();
-	void HandleUIRootInput();
+	
 	DISALLOW_COPY_AND_ASSIGN(Engine)
 };
 

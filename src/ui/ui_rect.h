@@ -23,15 +23,11 @@ public:
 
   virtual void Setup() override;
   virtual void Update(float deltaTime) override;
-  virtual void OnMouseLeftButtonPress();
-  virtual void OnMouseLeftButtonRelease();
-  virtual void OnMouseHover();
   //实现鼠标事件用
-  UIRect *FindRect(float x, float y);
+  UIRect *FindButton(float x, float y);
 
   float width = 0.0f;
   float height = 0.0f;
-  int depth = 0;
   glm::vec3 color{1};
   float alpha = 1.0f;
 

@@ -24,7 +24,7 @@ void Renderer::SetupUIBatchRender()
     int width, height;
     glfwGetWindowSize(Engine::GetInstance()->GetMainWindow(), &width, &height);
     //坐下为原点，分辨率为大小
-    glm::mat4 projectionMatrix = glm::ortho(0.f, (float)width, 0.f, (float)height, -10.f, 10.f);
+    glm::mat4 projectionMatrix = glm::ortho(0.f, (float)width, 0.f, (float)height, -100.f, 100.f);
     glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0, 0, 1), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
     ui_project_view_matrix_ = projectionMatrix * viewMatrix;
 
@@ -131,6 +131,11 @@ void Renderer::SortTransparent()
 
 void Renderer::BatchRenderUI()
 {
+    //按z轴排序
+    sort(ui_rect_list_.begin(), ui_rect_list_.end(), [](ui::UIRect *a, ui::UIRect *b) -> bool {
+        return a->worldPosition.z < b->worldPosition.z;
+    });
+
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);

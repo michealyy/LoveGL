@@ -18,9 +18,9 @@ public:
 
   virtual void Setup() override;
   virtual void Update(float deltaTime) override;
-  virtual void OnMouseLeftButtonPress() override;
-  virtual void OnMouseLeftButtonRelease() override;
-  virtual void OnMouseHover() override;
+  virtual void OnMouseLeftButtonPress();
+  virtual void OnMouseLeftButtonRelease();
+  virtual void OnMouseHover();
   inline void SetClickCallback(const std::function<void(void)> &func) { click_callback_ = func; }
   
   Material *normal_material = nullptr;

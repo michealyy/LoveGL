@@ -44,13 +44,11 @@ void Engine::OnUpdate()
 	lastTime = _time;
 	fps = (int)(1.f / deltaTime);
 
-	this->currentScene->Update(deltaTime);
+	if (currentScene)
+		this->currentScene->Update(deltaTime);
 
 	if (ui_root)
-	{
-		HandleUIRootInput();
-		ui_root->Update(deltaTime);
-	}
+		this->ui_root->Update(deltaTime);
 
 	draw_call = 0;
 	ui_draw_call = 0;
@@ -144,49 +142,6 @@ void Engine::LoadMaterials()
 	auto ui_default = new Material("ui_default");
 	ui_default->SetShader("unlit_pos_tex");
 	ui_default->SetTexture(0, "white");
-}
-
-void Engine::HandleUIRootInput()
-{
-	double x, y;
-	glfwGetCursorPos(main_window_, &x, &y);
-	int width, height;
-	glfwGetWindowSize(main_window_, &width, &height);
-	//fprintf(stderr, "mouse pos %f,%f\n", x, y);
-
-	float mouseX = static_cast<float>(x);
-	float mouseY = static_cast<float>(height - y);
-
-	//left mouse btn
-	auto left_mouse_btn_stat = glfwGetMouseButton(main_window_, GLFW_MOUSE_BUTTON_1);
-	if (left_mouse_btn_stat == GLFW_PRESS)
-	{
-		is_left_mouse_btn_press = true;
-		auto ui_rect = ui_root->FindRect(mouseX, mouseY);
-		if (ui_rect)
-		{
-			ui_rect->OnMouseLeftButtonPress();
-		}
-	}
-	else
-	{
-		auto ui_rect = ui_root->FindRect(mouseX, mouseY);
-		if (is_left_mouse_btn_press)
-		{
-			is_left_mouse_btn_press = false;
-			if (ui_rect)
-			{
-				ui_rect->OnMouseLeftButtonRelease();
-			}
-		}
-		else
-		{
-			if (ui_rect)
-			{
-				ui_rect->OnMouseHover();
-			}
-		}
-	}
 }
 
 } // namespace kd

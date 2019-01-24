@@ -1,7 +1,8 @@
 #include "ui_rect.h"
+#include <glm/gtc/matrix_transform.hpp>
 #include "../renderer.h"
 #include "../engine.h"
-#include <glm/gtc/matrix_transform.hpp>
+#include "ui_button.h"
 
 using namespace glm;
 
@@ -67,24 +68,13 @@ void UIRect::Update(float deltaTime)
     Renderer::GetInstance()->AddUIRect(this);
 }
 
-void UIRect::OnMouseLeftButtonPress()
-{
-}
-
-void UIRect::OnMouseLeftButtonRelease()
-{
-}
-
-void UIRect::OnMouseHover()
-{
-}
-
-UIRect *UIRect::FindRect(float x, float y)
+UIRect *UIRect::FindButton(float x, float y)
 {
     for (auto _child : children_)
     {
         auto child = dynamic_cast<UIRect *>(_child);
-        if (child)
+        auto button = dynamic_cast<Button *>(child);
+        if (button)
         {
             auto posX = child->worldPosition.x;
             auto posY = child->worldPosition.y;
@@ -94,13 +84,13 @@ UIRect *UIRect::FindRect(float x, float y)
             {
                 return child;
             }
-            else
+        }
+        else
+        {
+            auto __child = child->FindButton(x, y);
+            if (__child)
             {
-                auto __child = child->FindRect(x, y);
-                if (__child)
-                {
-                    return __child;
-                }
+                return __child;
             }
         }
     }
