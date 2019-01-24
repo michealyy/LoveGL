@@ -72,7 +72,12 @@ void Entity::RemoveChild(const string &name)
 
 void Entity::RemoveAllChild()
 {
-	children_.clear();
+	// for (auto child : children_)
+	// {
+	// 	SafeDelete(child);
+	// }
+	// children_.clear();
+	// Remove from Scene
 }
 
 void Entity::UpdateModelMatrix()

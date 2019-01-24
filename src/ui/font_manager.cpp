@@ -1,5 +1,7 @@
-#include "font_manager.h"
+﻿#include "font_manager.h"
 #include <filesystem>
+#include <fstream>
+#include <sstream>
 #include <glad/glad.h>
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb_truetype.h>
@@ -24,34 +26,35 @@ void FontManager::Setup(const std::string &file)
 	filesystem::path aPath(ASSET_PATH);
 	auto path = aPath / "fonts" / file;
 
-	/* load font file */
-	long size;
 	unsigned char *fontBuffer;
+	ifstream is;
+	is.open(path.string(), ios::binary);
+	if (!is.good())
+	{
+		fprintf(stderr, "[FontManager] font file not find: %s\n", file.c_str());
+		return;
+	}
+	is.seekg(0, ios::end);
+	auto size = is.tellg();
+	is.seekg(0, ios::beg);
+	fontBuffer = new unsigned char[size];
+	is.read((char *)fontBuffer, size);
+	is.close();
 
-	FILE *fontFile = fopen(path.string().c_str(), "rb");
-	fseek(fontFile, 0, SEEK_END);
-	size = ftell(fontFile);		  /* how long is the file ? */
-	fseek(fontFile, 0, SEEK_SET); /* reset */
-
-	fontBuffer = (unsigned char *)malloc(size);
-
-	fread(fontBuffer, size, 1, fontFile);
-	fclose(fontFile);
-
-	/* prepare font */
 	stbtt_fontinfo info;
 	if (!stbtt_InitFont(&info, fontBuffer, 0))
 	{
-		fprintf(stderr, "[FontManager] ttf file not find : %s\n", file.c_str());
+		fprintf(stderr, "[FontManager] font file not support: %s\n", file.c_str());
+		return;
 	}
 
-	unsigned char *bitmap = (unsigned char *)malloc(TEXTURE_WIDTH * TEXTURE_HEIGHT);
-	memset(bitmap, 0, TEXTURE_WIDTH * TEXTURE_HEIGHT);
+	unsigned char *atlas = new unsigned char[TEXTURE_WIDTH * TEXTURE_HEIGHT]; //(unsigned char *)malloc(TEXTURE_WIDTH * TEXTURE_HEIGHT);
+	memset(atlas, 0, TEXTURE_WIDTH * TEXTURE_HEIGHT);
 
 	//stb_truetype直接生成START_CHAR到END_CHAR字体图集
-	stbtt_BakeFontBitmap(fontBuffer, 0, font_size_, bitmap, TEXTURE_WIDTH, TEXTURE_HEIGHT, START_CHAR, END_CHAR - START_CHAR, glyph_info_);
+	stbtt_BakeFontBitmap(fontBuffer, 0, font_size_, atlas, TEXTURE_WIDTH, TEXTURE_HEIGHT, START_CHAR, END_CHAR - START_CHAR, glyph_info_);
 
-	//生成材质贴图
+	//生成材质贴图，TODO:支持多张字体贴图
 	string texture_name("font_");
 	texture_name.append(std::to_string(current_texture_count_));
 	auto texture = new Texture(texture_name);
@@ -73,17 +76,22 @@ void FontManager::Setup(const std::string &file)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 8);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0, GL_RED, GL_UNSIGNED_BYTE, bitmap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0, GL_RED, GL_UNSIGNED_BYTE, atlas);
 	glHint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
-	glGenerateMipmap(GL_TEXTURE_2D);	
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	delete[] fontBuffer;
+	delete[] atlas;
 }
 
 GlyphInfo FontManager::GetGlyphInfo(char character, float offsetX, float offsetY)
 {
+	char _character = character;
+	if (character < START_CHAR || character > END_CHAR)
+		_character = '*';
+
 	stbtt_aligned_quad quad;
-	float x = 0;
-	float y = 0;
-	stbtt_GetBakedQuad(glyph_info_, TEXTURE_WIDTH, TEXTURE_HEIGHT, character - START_CHAR, &x, &y, &quad, 1);
+	stbtt_GetBakedQuad(glyph_info_, TEXTURE_WIDTH, TEXTURE_HEIGHT, _character - START_CHAR, &offsetX, &offsetY, &quad, 1);
 
 	auto xmin = quad.x0;
 	auto xmax = quad.x1;
@@ -91,6 +99,8 @@ GlyphInfo FontManager::GetGlyphInfo(char character, float offsetX, float offsetY
 	auto ymax = -quad.y0;
 
 	GlyphInfo info{};
+	info.offsetX = offsetX;
+	info.offsetY = offsetY;
 	info.width = xmax - xmin;
 	info.height = ymax - ymin;
 	info.position = {xmin, ymin, 0};
@@ -98,8 +108,9 @@ GlyphInfo FontManager::GetGlyphInfo(char character, float offsetX, float offsetY
 	info.uv_left_top = {quad.s0, quad.t0};
 	info.uv_right_top = {quad.s1, quad.t0};
 	info.uv_right_bottom = {quad.s1, quad.t1};
-
+	//TODO:支持多张字体贴图
+	info.material_index = 0;
 	return info;
 }
 
-}
+} // namespace kd

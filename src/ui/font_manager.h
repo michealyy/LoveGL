@@ -12,6 +12,8 @@ namespace kd
 
 struct GlyphInfo
 {
+	float offsetX;
+	float offsetY;
 	float width;
 	float height;
 	glm::vec3 position;
@@ -19,6 +21,7 @@ struct GlyphInfo
 	glm::vec2 uv_right_top;
 	glm::vec2 uv_left_top;
 	glm::vec2 uv_left_bottom;
+	int material_index;
 };
 
 class FontManager final : public Singleton<FontManager>
@@ -41,7 +44,7 @@ class FontManager final : public Singleton<FontManager>
 
   private:
 	unsigned current_texture_count_ = 0;
-	float font_size_ = 32; //24
+	float font_size_ = 24; //24
 	stbtt_bakedchar glyph_info_[END_CHAR - START_CHAR];
 	std::vector<Material *> materials_;
 

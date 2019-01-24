@@ -1,7 +1,8 @@
 ﻿#include "ui_root.h"
 #include <glm/glm.hpp>
-#include "ui_button.h"
 #include "font_manager.h"
+#include "ui_button.h"
+#include "ui_label.h"
 
 using namespace glm;
 
@@ -31,17 +32,9 @@ void UIRoot::Setup()
     font_texture->position = vec3(0, 0, 1);
     AddChild(font_texture);
 
-    auto char_rect_info = FontManager::GetInstance()->GetGlyphInfo('+', 0, 0);
-    auto char_rect = new UIRect();
-    char_rect->material = FontManager::GetInstance()->GetMaterial(0);
-    char_rect->width = char_rect_info.width;
-    char_rect->height = char_rect_info.height;
-    char_rect->uv_right_bottom = char_rect_info.uv_right_bottom;
-    char_rect->uv_right_top = char_rect_info.uv_right_top;
-    char_rect->uv_left_top = char_rect_info.uv_left_top;
-    char_rect->uv_left_bottom = char_rect_info.uv_left_bottom;
-    char_rect->position = char_rect_info.position;
-    AddChild(char_rect);
+    auto label1 = new Label();
+    label1->SetText("kdRenderStudio");
+    AddChild(label1);
 
     auto ui1 = new Button();
     ui1->name = "ui1";
