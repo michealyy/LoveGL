@@ -5,33 +5,42 @@
 #include "vertex_attribute.h"
 #include "entity.h"
 #include "material.h"
+#include "ray.h"
 
 namespace kd
 {
 
+struct RayCastHit
+{
+  Entity *entity;
+  glm::vec3 point;
+};
+
 class Mesh : public Entity
 {
-  public:
-    explicit Mesh();
-    virtual ~Mesh();
+public:
+  explicit Mesh();
+  virtual ~Mesh();
 
-    virtual void Setup() override;
-    virtual void Update(float deltaTime) override;
+  virtual void Setup() override;
+  virtual void Update(float deltaTime) override;
 
-    Material *material = nullptr;
-    unsigned vao = 0;
-    unsigned ebo = 0;
-    std::vector<unsigned int> indices;
+  virtual bool Raycast(Ray ray, RayCastHit &rayCastHit);
 
-  protected:
-    virtual void AddVertices() = 0;
+  Material *material = nullptr;
+  unsigned vao = 0;
+  unsigned ebo = 0;
+  std::vector<unsigned int> indices;
 
-    unsigned vbo = 0;
-    std::vector<va::Pos> vertices_pos;
-    std::vector<va::Pos_Tex> vertices_pos_tex;
+public:
+  virtual void AddVertices() = 0;
 
-  private:
-    DISALLOW_COPY_AND_ASSIGN(Mesh)
+  unsigned vbo = 0;
+  std::vector<va::Pos> vertices_pos;
+  std::vector<va::Pos_Tex> vertices_pos_tex;
+
+private:
+  DISALLOW_COPY_AND_ASSIGN(Mesh)
 };
 
 } // namespace kd

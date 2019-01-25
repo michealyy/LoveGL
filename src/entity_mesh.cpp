@@ -1,9 +1,13 @@
-#include "entity_mesh.h"
+﻿#include "entity_mesh.h"
 #include <glad/glad.h>
+#include <glm/glm.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/intersect.hpp>
 #include "engine.h"
 #include "renderer.h"
 
 using namespace std;
+using namespace glm;
 
 namespace kd
 {
@@ -70,6 +74,30 @@ void Mesh::Update(float deltaTime)
     Entity::Update(deltaTime);
 
     Renderer::GetInstance()->AddMesh(this);
+}
+
+bool Mesh::Raycast(Ray ray, RayCastHit &rayCastHit)
+{
+    //遍历几何体所有三角面进行射线碰撞检测
+    for (int i = 0; i < indices.size() - 3; i = i + 3)
+    {
+        auto va_index_1 = indices[i];
+        auto va_index_2 = indices[i + 1];
+        auto va_index_3 = indices[i + 2];
+        vec2 bary_pos;
+        float distance;
+        if (intersectRayTriangle(ray.origin, ray.direction, vertices_pos_tex[va_index_1].Position,
+            vertices_pos_tex[va_index_2].Position, vertices_pos_tex[va_index_3].Position, bary_pos, distance))
+        {
+            printf("pick entity: %s, %f\n", name.c_str(), distance);
+            return true;
+        }
+    }
+
+    //遍历子节点
+    //child->Raycast()
+
+    return false;
 }
 
 } // namespace kd

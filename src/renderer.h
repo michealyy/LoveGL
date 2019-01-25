@@ -39,6 +39,7 @@ private:
   std::vector<Mesh *> transparent_meshes_;
 
   //post processing
+  bool open_post_processing = false;
   unsigned post_processing_framebuffer_ = 0;
   unsigned post_processing_texture_ = 0;
   unsigned post_processing_render_buffer_ = 0;

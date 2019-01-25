@@ -15,7 +15,7 @@ class SceneGeometry : public Scene
 
     virtual void Setup() override;
     virtual void Update(float deltaTime) override;
-
+    
   private:
 
     DISALLOW_COPY_AND_ASSIGN(SceneGeometry)

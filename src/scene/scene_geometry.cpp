@@ -1,10 +1,13 @@
-#include "scene_geometry.h"
+﻿#include "scene_geometry.h"
 #include <glm/glm.hpp>
 #include "../engine.h"
 #include "../material.h"
 #include "../entity_camera.h"
 #include "../entity_geometry.h"
 #include "../ui/ui_rect.h"
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/intersect.hpp>
 
 using namespace glm;
 
@@ -32,25 +35,25 @@ void SceneGeometry::Setup()
     Engine::GetInstance()->mainCamera = camera;
     AddEntity(camera);
 
-    auto mat1 = new Material("unlit_pos_1");
-    mat1->SetShader("unlit_pos");
-    mat1->SetColor(vec3(1, 0, 0));
-    mat1->SetAlpha(0.2f);
-    auto box1 = new Box(mat1, 1, 1, 1);
-    box1->scale = vec3(2, 2, 0.2);
-    box1->eulerAngles = vec3(0, 0, 45);
-    box1->name = "box1";
-    root->AddChild(box1);
+    // auto mat1 = new Material("unlit_pos_1");
+    // mat1->SetShader("unlit_pos");
+    // mat1->SetColor(vec3(1, 0, 0));
+    // mat1->SetAlpha(0.2f);
+    // auto box1 = new Box(mat1, 1, 1, 1);
+    // box1->scale = vec3(2, 2, 0.2);
+    // box1->eulerAngles = vec3(0, 0, 45);
+    // box1->name = "box1";
+    // root->AddChild(box1);
 
-    auto mat2 = new Material("unlit_pos_2");
-    mat2->SetShader("unlit_pos");
-    mat2->SetColor(vec3(0, 1, 0));
-    mat2->SetAlpha(1);
-    auto cone1 = new Cone(mat2);
-    cone1->color = vec3(0, 1, 0);
-    cone1->name = "cone1";
-    cone1->position = vec3(-2, 0, 0);
-    root->AddChild(cone1);
+    // auto mat2 = new Material("unlit_pos_2");
+    // mat2->SetShader("unlit_pos");
+    // mat2->SetColor(vec3(0, 1, 0));
+    // mat2->SetAlpha(1);
+    // auto cone1 = new Cone(mat2);
+    // cone1->color = vec3(0, 1, 0);
+    // cone1->name = "cone1";
+    // cone1->position = vec3(-2, 0, 0);
+    // root->AddChild(cone1);
 
     auto mat3 = new Material("unlit_pos_tex_1");
     mat3->SetShader("unlit_pos_tex");
@@ -75,6 +78,30 @@ void SceneGeometry::Setup()
 void SceneGeometry::Update(float deltaTime)
 {
     Scene::Update(deltaTime);
+
+    //场景拾取
+    auto main_window = Engine::GetInstance()->GetMainWindow();
+    double x, y;
+    glfwGetCursorPos(main_window, &x, &y);
+    int width, height;
+    glfwGetWindowSize(main_window, &width, &height);
+    if (glfwGetMouseButton(main_window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS && Engine::GetInstance()->mainCamera)
+    {
+        for(auto entities : entities_)
+        {
+            auto mesh = dynamic_cast<Mesh*>(entities);
+            if (mesh)
+            {
+                //主摄像机鼠标点转换到世界空间射线
+                auto ray = Engine::GetInstance()->mainCamera->ScreenPointToRay(vec2(x, height - y));
+                RayCastHit rayCastHit;
+                if (mesh->Raycast(ray, rayCastHit))
+                {
+                    //break;
+                }
+            }
+        }
+    }
 }
 
 } // namespace kd

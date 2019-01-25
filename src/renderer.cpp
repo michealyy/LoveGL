@@ -58,13 +58,31 @@ void Renderer::SetupPostProcessingRenderTexture()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     //屏幕大小的矩形
-    float vertices[] = { 
-        -1.0,  1.0,  0.0, 1.0,
-        -1.0, -1.0,  0.0, 0.0,
-        1.0, -1.0,  1.0, 0.0,
-        -1.0,  1.0,  0.0, 1.0,
-        1.0, -1.0,  1.0, 0.0,
-        1.0,  1.0,  1.0, 1.0,
+    float vertices[] = {
+        -1.0,
+        1.0,
+        0.0,
+        1.0,
+        -1.0,
+        -1.0,
+        0.0,
+        0.0,
+        1.0,
+        -1.0,
+        1.0,
+        0.0,
+        -1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        -1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
     };
     glGenVertexArrays(1, &post_processing_vao_);
     glBindVertexArray(post_processing_vao_);
@@ -74,7 +92,7 @@ void Renderer::SetupPostProcessingRenderTexture()
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void *)0);
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*) (sizeof(float) *2));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void *)(sizeof(float) * 2));
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -133,10 +151,12 @@ void Renderer::RenderSkyBox()
 
 void Renderer::Render3DObjects()
 {
-    //渲染到后处理贴图
-    glBindFramebuffer(GL_FRAMEBUFFER, post_processing_framebuffer_);
+    //渲染到后处理贴图 TODO:FBO实现抗锯齿
+    if (open_post_processing)
+        glBindFramebuffer(GL_FRAMEBUFFER, post_processing_framebuffer_);
+    
     glClearColor(UI_CLEAR_COLOR.r, UI_CLEAR_COLOR.g, UI_CLEAR_COLOR.b, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //开启深度测试，自动抛弃离摄像机远的片段
     glEnable(GL_DEPTH_TEST);
@@ -162,14 +182,17 @@ void Renderer::Render3DObjects()
     transparent_meshes_.clear();
 
     //关闭场景渲染到贴图，开始渲染成品的贴图
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    //Engine::GetInstance()->GetShader("post_blur")->Bind();
-    Engine::GetInstance()->GetShader("post_normal")->Bind();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, post_processing_texture_);
-    glBindVertexArray(post_processing_vao_);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    glBindVertexArray(0);
+    if (open_post_processing)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        //Engine::GetInstance()->GetShader("post_blur")->Bind();
+        Engine::GetInstance()->GetShader("post_normal")->Bind();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, post_processing_texture_);
+        glBindVertexArray(post_processing_vao_);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
+    }
 }
 
 void Renderer::DrawMesh(Mesh *mesh)
@@ -220,7 +243,7 @@ void Renderer::SortUIRectByDepthAndHandleInput()
     float mouseX = static_cast<float>(x);
     float mouseY = static_cast<float>(height - y);
     //反向遍历，z越近越早接受事件
-    ui::UIRect* first_rect = nullptr;
+    ui::UIRect *first_rect = nullptr;
     for (auto iter = ui_rect_list_.rbegin(); iter != ui_rect_list_.rend(); ++iter)
     {
         auto ui_rect = *iter;

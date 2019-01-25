@@ -22,9 +22,10 @@ public:
 		entity->scene = this;
 	}
 
-private:
+protected:
 	std::vector<Entity *> entities_;
 
+private:
 	DISALLOW_COPY_AND_ASSIGN(Scene)
 };
 
