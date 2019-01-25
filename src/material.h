@@ -13,14 +13,14 @@ namespace kd
 
 struct TextureUnit
 {
-	unsigned Index;
-	std::string Name;
+	unsigned index;
+	std::string name;
 };
 
 struct ShaderUniform
 {
-	std::string Type;
-	std::any Value;
+	std::string type;
+	std::any value;
 };
 
 class Material
@@ -39,7 +39,7 @@ class Material
 	void SetColor(glm::vec3 color);
 	void SetAlpha(float alpha);
 	void SetShader(const std::string &shader_name);
-	inline void SetTexture(unsigned index, const std::string &texture_name) { textures_.push_back(TextureUnit{index, texture_name}); }
+	inline void SetTexture(const std::string &texture_name, unsigned index = 0) { textures_.push_back(TextureUnit{index, texture_name}); }
 
 	inline std::string GetName() { return name_; }
 	inline Shader *GetShader() { return shader_; }

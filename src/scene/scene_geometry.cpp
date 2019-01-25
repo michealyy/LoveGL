@@ -56,7 +56,7 @@ void SceneGeometry::Setup()
 
     auto mat3 = new Material("unlit_pos_tex_1");
     mat3->SetShader("unlit_pos_tex");
-    mat3->SetTexture(0, "wood");
+    mat3->SetTexture("wood");
     auto box2 = new Box(mat3, 1, 1, 1);
     box2->name = "box2";
     box2->position = vec3(0, 0, -2);

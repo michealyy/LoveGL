@@ -31,6 +31,7 @@ void Material::Bind()
 	if (shader_ != nullptr)
 	{
 		shader_->Bind();
+		TransferUniformsToShader();
 	}
 	else
 	{
@@ -40,19 +41,17 @@ void Material::Bind()
 	for (int i = 0; i < textures_.size(); i++)
 	{
 		auto texture_unit = textures_[i];
-		glActiveTexture(GL_TEXTURE0 + texture_unit.Index);
-		auto texture = Engine::GetInstance()->GetTexture(texture_unit.Name);
+		glActiveTexture(GL_TEXTURE0 + texture_unit.index);
+		auto texture = Engine::GetInstance()->GetTexture(texture_unit.name);
 		if (texture != nullptr)
 		{
 			texture->Bind();
 		}
 		else
 		{
-			fprintf(stderr, "[Material] can not find texture by name: %s\n", texture_unit.Name.c_str());
+			fprintf(stderr, "[Material] can not find texture by name: %s\n", texture_unit.name.c_str());
 		}
 	}
-
-	TransferUniformsToShader();
 }
 
 void Material::LoadFormFile(const string &path)
@@ -112,18 +111,18 @@ void Material::TransferUniformsToShader()
 {
 	for (auto iter = uniforms_.begin(); iter != uniforms_.end(); iter++)
 	{
-		if (iter->second.Type == "float")
+		if (iter->second.type == "float")
 		{
-			auto a= iter->second.Value;
-			shader_->SetFloat(iter->first.c_str(), any_cast<float>(iter->second.Value));
+			auto a= iter->second.value;
+			shader_->SetFloat(iter->first.c_str(), any_cast<float>(iter->second.value));
 		}
-		else if (iter->second.Type == "vector3")
+		else if (iter->second.type == "vector3")
 		{
-			shader_->SetVector3(iter->first.c_str(), any_cast<vec3>(iter->second.Value));
+			shader_->SetVector3(iter->first.c_str(), any_cast<vec3>(iter->second.value));
 		}
-		else if (iter->second.Type == "vector4")
+		else if (iter->second.type == "vector4")
 		{
-			shader_->SetVector4(iter->first.c_str(), any_cast<vec4>(iter->second.Value));
+			shader_->SetVector4(iter->first.c_str(), any_cast<vec4>(iter->second.value));
 		}
 	}
 }

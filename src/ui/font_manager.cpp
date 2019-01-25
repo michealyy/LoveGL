@@ -60,7 +60,7 @@ void FontManager::Setup(const std::string &file)
 	auto texture = new Texture(texture_name);
 	auto font_mat = new Material(texture_name);
 	font_mat->SetShader("font");
-	font_mat->SetTexture(0, texture_name);
+	font_mat->SetTexture(texture_name);
 	materials_.push_back(font_mat);
 	current_texture_count_++;
 

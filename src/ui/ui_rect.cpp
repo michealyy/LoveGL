@@ -35,7 +35,7 @@ void UIRect::SetImage(const std::string &name)
     {
         material = new Material(mat_name);
         material->SetShader("unlit_pos_tex");
-        material->SetTexture(0, name);
+        material->SetTexture(name);
     }
 }
 

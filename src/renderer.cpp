@@ -63,7 +63,6 @@ void Renderer::Render()
 {
     RenderSkyBox();
     Render3DObjects();
-    SortUIRectByDepthAndHandleInput();
     BatchRenderUI();
 }
 
@@ -183,6 +182,8 @@ void Renderer::SortUIRectByDepthAndHandleInput()
 
 void Renderer::BatchRenderUI()
 {
+    SortUIRectByDepthAndHandleInput();
+
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);

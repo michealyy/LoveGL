@@ -141,7 +141,7 @@ void Engine::LoadMaterials()
 {
 	auto ui_default = new Material("ui_default");
 	ui_default->SetShader("unlit_pos_tex");
-	ui_default->SetTexture(0, "white");
+	ui_default->SetTexture("white");
 }
 
 } // namespace kd

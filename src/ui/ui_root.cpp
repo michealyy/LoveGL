@@ -17,10 +17,10 @@ UIRoot::UIRoot()
     //按钮悬停变色用
     ui_button_normal_mat = new Material("ui_button_normal");
     ui_button_normal_mat->SetShader("unlit_pos_tex");
-    ui_button_normal_mat->SetTexture(0, "white");
+    ui_button_normal_mat->SetTexture("white");
     ui_button_hover_mat = new Material("ui_button_hover");
     ui_button_hover_mat->SetShader("unlit_pos_tex");
-    ui_button_hover_mat->SetTexture(0, "white");
+    ui_button_hover_mat->SetTexture("white");
 }
 
 UIRoot::~UIRoot()
@@ -56,7 +56,7 @@ void UIRoot::Setup()
     //检视器头
     auto ui_common_tile_mat = new Material("ui_common_tile");
     ui_common_tile_mat->SetShader("unlit_pos_tex");
-    ui_common_tile_mat->SetTexture(0, "white");
+    ui_common_tile_mat->SetTexture("white");
     auto title = new UIRect();
     title->material = ui_common_tile_mat;
     title->width = 100;
@@ -73,7 +73,7 @@ void UIRoot::Setup()
     //左背景
     auto ui_common_bg_mat = new Material("ui_common_bg");
     ui_common_bg_mat->SetShader("unlit_pos_tex");
-    ui_common_bg_mat->SetTexture(0, "white");
+    ui_common_bg_mat->SetTexture("white");
     auto bg = new UIRect();
     bg->material = ui_common_bg_mat;
     bg->width = 100;
