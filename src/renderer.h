@@ -29,7 +29,7 @@ private:
   void Render3DObjects();
   void DrawMesh(Mesh *mesh);
   void SortTransparent();
-  void SortUIRectByWorldZAndHandleInput();
+  void SortUIRectByDepthAndHandleInput();
   void BatchRenderUI();
   void GenerateUIDrawCall(unsigned last_rect_index);
 

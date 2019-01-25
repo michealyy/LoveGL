@@ -30,6 +30,7 @@ public:
   float height = 0.0f;
   glm::vec3 color{1};
   float alpha = 1.0f;
+  int depth = 0;
 
   glm::vec3 right_bottom;
   glm::vec3 right_top;

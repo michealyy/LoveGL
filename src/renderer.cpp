@@ -63,7 +63,7 @@ void Renderer::Render()
 {
     RenderSkyBox();
     Render3DObjects();
-    SortUIRectByWorldZAndHandleInput();
+    SortUIRectByDepthAndHandleInput();
     BatchRenderUI();
 }
 
@@ -130,11 +130,11 @@ void Renderer::SortTransparent()
     });
 }
 
-void Renderer::SortUIRectByWorldZAndHandleInput()
+void Renderer::SortUIRectByDepthAndHandleInput()
 {
     //按z轴排序。影响渲染和事件响应先后
     sort(ui_rect_list_.begin(), ui_rect_list_.end(), [](ui::UIRect *a, ui::UIRect *b) -> bool {
-        return a->worldPosition.z < b->worldPosition.z;
+        return a->depth < b->depth;
     });
 
     //处理UI事件 TODO:解耦render负责渲染

@@ -55,6 +55,7 @@ void Label::GenCharNode()
         offsetX = char_rect_info.offsetX;
 		offsetY = char_rect_info.offsetY;
         auto char_rect = new UIRect();
+        char_rect->depth = depth;
         char_rect->material = FontManager::GetInstance()->GetMaterial(char_rect_info.material_index);
         char_rect->width = char_rect_info.width;
         char_rect->height = char_rect_info.height;

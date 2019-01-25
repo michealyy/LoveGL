@@ -53,7 +53,7 @@ void UIRoot::Setup()
     ui_draw_call_label_->position = vec3(width - 100, height - 45, 0);
     AddChild(ui_draw_call_label_);
 
-    //检视器
+    //检视器头
     auto ui_common_tile_mat = new Material("ui_common_tile");
     ui_common_tile_mat->SetShader("unlit_pos_tex");
     ui_common_tile_mat->SetTexture(0, "white");
@@ -67,6 +67,7 @@ void UIRoot::Setup()
     auto inspector_label = new Label();
     inspector_label->SetText("Inspector");
     inspector_label->position = vec3(20, 10, 1);
+    inspector_label->depth = 1;
     title->AddChild(inspector_label);
 
     //左背景
@@ -79,7 +80,7 @@ void UIRoot::Setup()
     bg->height = (float)height;
     bg->color = vec3(0, 0, 0);
     bg->alpha = 0.8f;
-    bg->position = vec3(0, 0, -1);
+    bg->depth = -1;
     AddChild(bg);
 
     //测试按钮
