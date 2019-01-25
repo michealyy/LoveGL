@@ -17,7 +17,7 @@ public:
   explicit Renderer();
   ~Renderer();
 
-  void SetupUIBatchRender();
+  void Setup();
   void AddMesh(Mesh *mesh);
   inline void AddOpaque(Mesh *mesh) { opaque_meshes_.push_back(mesh); }
   inline void AddTransparent(Mesh *mesh) { transparent_meshes_.push_back(mesh); }
@@ -25,6 +25,8 @@ public:
   void Render();
 
 private:
+  void SetupUIBatchRender();
+  void SetupPostProcessingRenderTexture();
   void RenderSkyBox();
   void Render3DObjects();
   void DrawMesh(Mesh *mesh);
@@ -36,9 +38,16 @@ private:
   std::vector<Mesh *> opaque_meshes_;
   std::vector<Mesh *> transparent_meshes_;
 
+  //post processing
+  unsigned post_processing_framebuffer_ = 0;
+  unsigned post_processing_texture_ = 0;
+  unsigned post_processing_render_buffer_ = 0;
+  unsigned post_processing_vao_ = 0;
+  unsigned post_processing_vbo_ = 0;
+
   //ui batch control
   std::vector<ui::UIRect *> ui_rect_list_;
-  unsigned ui_vao_;
+  unsigned ui_vao_ = 0;
   unsigned ui_vbo_[2];
   static const int VBO_SIZE = 65536;
   va::Pos_Tex ui_vertices_[VBO_SIZE];

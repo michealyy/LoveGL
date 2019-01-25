@@ -28,7 +28,7 @@ void Engine::OnSetup()
 
 	FontManager::GetInstance()->Setup("FreeSans.ttf");
 
-	Renderer::GetInstance()->SetupUIBatchRender();
+	Renderer::GetInstance()->Setup();
 
 	this->currentScene = new SceneGeometry();
 	this->currentScene->Setup();

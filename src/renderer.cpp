@@ -4,6 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include "engine.h"
+#include "config.h"
 
 using namespace std;
 
@@ -16,6 +17,66 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
+    glDeleteFramebuffers(1, &post_processing_framebuffer_);
+    glDeleteTextures(1, &post_processing_texture_);
+    glDeleteRenderbuffers(1, &post_processing_render_buffer_);
+    glDeleteVertexArrays(1, &post_processing_vao_);
+    glDeleteBuffers(1, &post_processing_vbo_);
+
+    glDeleteVertexArrays(1, &ui_vao_);
+    glDeleteBuffers(2, ui_vbo_);
+}
+
+void Renderer::Setup()
+{
+    SetupPostProcessingRenderTexture();
+    SetupUIBatchRender();
+}
+
+void Renderer::SetupPostProcessingRenderTexture()
+{
+    int width, height;
+    glfwGetWindowSize(Engine::GetInstance()->GetMainWindow(), &width, &height);
+
+    glGenFramebuffers(1, &post_processing_framebuffer_);
+    glBindFramebuffer(GL_FRAMEBUFFER, post_processing_framebuffer_);
+    //渲染到贴图
+    glGenTextures(1, &post_processing_texture_);
+    glBindTexture(GL_TEXTURE_2D, post_processing_texture_);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, post_processing_texture_, 0);
+    //Renderbuffer作为深度模板缓冲区
+    glGenRenderbuffers(1, &post_processing_render_buffer_);
+    glBindRenderbuffer(GL_RENDERBUFFER, post_processing_render_buffer_);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, post_processing_render_buffer_);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        fprintf(stderr, "[Render] Post Processing Framebuffer is not complete");
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    //屏幕大小的矩形
+    float vertices[] = { 
+        -1.0,  1.0,  0.0, 1.0,
+        -1.0, -1.0,  0.0, 0.0,
+        1.0, -1.0,  1.0, 0.0,
+        -1.0,  1.0,  0.0, 1.0,
+        1.0, -1.0,  1.0, 0.0,
+        1.0,  1.0,  1.0, 1.0,
+    };
+    glGenVertexArrays(1, &post_processing_vao_);
+    glBindVertexArray(post_processing_vao_);
+    glGenBuffers(1, &post_processing_vbo_);
+    glBindBuffer(GL_ARRAY_BUFFER, post_processing_vbo_);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void *)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*) (sizeof(float) *2));
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void Renderer::SetupUIBatchRender()
@@ -72,6 +133,11 @@ void Renderer::RenderSkyBox()
 
 void Renderer::Render3DObjects()
 {
+    //渲染到后处理贴图
+    glBindFramebuffer(GL_FRAMEBUFFER, post_processing_framebuffer_);
+    glClearColor(UI_CLEAR_COLOR.r, UI_CLEAR_COLOR.g, UI_CLEAR_COLOR.b, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     //开启深度测试，自动抛弃离摄像机远的片段
     glEnable(GL_DEPTH_TEST);
 
@@ -94,6 +160,16 @@ void Renderer::Render3DObjects()
 
     opaque_meshes_.clear();
     transparent_meshes_.clear();
+
+    //关闭场景渲染到贴图，开始渲染成品的贴图
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    //Engine::GetInstance()->GetShader("post_blur")->Bind();
+    Engine::GetInstance()->GetShader("post_normal")->Bind();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, post_processing_texture_);
+    glBindVertexArray(post_processing_vao_);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(0);
 }
 
 void Renderer::DrawMesh(Mesh *mesh)

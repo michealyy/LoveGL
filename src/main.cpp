@@ -44,7 +44,7 @@ int main(int, char**) {
 	Engine::GetInstance()->OnSetup();
 	while (!glfwWindowShouldClose(window))
 	{
-		glClearColor(UI_CLEAR_COLOR.r, UI_CLEAR_COLOR.g, UI_CLEAR_COLOR.b, 1.0f);
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		Engine::GetInstance()->OnUpdate();
