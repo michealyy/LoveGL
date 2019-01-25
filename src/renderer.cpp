@@ -110,7 +110,6 @@ void Renderer::DrawMesh(Mesh *mesh)
     }
 
     material->Bind();
-    material->TransferUniformsToShader();
     material->GetShader()->SetMatrix("mvp", camera->projectMatrix * mesh->localToCameraTransform);
 
     glBindVertexArray(mesh->vao);
@@ -243,10 +242,10 @@ void Renderer::GenerateUIDrawCall(unsigned last_rect_index)
     //取累积最后rect的材质
     auto rect = ui_rect_list_[last_rect_index];
     auto material = rect->material;
+    material->SetColor(rect->color);
+    material->SetAlpha(rect->alpha);
     material->Bind();
     material->GetShader()->SetMatrix("mvp", ui_project_view_matrix_);
-    material->GetShader()->SetVector3("color", rect->color);
-    material->GetShader()->SetFloat("alpha", rect->alpha);
 
     glBindVertexArray(ui_vao_);
 

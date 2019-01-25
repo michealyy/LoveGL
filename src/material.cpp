@@ -51,6 +51,8 @@ void Material::Bind()
 			fprintf(stderr, "[Material] can not find texture by name: %s\n", texture_unit.Name.c_str());
 		}
 	}
+
+	TransferUniformsToShader();
 }
 
 void Material::LoadFormFile(const string &path)
@@ -70,6 +72,10 @@ void Material::SetShader(const string &shader_name)
 		shader_ = shader;
 		shader_name_ = shader_name;
 	}
+
+	//外部没有设置color,alpha时候其他材质公用的shader会影响到自己
+	uniforms_["color"] = ShaderUniform{"vector3", vec3(1.f, 1.f, 1.f)};
+	uniforms_["alpha"] = ShaderUniform{"float", 1.f};
 }
 
 void Material::SetFloat(const char *name, float value)
@@ -108,6 +114,7 @@ void Material::TransferUniformsToShader()
 	{
 		if (iter->second.Type == "float")
 		{
+			auto a= iter->second.Value;
 			shader_->SetFloat(iter->first.c_str(), any_cast<float>(iter->second.Value));
 		}
 		else if (iter->second.Type == "vector3")
