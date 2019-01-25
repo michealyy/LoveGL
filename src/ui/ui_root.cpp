@@ -44,13 +44,13 @@ void UIRoot::Setup()
 
     //fps状态等
     fps_label_ = new Label();
-    fps_label_->position = vec3(width - 100, height - 12, 0);
+    fps_label_->position = vec3(width - 80, height - 12, 0);
     AddChild(fps_label_);
     draw_call_label_ = new Label();
-    draw_call_label_->position = vec3(width - 100, height - 28, 0);
+    draw_call_label_->position = vec3(width - 80, height - 28, 0);
     AddChild(draw_call_label_);
     ui_draw_call_label_ = new Label();
-    ui_draw_call_label_->position = vec3(width - 100, height - 45, 0);
+    ui_draw_call_label_->position = vec3(width - 80, height - 45, 0);
     AddChild(ui_draw_call_label_);
 
     //检视器头
@@ -112,7 +112,7 @@ void UIRoot::Update(float deltaTime)
     {
         fps_label_->SetText(std::string("FPS: ").append(std::to_string(Engine::GetInstance()->fps)));
         draw_call_label_->SetText(std::string("Draw call: ").append(std::to_string(Engine::GetInstance()->draw_call)));
-        ui_draw_call_label_->SetText(std::string("UI Draw call: ").append(std::to_string(Engine::GetInstance()->ui_draw_call)));
+        ui_draw_call_label_->SetText(std::string("UI Batch: ").append(std::to_string(Engine::GetInstance()->ui_draw_call)));
     }
 }
 

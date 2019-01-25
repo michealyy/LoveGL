@@ -9,6 +9,14 @@ using namespace glm;
 namespace kd
 {
 
+CameraController::CameraController()
+{
+}
+
+CameraController::~CameraController()
+{
+}
+
 Camera::Camera()
 {
     SetPerspective();
@@ -16,19 +24,22 @@ Camera::Camera()
 
 Camera::~Camera()
 {
+    SafeDelete(cameraController);
 }
 
 void Camera::Setup()
 {
     Entity::Setup();
+    if (cameraController)
+        cameraController->Setup();
 }
 
 void Camera::Update(float deltaTime)
 {
     Entity::Update(deltaTime);
 
-    if (canController)
-        UpdateControl(deltaTime);
+    if (cameraController)
+        cameraController->Update(deltaTime);
 }
 
 void Camera::SetPerspective()
@@ -52,8 +63,23 @@ mat4 Camera::GetViewMatrix()
     return inverse(worldTransform);
 }
 
-void Camera::UpdateControl(float deltaTime)
+FreeCameraController::FreeCameraController()
 {
+}
+
+FreeCameraController::~FreeCameraController()
+{
+}
+
+void FreeCameraController::Setup()
+{
+}
+
+void FreeCameraController::Update(float deltaTime)
+{
+    if (camera == nullptr)
+        return;
+    
     auto window = Engine::GetInstance()->GetMainWindow();
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) != GLFW_PRESS)
@@ -68,37 +94,37 @@ void Camera::UpdateControl(float deltaTime)
         glfwGetCursorPos(window, &mousePosX, &mousePosY);
         float x = (float)(mousePosY - lastMousePosY);
         float y = (float)(mousePosX - lastMousePosX);
-        eulerAngles += vec3(x * rotateSpeed * deltaTime, y * rotateSpeed * deltaTime, 0);
+        camera->eulerAngles += vec3(x * rotateSpeed * deltaTime, y * rotateSpeed * deltaTime, 0);
         
         if (glfwGetKey(window, GLFW_KEY_W))
         {
-            auto movedelta = worldTransform * vec4(0, 0, -1, 0) * moveSpeed;
-            position = position + vec3(movedelta.x, movedelta.y, movedelta.z);
+            auto movedelta = camera->worldTransform * vec4(0, 0, -1, 0) * moveSpeed;
+            camera->position = camera->position + vec3(movedelta.x, movedelta.y, movedelta.z);
         }
         if (glfwGetKey(window, GLFW_KEY_S))
         {
-            auto movedelta = worldTransform * vec4(0, 0, 1, 0) * moveSpeed;
-            position = position + vec3(movedelta.x, movedelta.y, movedelta.z);
+            auto movedelta = camera->worldTransform * vec4(0, 0, 1, 0) * moveSpeed;
+            camera->position = camera->position + vec3(movedelta.x, movedelta.y, movedelta.z);
         }
         if (glfwGetKey(window, GLFW_KEY_A))
         {
-            auto movedelta = worldTransform * vec4(-1, 0, 0, 0) * moveSpeed;
-            position = position + vec3(movedelta.x, movedelta.y, movedelta.z);
+            auto movedelta = camera->worldTransform * vec4(-1, 0, 0, 0) * moveSpeed;
+            camera->position = camera->position + vec3(movedelta.x, movedelta.y, movedelta.z);
         }
         if (glfwGetKey(window, GLFW_KEY_D))
         {
-            auto movedelta = worldTransform * vec4(1, 0, 0, 0) * moveSpeed;
-            position = position + vec3(movedelta.x, movedelta.y, movedelta.z);
+            auto movedelta = camera->worldTransform * vec4(1, 0, 0, 0) * moveSpeed;
+            camera->position = camera->position + vec3(movedelta.x, movedelta.y, movedelta.z);
         }
         if (glfwGetKey(window, GLFW_KEY_SPACE))
         {
-            auto movedelta = worldTransform * vec4(0, 1, 0, 0) * moveSpeed;
-            position = position + vec3(movedelta.x, movedelta.y, movedelta.z);
+            auto movedelta = camera->worldTransform * vec4(0, 1, 0, 0) * moveSpeed;
+            camera->position = camera->position + vec3(movedelta.x, movedelta.y, movedelta.z);
         }
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT))
         {
-            auto movedelta = worldTransform * vec4(0, -1, 0, 0) * moveSpeed;
-            position = position + vec3(movedelta.x, movedelta.y, movedelta.z);
+            auto movedelta = camera->worldTransform * vec4(0, -1, 0, 0) * moveSpeed;
+            camera->position = camera->position + vec3(movedelta.x, movedelta.y, movedelta.z);
         }
     }
     else

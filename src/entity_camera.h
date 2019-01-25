@@ -5,6 +5,19 @@
 namespace kd
 {
 
+class CameraController
+{
+public:
+  explicit CameraController();
+  virtual ~CameraController();
+  virtual void Setup() = 0;
+  virtual void Update(float deltaTime) = 0;
+  Entity *camera = nullptr;
+
+private:
+  DISALLOW_COPY_AND_ASSIGN(CameraController)
+};
+
 class Camera : public Entity
 {
 public:
@@ -17,6 +30,11 @@ public:
   void SetPerspective();
   void SetOrtho(glm::vec2 size);
   glm::mat4 GetViewMatrix();
+  inline void SetController(CameraController *controller)
+  {
+    cameraController = controller;
+    controller->camera = this;
+  };
 
   float fov = 45.0f;
   bool isOrtho = false;
@@ -29,18 +47,28 @@ public:
 
   glm::mat4 projectMatrix{1.0f};
 
-  bool canController = false;
+private:
+  CameraController *cameraController = nullptr;
+
+  DISALLOW_COPY_AND_ASSIGN(Camera)
+};
+
+class FreeCameraController : public CameraController
+{
+public:
+  explicit FreeCameraController();
+  virtual ~FreeCameraController();
+  virtual void Setup() override;
+  virtual void Update(float deltaTime) override;
+
   float moveSpeed = 0.1f;
   float rotateSpeed = 10.f;
 
-protected:
-  virtual void UpdateControl(float deltaTime);
+private:
   bool firstMousePos = true;
   double lastMousePosX = 0;
   double lastMousePosY = 0;
-
-private:
-  DISALLOW_COPY_AND_ASSIGN(Camera)
+  DISALLOW_COPY_AND_ASSIGN(FreeCameraController)
 };
 
 } // namespace kd

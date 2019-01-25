@@ -3,9 +3,7 @@
 #include "../engine.h"
 #include "../material.h"
 #include "../entity_camera.h"
-#include "../entity_box.h"
-#include "../entity_cylinder.h"
-#include "../entity_cone.h"
+#include "../entity_geometry.h"
 #include "../ui/ui_rect.h"
 
 using namespace glm;
@@ -29,7 +27,7 @@ void SceneGeometry::Setup()
 
     auto camera = new Camera();
     camera->name = "SceneGeometry camera";
-    camera->canController = true;
+    camera->SetController(new FreeCameraController());
     camera->position = vec3(0, 1, 5);
     Engine::GetInstance()->mainCamera = camera;
     AddEntity(camera);
