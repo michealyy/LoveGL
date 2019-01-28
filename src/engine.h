@@ -7,6 +7,7 @@
 #include "material.h"
 #include "texture.h"
 #include "scene.h"
+#include "vertex_attribute.h"
 #include "entity_camera.h"
 #include "ui/ui_root.h"
 
@@ -29,13 +30,14 @@ class Engine final : public Singleton<Engine>
 	Texture *GetTexture(const std::string &name);
 	Material *GetMaterial(const std::string &name);
 	Material *GetMaterialById(unsigned id);
+	MeshData *GetMesh(const std::string &name);
 	inline void AddTexture(const std::string &name, Texture *texture) { textures_[name] = texture; }
 	inline void AddMaterial(const std::string &name, Material *material) { materials_[name] = material; }
 
 	Scene *currentScene = nullptr;
 	Camera *mainCamera = nullptr;
 	ui::UIRoot *ui_root = nullptr;
-	Entity* selected_entity = nullptr;
+	Entity *selected_entity = nullptr;
 	//statistics
 	int fps = 0;
 	unsigned draw_call = 0;
@@ -48,11 +50,13 @@ class Engine final : public Singleton<Engine>
 	std::map<std::string, Texture *> textures_;
 	std::map<std::string, Shader *> shaders_;
 	std::map<std::string, Material *> materials_;
+	std::map<std::string, MeshData *> meshes_;
 
 	void LoadTextures();
 	void LoadShaders();
 	void LoadMaterials();
-	
+	void LoadMeshes();
+
 	DISALLOW_COPY_AND_ASSIGN(Engine)
 };
 

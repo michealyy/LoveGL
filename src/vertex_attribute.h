@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <vector>
 
 namespace kd
 {
@@ -29,5 +30,11 @@ struct P_T_N_T_B
 };
 
 } // namespace va
+
+struct MeshData
+{
+    std::vector<va::Pos_Tex> vertices;
+    std::vector<unsigned> indices;
+};
 
 }

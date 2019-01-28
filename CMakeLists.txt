@@ -18,8 +18,7 @@ include_directories("glfw/include")
 link_libraries(glfw)
 
 #glad
-set(GLAD "glfw/deps/glad/glad.h"
-         "glfw/deps/glad.c")
+set(GLAD "glfw/deps/glad.c")
 
 include_directories("deps")
 

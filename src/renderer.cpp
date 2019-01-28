@@ -209,7 +209,7 @@ void Renderer::Render3DObjects()
 
 void Renderer::DrawMesh(Mesh *mesh)
 {
-    //glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
 
     auto material = mesh->material;
     auto camera = Engine::GetInstance()->mainCamera;

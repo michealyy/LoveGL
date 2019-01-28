@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <ofbx.h>
 #include "common.h"
 #include "vertex_attribute.h"
 #include "entity.h"
@@ -21,13 +20,13 @@ struct RayCastHit
 class Mesh : public Entity
 {
 public:
-  explicit Mesh();
+  explicit Mesh(Material *mat = nullptr);
   virtual ~Mesh();
 
   virtual void Setup() override;
   virtual void Update(float deltaTime) override;
   virtual bool Raycast(Ray ray, RayCastHit &rayCastHit);
-  bool LoadFromFbx(const std::string& path);
+  void SetMesh(const std::string &name);
 
   Material *material = nullptr;
   unsigned vao = 0;
@@ -35,9 +34,7 @@ public:
   std::vector<unsigned int> indices;
 
 public:
-  virtual void AddVertices() = 0;
-  void LoadNodeRecursively(const ofbx::Object& object);
-  void ProcessNode();
+  virtual void AddVertices();
 
   unsigned vbo = 0;
   std::vector<va::Pos> vertices_pos;
