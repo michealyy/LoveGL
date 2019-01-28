@@ -53,6 +53,11 @@ void UIRoot::Setup()
     ui_draw_call_label_->position = vec3(width - 80, height - 45, 0);
     AddChild(ui_draw_call_label_);
 
+    //选中物体
+    selected_entity_label_ = new Label();
+    selected_entity_label_->position = vec3(width/2, height - 20, 0);
+    AddChild(selected_entity_label_);
+
     //检视器头
     auto ui_common_tile_mat = new Material("ui_common_tile");
     ui_common_tile_mat->SetShader("unlit_pos_tex");
@@ -113,6 +118,11 @@ void UIRoot::Update(float deltaTime)
         fps_label_->SetText(std::string("FPS: ").append(std::to_string(Engine::GetInstance()->fps)));
         draw_call_label_->SetText(std::string("Draw call: ").append(std::to_string(Engine::GetInstance()->draw_call)));
         ui_draw_call_label_->SetText(std::string("UI Batch: ").append(std::to_string(Engine::GetInstance()->ui_draw_call)));
+    }
+
+    if(Engine::GetInstance()->selected_entity)
+    {
+        selected_entity_label_->SetText(std::string("Selected: ").append(Engine::GetInstance()->selected_entity->name));
     }
 }
 

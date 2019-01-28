@@ -34,8 +34,8 @@ class Engine final : public Singleton<Engine>
 
 	Scene *currentScene = nullptr;
 	Camera *mainCamera = nullptr;
-
-	ui::UIRoot *ui_root = nullptr;;
+	ui::UIRoot *ui_root = nullptr;
+	Entity* selected_entity = nullptr;
 	//statistics
 	int fps = 0;
 	unsigned draw_call = 0;

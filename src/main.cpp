@@ -10,7 +10,7 @@ int main(int, char**) {
 		return -1;
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	//only forward render path
 	glfwWindowHint(GLFW_SAMPLES, 8);
@@ -44,7 +44,7 @@ int main(int, char**) {
 	Engine::GetInstance()->OnSetup();
 	while (!glfwWindowShouldClose(window))
 	{
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClearColor(UI_CLEAR_COLOR.r, UI_CLEAR_COLOR.g, UI_CLEAR_COLOR.b, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		Engine::GetInstance()->OnUpdate();

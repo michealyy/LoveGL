@@ -31,7 +31,7 @@ public:
   void SetPerspective();
   void SetOrtho(glm::vec2 size);
   glm::mat4 GetViewMatrix();
-  Ray ScreenPointToRay(glm::vec2 point);
+  Ray MousePointToRay(glm::vec2 point);
   inline void SetController(CameraController *controller)
   {
     cameraController = controller;

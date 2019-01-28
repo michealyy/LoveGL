@@ -78,24 +78,39 @@ void Mesh::Update(float deltaTime)
 
 bool Mesh::Raycast(Ray ray, RayCastHit &rayCastHit)
 {
+    if (vertices_pos_tex.size() <= 0)
+        return false;
+    
     //遍历几何体所有三角面进行射线碰撞检测
     for (int i = 0; i < indices.size() - 3; i = i + 3)
     {
+        
         auto va_index_1 = indices[i];
         auto va_index_2 = indices[i + 1];
         auto va_index_3 = indices[i + 2];
+        
+        vec3 va_1 = worldTransform * vec4(vertices_pos_tex[va_index_1].Position, 1.f);
+        vec3 va_2 = worldTransform * vec4(vertices_pos_tex[va_index_2].Position, 1.f);
+        vec3 va_3 = worldTransform * vec4(vertices_pos_tex[va_index_3].Position, 1.f);
+
         vec2 bary_pos;
         float distance;
-        if (intersectRayTriangle(ray.origin, ray.direction, vertices_pos_tex[va_index_1].Position,
-            vertices_pos_tex[va_index_2].Position, vertices_pos_tex[va_index_3].Position, bary_pos, distance))
+        if (intersectRayTriangle(ray.origin, ray.direction, va_1, va_2, va_3, bary_pos, distance))
         {
-            printf("pick entity: %s, %f\n", name.c_str(), distance);
+            rayCastHit.entity = this;
+            rayCastHit.point = bary_pos;
+            rayCastHit.distance = distance;
             return true;
         }
     }
 
     //遍历子节点
-    //child->Raycast()
+    for (auto child : children_)
+	{
+        auto _child = dynamic_cast<Mesh*>(child);
+        if (_child)
+            return _child->Raycast(ray, rayCastHit);
+	}
 
     return false;
 }

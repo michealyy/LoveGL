@@ -12,8 +12,9 @@ namespace kd
 
 struct RayCastHit
 {
-  Entity *entity;
-  glm::vec3 point;
+  Entity *entity = nullptr;
+  glm::vec2 point;
+  float distance = 0.f;
 };
 
 class Mesh : public Entity

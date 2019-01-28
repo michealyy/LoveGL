@@ -27,6 +27,7 @@ private:
   Label *fps_label_;
   Label *draw_call_label_;
   Label *ui_draw_call_label_;
+  Label *selected_entity_label_;
 
   DISALLOW_COPY_AND_ASSIGN(UIRoot)
 };

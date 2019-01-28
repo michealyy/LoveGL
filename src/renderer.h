@@ -23,10 +23,12 @@ public:
   inline void AddTransparent(Mesh *mesh) { transparent_meshes_.push_back(mesh); }
   inline void AddUIRect(ui::UIRect *rect) { ui_rect_list_.push_back(rect); }
   void Render();
+  void DrawDebugLine(const float vertices[6]);
 
 private:
   void SetupUIBatchRender();
   void SetupPostProcessingRenderTexture();
+  void SetupDebugLines();
   void RenderSkyBox();
   void Render3DObjects();
   void DrawMesh(Mesh *mesh);
@@ -61,6 +63,10 @@ private:
 
   //ui input control
   bool is_left_mouse_btn_press = false;
+
+  //debug line
+  unsigned line_vao_ = 0;
+  unsigned line_vbo_ = 0;
 
   DISALLOW_COPY_AND_ASSIGN(Renderer)
 };

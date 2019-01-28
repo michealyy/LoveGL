@@ -31,6 +31,7 @@ void Renderer::Setup()
 {
     SetupPostProcessingRenderTexture();
     SetupUIBatchRender();
+    SetupDebugLines();
 }
 
 void Renderer::SetupPostProcessingRenderTexture()
@@ -127,6 +128,16 @@ void Renderer::SetupUIBatchRender()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void Renderer::SetupDebugLines()
+{
+    glGenVertexArrays(1, &line_vao_);
+    glBindVertexArray(line_vao_);
+    glGenBuffers(1, &line_vbo_);
+    glBindBuffer(GL_ARRAY_BUFFER, line_vbo_);
+    glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+}
+
 void Renderer::AddMesh(Mesh *mesh)
 {
     if (mesh != nullptr && mesh->material != nullptr)
@@ -140,7 +151,7 @@ void Renderer::AddMesh(Mesh *mesh)
 
 void Renderer::Render()
 {
-    RenderSkyBox();
+    RenderSkyBox();    
     Render3DObjects();
     BatchRenderUI();
 }
@@ -153,10 +164,11 @@ void Renderer::Render3DObjects()
 {
     //渲染到后处理贴图 TODO:FBO实现抗锯齿
     if (open_post_processing)
+    {
         glBindFramebuffer(GL_FRAMEBUFFER, post_processing_framebuffer_);
-    
-    glClearColor(UI_CLEAR_COLOR.r, UI_CLEAR_COLOR.g, UI_CLEAR_COLOR.b, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(UI_CLEAR_COLOR.r, UI_CLEAR_COLOR.g, UI_CLEAR_COLOR.b, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
 
     //开启深度测试，自动抛弃离摄像机远的片段
     glEnable(GL_DEPTH_TEST);
@@ -213,6 +225,7 @@ void Renderer::DrawMesh(Mesh *mesh)
     glBindVertexArray(mesh->vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
     glDrawElements(GL_TRIANGLES, (int)mesh->indices.size(), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 
     Engine::GetInstance()->draw_call++;
 }
@@ -225,6 +238,25 @@ void Renderer::SortTransparent()
         auto b_z = glm::column(b->localToCameraTransform, 3).z;
         return a_z < b_z;
     });
+}
+
+void Renderer::DrawDebugLine(const float vertices[6])
+{
+    //TODO:支持多个线段
+    auto camera = Engine::GetInstance()->mainCamera;
+    auto shader = Engine::GetInstance()->GetShader("unlit_pos");
+    shader->Bind();
+    shader->SetMatrix("mvp", camera->projectMatrix * camera->GetViewMatrix());
+    shader->SetFloat("alpha", 1);
+    shader->SetVector3("color", glm::vec3(0,1,0));
+    
+    glBindVertexArray(line_vao_);
+
+    //float _vertices[] = {0,0,0, 0,2,0};
+    glBindBuffer(GL_ARRAY_BUFFER, line_vbo_);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*6, vertices, GL_STATIC_DRAW);
+
+    glDrawArrays(GL_LINE_LOOP, 0, 2);
 }
 
 void Renderer::SortUIRectByDepthAndHandleInput()
@@ -360,6 +392,7 @@ void Renderer::GenerateUIDrawCall(unsigned last_rect_index)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ui_vbo_[1]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ui_indices_[0]) * ui_element_index_, ui_indices_, GL_STATIC_DRAW);
     glDrawElements(GL_TRIANGLES, ui_element_index_, GL_UNSIGNED_SHORT, 0);
+    glBindVertexArray(0);
 
     Engine::GetInstance()->ui_vertices = Engine::GetInstance()->ui_vertices + ui_vertex_index_;
     Engine::GetInstance()->ui_draw_call++;

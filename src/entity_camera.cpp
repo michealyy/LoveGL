@@ -63,26 +63,21 @@ mat4 Camera::GetViewMatrix()
     return inverse(worldTransform);
 }
 
-Ray Camera::ScreenPointToRay(vec2 point)
+Ray Camera::MousePointToRay(vec2 point)
 {
     int width, height;
     glfwGetWindowSize(Engine::GetInstance()->GetMainWindow(), &width, &height);
+
+    float mouseX = point.x / (width  * 0.5f) - 1.0f;
+    float mouseY = point.y / (height * 0.5f) - 1.0f;
+    vec4 screenPos = vec4(mouseX, -mouseY, 1.0f, 1.0f);
     
-    auto world_dir = normalize(unProject(vec3(point, 1), worldTransform, projectMatrix, vec4(0.0f, 0.0f, width, height)));
+    auto invVP = inverse(projectMatrix * GetViewMatrix());
+    vec4 world_dir = invVP * screenPos;
+    vec3 worldDir = normalize(vec3(world_dir));
 
-    // // float mouseX = getMousePositionX() / (getWindowWidth()  * 0.5f) - 1.0f;
-    // // float mouseY = getMousePositionY() / (getWindowHeight() * 0.5f) - 1.0f;
-
-    // // glm::mat4 proj = glm::perspective(FoV, AspectRatio, Near, Far);
-    // // glm::mat4 view = glm::lookAt(glm::vec3(0.0f), CameraDirection, CameraUpVector);
-
-    // glm::mat4 invVP = glm::inverse(projectMatrix * worldTransform);
-    // //glm::vec4 screenPos = glm::vec4(mouseX, -mouseY, 1.0f, 1.0f);
-    // glm::vec4 worldPos = invVP * screenPos;
-
-    // glm::vec3 world_dir = glm::normalize(glm::vec3(worldPos));
-
-    return Ray{worldPosition, world_dir};
+    //auto world_dir = normalize(unProject(vec3(point, 1), inverse(worldTransform), projectMatrix, vec4(0.0f, 0.0f, width, height)));
+    return Ray{worldPosition, worldDir};
 }
 
 FreeCameraController::FreeCameraController()
