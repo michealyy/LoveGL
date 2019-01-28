@@ -37,6 +37,7 @@ public:
   virtual void AddVertices();
 
   unsigned vbo = 0;
+  std::vector<va::P_T_N_T_B> vertices;
   std::vector<va::Pos> vertices_pos;
   std::vector<va::Pos_Tex> vertices_pos_tex;
 

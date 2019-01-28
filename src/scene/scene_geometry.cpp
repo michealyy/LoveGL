@@ -47,6 +47,7 @@ void SceneGeometry::Setup()
     auto mat2 = new Material("unlit_pos_2");
     mat2->SetShader("unlit_pos");
     mat2->SetColor(vec3(0, 1, 0));
+    mat2->SetAlpha(0.2f);
     auto cone1 = new Mesh(mat2);
     cone1->SetMesh("cone");
     cone1->name = "cone1";
@@ -62,10 +63,11 @@ void SceneGeometry::Setup()
     box1->position = vec3(3, 0, 0);
     root->AddChild(box1);
 
-    auto mat4 = new Material("unlit_pos_3");
-    mat4->SetShader("unlit_pos");
-    mat4->SetColor(vec3(0, 0, 1));
-    mat4->SetAlpha(0.2f);
+    auto mat4 = new Material("blinn_phong_1");
+    mat4->SetShader("blinn_phong");
+    mat4->SetTexture("white");
+    // mat4->SetColor(vec3(0, 0, 1));
+    // mat4->SetAlpha(0.2f);
     auto sphere = new Mesh(mat4);
     sphere->SetMesh("sphere");
     sphere->name = "sphere";

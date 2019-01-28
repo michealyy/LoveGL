@@ -33,7 +33,7 @@ struct P_T_N_T_B
 
 struct MeshData
 {
-    std::vector<va::Pos_Tex> vertices;
+    std::vector<va::P_T_N_T_B> vertices;
     std::vector<unsigned> indices;
 };
 

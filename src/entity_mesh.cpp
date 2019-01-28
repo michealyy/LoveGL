@@ -31,7 +31,7 @@ void Mesh::Setup()
 
     AddVertices();
 
-    if (vertices_pos.size() < 2 && vertices_pos_tex.size() < 2)
+    if (vertices.size() < 2 && vertices_pos.size() < 2 && vertices_pos_tex.size() < 2)
     {
         fprintf(stderr, "[mesh] vertices size < 2");
         return;
@@ -43,32 +43,58 @@ void Mesh::Setup()
 
     glBindVertexArray(vao);
 
-    if (vertices_pos.size() > 1)
+    if (vertices.size() > 1)
     {
-        GLsizei stride = sizeof(va::Pos);
+        GLsizei stride = sizeof(va::P_T_N_T_B);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, vertices_pos.size() * stride, &vertices_pos[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * stride, &vertices[0], GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
+        //positions
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void *)0);
-    }
-    else if (vertices_pos_tex.size() > 1)
-    {
-        GLsizei stride = sizeof(va::Pos_Tex);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, vertices_pos_tex.size() * stride, &vertices_pos_tex[0], GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void *)0);
+        //texture coords
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(va::Pos_Tex, TexCoords));
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(va::P_T_N_T_B, TexCoords));
+        //normals
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(va::P_T_N_T_B, Normal));
+        //tangent
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(va::P_T_N_T_B, Tangent));
+        //bitangent
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(va::P_T_N_T_B, Bitangent));
     }
+
+    // if (vertices_pos.size() > 1)
+    // {
+    //     GLsizei stride = sizeof(va::Pos);
+    //     glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    //     glBufferData(GL_ARRAY_BUFFER, vertices_pos.size() * stride, &vertices_pos[0], GL_STATIC_DRAW);
+
+    //     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    //     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+
+    //     glEnableVertexAttribArray(0);
+    //     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void *)0);
+    // }
+    // else if (vertices_pos_tex.size() > 1)
+    // {
+    //     GLsizei stride = sizeof(va::Pos_Tex);
+    //     glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    //     glBufferData(GL_ARRAY_BUFFER, vertices_pos_tex.size() * stride, &vertices_pos_tex[0], GL_STATIC_DRAW);
+
+    //     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    //     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+
+    //     glEnableVertexAttribArray(0);
+    //     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void *)0);
+    //     glEnableVertexAttribArray(1);
+    //     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(va::Pos_Tex, TexCoords));
+    // }
 }
 
 void Mesh::Update(float deltaTime)
@@ -126,7 +152,7 @@ void Mesh::SetMesh(const std::string &name)
     auto mesh = Engine::GetInstance()->GetMesh(name);
     if (mesh)
     {
-        this->vertices_pos_tex = mesh->vertices;
+        this->vertices = mesh->vertices;
         this->indices = mesh->indices;
     }
 }

@@ -14,10 +14,9 @@ out vec3 _lightDir;
 out vec3 _cameraDir;
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
-uniform vec3 lightPosition;
+uniform mat4 mvp;
 uniform vec3 cameraPos;
+uniform vec3 lightPosition;
 
 void main()
 {
@@ -28,7 +27,7 @@ void main()
     _lightDir = lightPosition - worldPos.xyz;
     _cameraDir = cameraPos - worldPos.xyz;
 
-    gl_Position = projection * view * worldPos;
+    gl_Position = mvp * vec4(pos, 1.0);
 }
 
 #fragment
@@ -51,7 +50,7 @@ void main()
     vec3 N = normalize(_normal);
 
     float ambient = 0.2;
-    //float shininess = 100;
+    float shininess = 100;
     //漫反射强度：平面法线和光源方向夹角相关
     float diffuse = clamp(dot(N, L), 0.0, 1.0);
 

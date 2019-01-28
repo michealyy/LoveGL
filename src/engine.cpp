@@ -28,7 +28,7 @@ void Engine::OnSetup()
 	LoadShaders();
 	LoadMaterials();
 	LoadMeshes();
-	
+
 	FontManager::GetInstance()->Setup("FreeSans.ttf");
 
 	Renderer::GetInstance()->Setup();
@@ -177,15 +177,19 @@ void Engine::LoadMeshes()
 					auto mesh = new MeshData();
 					for (int i = 0; i < loader.LoadedMeshes.size(); i++)
 					{
-						objl::Mesh curMesh = loader.LoadedMeshes[i];
+						auto curMesh = loader.LoadedMeshes[i];
 						for (int j = 0; j < curMesh.Vertices.size(); j++)
 						{
-							va::Pos_Tex vertex;
-							auto pos = curMesh.Vertices[j].Position;
+							auto vertices = curMesh.Vertices[j];
+							va::P_T_N_T_B vertex;
+							auto pos = vertices.Position;
 							vertex.Position = glm::vec3(pos.X, pos.Y, pos.Z);
-							auto uv = curMesh.Vertices[j].TextureCoordinate;
+							auto uv = vertices.TextureCoordinate;
 							vertex.TexCoords = glm::vec2(uv.X, uv.Y);
+							auto normal = vertices.Normal;
+							vertex.Normal = glm::vec3(normal.X, normal.Y, normal.Z);
 							mesh->vertices.push_back(vertex);
+							//TODO: Tangent + Bitangent
 						}
 						for (int j = 0; j < curMesh.Indices.size(); j++)
 						{

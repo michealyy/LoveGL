@@ -220,7 +220,11 @@ void Renderer::DrawMesh(Mesh *mesh)
     }
 
     material->Bind();
-    material->GetShader()->SetMatrix("mvp", camera->projectMatrix * mesh->localToCameraTransform);
+    auto shader = material->GetShader();
+    shader->SetMatrix("mvp", camera->projectMatrix * mesh->localToCameraTransform);
+    shader->SetMatrix("model", mesh->worldTransform);
+    shader->SetVector3("cameraPos", camera->worldPosition);
+    shader->SetVector3("lightPosition", glm::vec3(-10,0,0));
 
     glBindVertexArray(mesh->vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
