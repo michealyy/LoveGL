@@ -115,4 +115,40 @@ bool Mesh::Raycast(Ray ray, RayCastHit &rayCastHit)
     return false;
 }
 
+bool Mesh::LoadFromFbx(const std::string& path)
+{
+    FILE* fp = fopen(path.c_str(), "rb");
+	if (!fp) return false;
+
+	fseek(fp, 0, SEEK_END);
+	long file_size = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+	auto* content = new ofbx::u8[file_size];
+	fread(content, 1, file_size, fp);
+	auto scene = ofbx::load((ofbx::u8*)content, file_size);
+    if (scene)
+    {
+        LoadNodeRecursively(scene->getRoot());
+    }
+    
+    delete[] content;
+	fclose(fp);
+}
+
+void Mesh::LoadNodeRecursively(const ofbx::Object& object)
+{
+    if (object.getType()== ofbx::Object::Type::MESH)
+    {
+        int i = 0;
+        while (ofbx::Object* child = object.resolveObjectLink(i))
+        {
+            LoadNodeRecursively(*child);
+            ++i;
+        }
+    }
+}
+
+void Mesh::ProcessNode()
+{}
+
 } // namespace kd
