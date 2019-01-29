@@ -223,8 +223,23 @@ void Renderer::DrawMesh(Mesh *mesh)
     auto shader = material->GetShader();
     shader->SetMatrix("mvp", camera->projectMatrix * mesh->localToCameraTransform);
     shader->SetMatrix("model", mesh->worldTransform);
-    shader->SetVector3("cameraPos", camera->worldPosition);
-    shader->SetVector3("lightPosition", glm::vec3(-10,0,0));
+    shader->SetVector3("viewPos", camera->worldPosition);
+    //平行光测试
+    shader->SetVector3("directionalLight.color", glm::vec3(0.4f, 0.4f, 0.4f));
+    shader->SetVector3("directionalLight.direction", glm::vec3(0, -1, 0));
+    //点光测试
+    shader->SetInt("pointLightsCount", 1);
+    shader->SetVector3("pointLights[0].color", glm::vec3(1, 0, 0));
+    shader->SetVector3("pointLights[0].position", glm::vec3(-2, 1, 0));
+    shader->SetFloat("pointLights[0].constant", 1);
+    shader->SetFloat("pointLights[0].linear", 0.14f);
+    shader->SetFloat("pointLights[0].quadratic", 0.07f);
+    //聚光测试
+    shader->SetInt("spotLightsCount", 1);
+    shader->SetVector3("spotLights[0].color", glm::vec3(0, 1, 0));
+    shader->SetVector3("spotLights[0].position", glm::vec3(2, 2, 2));
+    shader->SetVector3("spotLights[0].direction", glm::vec3(0, -1, 0));
+    shader->SetFloat("spotLights[0].angle", glm::cos(glm::radians(15.f)));
 
     glBindVertexArray(mesh->vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);

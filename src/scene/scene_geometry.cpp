@@ -66,13 +66,24 @@ void SceneGeometry::Setup()
     auto mat4 = new Material("blinn_phong_1");
     mat4->SetShader("blinn_phong");
     mat4->SetTexture("white");
-    // mat4->SetColor(vec3(0, 0, 1));
+    mat4->SetColor(vec3(1, 0, 0));
     // mat4->SetAlpha(0.2f);
     auto sphere = new Mesh(mat4);
     sphere->SetMesh("sphere");
     sphere->name = "sphere";
     sphere->position = vec3(6, 0, 0);
     root->AddChild(sphere);
+
+    //大地面
+    auto mat5 = new Material("blinn_phong_2");
+    mat5->SetShader("blinn_phong");
+    mat5->SetTexture("white");
+    auto plane = new Mesh(mat5);
+    plane->SetMesh("plane");
+    plane->name = "plane";
+    plane->position = vec3(0, -1, 0);
+    plane->scale = vec3(10,0.01,10);
+    root->AddChild(plane);
 
     Scene::Setup();
 }
