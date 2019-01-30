@@ -11,7 +11,7 @@ namespace kd
 
 class SceneManager
 {
-public:
+  public:
 	explicit SceneManager();
 	virtual ~SceneManager();
 
@@ -20,56 +20,48 @@ public:
 
 	inline Entity *GetRoot() { return root_; }
 	inline std::vector<Entity *> &GetEntities() { return entities_; };
-	inline std::vector<Camera *> &GetCameras() { return cameras_; };
-	inline std::vector<Light *> &GetLights() { return lights_; };
+	// inline std::vector<Camera *> &GetCameras() { return cameras_; };
+	// inline std::vector<Light *> &GetLights() { return lights_; };
 	//void RemoveEntity();
+	void Render();
 
-protected:
+  protected:
 	Entity *root_ = nullptr;
 	std::vector<Entity *> entities_;
 	std::vector<Camera *> cameras_;
-	std::vector<Light *> lights_;
+	DirectionalLight* directionalLight_ = nullptr;
+	std::vector<PointLight *> pointLights_;
+	std::vector<SpotLight *> spotLights_;
 
-private:
+  private:
+	void DrawMesh(Camera *camera, Mesh *mesh);
+
 	DISALLOW_COPY_AND_ASSIGN(SceneManager)
 
-public:
+  public:
 	template <typename ClassType>
 	ClassType *CreateEntity(Entity *parent = nullptr)
 	{
 		if (parent == nullptr)
 			parent = root_;
 
-		if (typeid(ClassType) == typeid(Mesh))
+		auto entity = new ClassType();
+		parent->AddChild(entity);
+		entities_.push_back(entity);
+		
+		if (typeid(ClassType) == typeid(Camera))
+			cameras_.push_back(dynamic_cast<Camera *>(entity));
+		else if (typeid(ClassType) == typeid(DirectionalLight))
 		{
-			auto mesh = new Mesh();
-			parent->AddChild(mesh);
-			entities_.push_back(mesh);
-			return dynamic_cast<ClassType *>(mesh);
+			SafeDelete(directionalLight_);
+			directionalLight_ = dynamic_cast<DirectionalLight *>(entity);
 		}
-		else if (typeid(ClassType) == typeid(Camera))
-		{
-			auto camera = new Camera();
-			parent->AddChild(camera);
-			cameras_.push_back(camera);
-			entities_.push_back(camera);
-			return dynamic_cast<ClassType *>(camera);
-		}
-		else if (typeid(ClassType) == typeid(Light))
-		{
-			auto light = new Light();
-			parent->AddChild(light);
-			lights_.push_back(light);
-			entities_.push_back(light);
-			return dynamic_cast<ClassType *>(light);
-		}
-		else
-		{
-			auto entity = new Entity();
-			parent->AddChild(entity);
-			entities_.push_back(entity);
-			return dynamic_cast<ClassType *>(entity);
-		}
+		else if (typeid(ClassType) == typeid(PointLight))
+			pointLights_.push_back(dynamic_cast<PointLight *>(entity));
+		else if (typeid(ClassType) == typeid(SpotLight))
+			spotLights_.push_back(dynamic_cast<SpotLight *>(entity));
+		
+		return entity;
 	}
 };
 

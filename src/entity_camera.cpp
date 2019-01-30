@@ -42,6 +42,14 @@ void Camera::Update(float deltaTime)
         cameraController->Update(deltaTime);
 }
 
+void Camera::RenderScene()
+{
+    if (renderTarget)
+        renderTarget->Bind();
+    
+    //Engine::GetInstance()->sceneManager->Re
+}
+
 void Camera::SetPerspective()
 {
     isOrtho = false;

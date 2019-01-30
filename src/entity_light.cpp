@@ -11,11 +11,11 @@ Light::~Light()
 {
 }
 
-void Light::Setup()
+DirectionalLight::DirectionalLight()
 {
 }
 
-void Light::Update(float deltaTime)
+DirectionalLight::~DirectionalLight()
 {
 }
 

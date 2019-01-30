@@ -1,4 +1,4 @@
-#include "app_light.h"
+﻿#include "app_light.h"
 #include <glm/glm.hpp>
 #include "../engine.h"
 #include "../renderer.h"
@@ -19,12 +19,31 @@ void AppLight::Setup()
     scnMgr = new SceneManager();
     Engine::GetInstance()->sceneManager = scnMgr;
     
+    //主摄像机
     auto camera = scnMgr->CreateEntity<Camera>();
     camera->name = "MainCamera";
     camera->SetController(new FreeCameraController());
     camera->position = vec3(0, 0, 10);
     Engine::GetInstance()->mainCamera = camera;
 
+    //灯源
+    auto directionalLight = scnMgr->CreateEntity<DirectionalLight>();
+    directionalLight->color = vec3(0.4, 0.4, 0.4);
+    directionalLight->direction = vec3(0, -1, 0);
+
+    auto pointLight = scnMgr->CreateEntity<PointLight>();
+    pointLight->color = vec3(1, 0, 0);
+    pointLight->position = vec3(-2, 1, 0);
+    pointLight->linear = 0.14f;
+    pointLight->quadratic = 0.07f;
+    
+    auto spotLight = scnMgr->CreateEntity<SpotLight>();
+    spotLight->color = vec3(0, 1, 0);
+    spotLight->position = vec3(2, 2, 2);
+    spotLight->direction = vec3(0, -1, 0);
+    spotLight->angle = cos(radians(15.f));
+
+    //网格物体
     auto mat1 = new Material("unlit_pos_1");
     mat1->SetShader("unlit_pos");
     mat1->SetColor(vec3(1, 0, 0));
@@ -54,32 +73,26 @@ void AppLight::Setup()
     box1->name = "box1";
     box1->position = vec3(3, 0, 0);
 
-    // auto mat4 = new Material("blinn_phong_1");
-    // mat4->SetShader("blinn_phong");
-    // mat4->SetTexture("white");
-    // mat4->SetColor(vec3(1, 0, 0));
-    // auto sphere = scnMgr->CreateEntity<Mesh>();
-    // sphere->material = mat4;
-    // sphere->SetMesh("sphere");
-    // sphere->name = "sphere";
-    // sphere->position = vec3(6, 0, 0);
+    auto mat4 = new Material("blinn_phong_1");
+    mat4->SetShader("blinn_phong");
+    mat4->SetTexture("white");
+    mat4->SetColor(vec3(1, 0, 0));
+    auto sphere = scnMgr->CreateEntity<Mesh>();
+    sphere->material = mat4;
+    sphere->SetMesh("sphere");
+    sphere->name = "sphere";
+    sphere->position = vec3(6, 0, 0);
 
     //大地面
-    // auto mat5 = new Material("blinn_phong_2");
-    // mat5->SetShader("blinn_phong");
-    // mat5->SetTexture("white");
-    // auto plane = scnMgr->CreateEntity<Mesh>();
-    // plane->material = mat5;
-    // plane->SetMesh("plane");
-    // plane->name = "plane";
-    // plane->position = vec3(0, -1, 0);
-    // plane->scale = vec3(10,0.01,10);
-
-
-
-
-    auto light = scnMgr->CreateEntity<Light>();
-    int a = 0;
+    auto mat5 = new Material("blinn_phong_2");
+    mat5->SetShader("blinn_phong");
+    mat5->SetTexture("white");
+    auto plane = scnMgr->CreateEntity<Mesh>();
+    plane->material = mat5;
+    plane->SetMesh("plane");
+    plane->name = "plane";
+    plane->position = vec3(0, -1, 0);
+    plane->scale = vec3(10, 1, 10);
 }
 
 void AppLight::Update(float deltaTime)

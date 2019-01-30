@@ -2,6 +2,7 @@
 
 #include "entity.h"
 #include "ray.h"
+#include "render_target.h"
 
 namespace kd
 {
@@ -27,6 +28,7 @@ public:
 
   virtual void Setup() override;
   virtual void Update(float deltaTime) override;
+  void RenderScene();
 
   void SetPerspective();
   void SetOrtho(glm::vec2 size);
@@ -38,6 +40,16 @@ public:
     controller->camera = this;
   };
 
+  RenderTarget *renderTarget = nullptr;
+  int depth = 0;
+  bool isOverlay = true;
+  glm::vec3 clearColor{1};
+  bool isLinePolygon = false;
+  glm::mat4 projectMatrix{1.0f};
+
+private:
+  CameraController *cameraController = nullptr;
+
   float fov = 45.0f;
   bool isOrtho = false;
   float _near = 0.1f;
@@ -46,11 +58,6 @@ public:
   float right = 1.0f;
   float bottom = 0.0f;
   float top = 1.0f;
-
-  glm::mat4 projectMatrix{1.0f};
-
-private:
-  CameraController *cameraController = nullptr;
 
   DISALLOW_COPY_AND_ASSIGN(Camera)
 };

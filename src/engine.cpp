@@ -51,20 +51,21 @@ void Engine::OnUpdate()
 	float _time = (float)glfwGetTime();
 	float deltaTime = _time - lastTime;
 	lastTime = _time;
+	
 	fps = (int)(1.f / deltaTime);
+	draw_call = 0;
+	ui_draw_call = 0;
+	ui_vertices = 0;
+
+	if (app_)
+		app_->Update(deltaTime);
 	
 	if (sceneManager)
 		sceneManager->Update(deltaTime);
 	
-	if (app_)
-		app_->Update(deltaTime);
-	
 	if (ui_root)
 		this->ui_root->Update(deltaTime);
-
-	draw_call = 0;
-	ui_draw_call = 0;
-	ui_vertices = 0;
+	
 	Renderer::GetInstance()->Render();
 }
 

@@ -152,7 +152,7 @@ void Renderer::AddMesh(Mesh *mesh)
 void Renderer::Render()
 {
     RenderSkyBox();    
-    Render3DObjects();
+    //Render3DObjects();
     BatchRenderUI();
 }
 

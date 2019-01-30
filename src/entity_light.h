@@ -11,12 +11,7 @@ class Light : public Entity
 public:
   explicit Light();
   virtual ~Light();
-
-  virtual void Setup() override;
-  virtual void Update(float deltaTime) override;
   glm::vec3 color{1};
-
-protected:
 
 private:
   DISALLOW_COPY_AND_ASSIGN(Light)
