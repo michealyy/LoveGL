@@ -1,97 +1,89 @@
-﻿#include "scene_geometry.h"
+#include "app_light.h"
 #include <glm/glm.hpp>
 #include "../engine.h"
 #include "../renderer.h"
-#include "../material.h"
-#include "../entity_camera.h"
-#include "../entity_geometry.h"
-#include "../ui/ui_rect.h"
-#include "../ui/ui_root.h"
 
+using namespace kd;
 using namespace glm;
 
-namespace kd
-{
-
-SceneGeometry::SceneGeometry()
+AppLight::AppLight()
 {
 }
 
-SceneGeometry::~SceneGeometry()
+AppLight::~AppLight()
 {
 }
 
-void SceneGeometry::Setup()
+void AppLight::Setup()
 {
-    auto root = new Entity();
-    root->name = "Root";
-    AddEntity(root);
-
-    auto camera = new Camera();
-    camera->name = "SceneGeometry camera";
+    scnMgr = new SceneManager();
+    Engine::GetInstance()->sceneManager = scnMgr;
+    
+    auto camera = scnMgr->CreateEntity<Camera>();
+    camera->name = "MainCamera";
     camera->SetController(new FreeCameraController());
     camera->position = vec3(0, 0, 10);
     Engine::GetInstance()->mainCamera = camera;
-    AddEntity(camera);
 
     auto mat1 = new Material("unlit_pos_1");
     mat1->SetShader("unlit_pos");
     mat1->SetColor(vec3(1, 0, 0));
     mat1->SetAlpha(0.5f);
-    auto cylinder1 = new Mesh(mat1);
+    auto cylinder1 = scnMgr->CreateEntity<Mesh>();
+    cylinder1->material = mat1;
     cylinder1->SetMesh("cylinder");
     cylinder1->name = "cylinder1";
     cylinder1->position = vec3(-3, 0, 0);
-    root->AddChild(cylinder1);
-
+    
     auto mat2 = new Material("unlit_pos_2");
     mat2->SetShader("unlit_pos");
     mat2->SetColor(vec3(0, 1, 0));
     mat2->SetAlpha(0.2f);
-    auto cone1 = new Mesh(mat2);
+    auto cone1 = scnMgr->CreateEntity<Mesh>();
+    cone1->material = mat2;
     cone1->SetMesh("cone");
     cone1->name = "cone1";
     cone1->position = vec3(0, 0, 0);
-    root->AddChild(cone1);
 
     auto mat3 = new Material("unlit_pos_tex_1");
     mat3->SetShader("unlit_pos_tex");
     mat3->SetTexture("wood");
-    auto box1 = new Mesh(mat3);
+    auto box1 = scnMgr->CreateEntity<Mesh>();
+    box1->material = mat3;
     box1->SetMesh("box");
     box1->name = "box1";
     box1->position = vec3(3, 0, 0);
-    root->AddChild(box1);
 
-    auto mat4 = new Material("blinn_phong_1");
-    mat4->SetShader("blinn_phong");
-    mat4->SetTexture("white");
-    mat4->SetColor(vec3(1, 0, 0));
-    // mat4->SetAlpha(0.2f);
-    auto sphere = new Mesh(mat4);
-    sphere->SetMesh("sphere");
-    sphere->name = "sphere";
-    sphere->position = vec3(6, 0, 0);
-    root->AddChild(sphere);
+    // auto mat4 = new Material("blinn_phong_1");
+    // mat4->SetShader("blinn_phong");
+    // mat4->SetTexture("white");
+    // mat4->SetColor(vec3(1, 0, 0));
+    // auto sphere = scnMgr->CreateEntity<Mesh>();
+    // sphere->material = mat4;
+    // sphere->SetMesh("sphere");
+    // sphere->name = "sphere";
+    // sphere->position = vec3(6, 0, 0);
 
     //大地面
-    auto mat5 = new Material("blinn_phong_2");
-    mat5->SetShader("blinn_phong");
-    mat5->SetTexture("white");
-    auto plane = new Mesh(mat5);
-    plane->SetMesh("plane");
-    plane->name = "plane";
-    plane->position = vec3(0, -1, 0);
-    plane->scale = vec3(10,0.01,10);
-    root->AddChild(plane);
+    // auto mat5 = new Material("blinn_phong_2");
+    // mat5->SetShader("blinn_phong");
+    // mat5->SetTexture("white");
+    // auto plane = scnMgr->CreateEntity<Mesh>();
+    // plane->material = mat5;
+    // plane->SetMesh("plane");
+    // plane->name = "plane";
+    // plane->position = vec3(0, -1, 0);
+    // plane->scale = vec3(10,0.01,10);
 
-    Scene::Setup();
+
+
+
+    auto light = scnMgr->CreateEntity<Light>();
+    int a = 0;
 }
 
-void SceneGeometry::Update(float deltaTime)
+void AppLight::Update(float deltaTime)
 {
-    Scene::Update(deltaTime);
-
     //场景拾取
     auto main_window = Engine::GetInstance()->GetMainWindow();
     double x, y;
@@ -106,7 +98,7 @@ void SceneGeometry::Update(float deltaTime)
 
     if (glfwGetMouseButton(main_window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS && Engine::GetInstance()->mainCamera)
     {
-        for(auto entities : entities_)
+        for(auto entities : scnMgr->GetEntities())
         {
             auto mesh = dynamic_cast<Mesh*>(entities);
             if (mesh)
@@ -121,5 +113,3 @@ void SceneGeometry::Update(float deltaTime)
         }
     }
 }
-
-} // namespace kd

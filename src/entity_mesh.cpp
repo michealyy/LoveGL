@@ -110,7 +110,7 @@ void Mesh::AddVertices()
 
 bool Mesh::Raycast(Ray ray, RayCastHit &rayCastHit)
 {
-    if (vertices_pos_tex.size() <= 0)
+    if (vertices.size() <= 0)
         return false;
     
     //遍历几何体所有三角面进行射线碰撞检测
@@ -121,9 +121,9 @@ bool Mesh::Raycast(Ray ray, RayCastHit &rayCastHit)
         auto va_index_2 = indices[i + 1];
         auto va_index_3 = indices[i + 2];
         
-        vec3 va_1 = worldTransform * vec4(vertices_pos_tex[va_index_1].Position, 1.f);
-        vec3 va_2 = worldTransform * vec4(vertices_pos_tex[va_index_2].Position, 1.f);
-        vec3 va_3 = worldTransform * vec4(vertices_pos_tex[va_index_3].Position, 1.f);
+        vec3 va_1 = worldTransform * vec4(vertices[va_index_1].Position, 1.f);
+        vec3 va_2 = worldTransform * vec4(vertices[va_index_2].Position, 1.f);
+        vec3 va_3 = worldTransform * vec4(vertices[va_index_3].Position, 1.f);
 
         vec2 bary_pos;
         float distance;

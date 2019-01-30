@@ -8,8 +8,6 @@
 namespace kd
 {
 
-class Scene;
-
 class Entity
 {
 public:
@@ -28,8 +26,8 @@ public:
 
 	std::string name;
 
+	//切场景不删除
 	bool notDeleteByScene = false;
-	Scene *scene = nullptr;
 
 	glm::vec3 position{0.0f};
 	glm::vec3 scale{1.0f};
@@ -52,7 +50,6 @@ public:
 
 private:
 	
-
 	DISALLOW_COPY_AND_ASSIGN(Entity)
 };
 

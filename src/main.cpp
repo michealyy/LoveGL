@@ -2,8 +2,10 @@
 #include <GLFW/glfw3.h>
 #include "config.h"
 #include "engine.h"
+#include "example/app_light.h"
 
-int main(int, char**) {
+int main(int, char **)
+{
 	using namespace kd;
 
 	if (!glfwInit())
@@ -15,13 +17,13 @@ int main(int, char**) {
 	//only forward render path
 	glfwWindowHint(GLFW_SAMPLES, 8);
 
-	GLFWwindow* window = glfwCreateWindow(static_cast<int>(WINDOW_SIZE.x), static_cast<int>(WINDOW_SIZE.y), "kdRenderStudio", NULL, NULL);
+	GLFWwindow *window = glfwCreateWindow(static_cast<int>(WINDOW_SIZE.x), static_cast<int>(WINDOW_SIZE.y), "kdRenderStudio", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
 		return -1;
 	}
-	
+
 	glfwMakeContextCurrent(window);
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
@@ -41,6 +43,8 @@ int main(int, char**) {
 	}
 
 	Engine::GetInstance()->SetMainWindow(window);
+	Engine::GetInstance()->SetApp(new AppLight());
+	
 	Engine::GetInstance()->OnSetup();
 	while (!glfwWindowShouldClose(window))
 	{

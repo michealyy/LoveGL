@@ -1,4 +1,4 @@
-#include "scene.h"
+#include "scene_manager.h"
 #include "engine.h"
 
 using namespace std;
@@ -6,20 +6,22 @@ using namespace std;
 namespace kd
 {
 
-Scene::Scene()
+SceneManager::SceneManager()
 {
+    root_ = new Entity();
+    root_->name = "Root";
+    entities_.push_back(root_);
 }
 
-Scene::~Scene()
+SceneManager::~SceneManager()
 {
     for (auto entity : entities_)
     {
-        if (!entity->notDeleteByScene)
-            SafeDelete(entity);
+        SafeDelete(entity);
     }
 }
 
-void Scene::Setup()
+void SceneManager::Setup()
 {
     for (auto entity : entities_)
     {
@@ -27,7 +29,7 @@ void Scene::Setup()
     }
 }
 
-void Scene::Update(float deltaTime)
+void SceneManager::Update(float deltaTime)
 {
     if (Engine::GetInstance()->mainCamera == nullptr)
     {

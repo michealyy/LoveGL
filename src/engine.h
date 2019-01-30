@@ -6,10 +6,11 @@
 #include "shader.h"
 #include "material.h"
 #include "texture.h"
-#include "scene.h"
 #include "vertex_attribute.h"
 #include "entity_camera.h"
 #include "ui/ui_root.h"
+#include "scene_manager.h"
+#include "app.h"
 
 namespace kd
 {
@@ -21,6 +22,7 @@ class Engine final : public Singleton<Engine>
 	explicit Engine();
 	~Engine();
 
+	inline void SetApp(App *app) { app_ = app; }
 	inline void SetMainWindow(GLFWwindow *wnd) { main_window_ = wnd; }
 	inline GLFWwindow *GetMainWindow() { return main_window_; }
 	void OnSetup();
@@ -34,7 +36,8 @@ class Engine final : public Singleton<Engine>
 	inline void AddTexture(const std::string &name, Texture *texture) { textures_[name] = texture; }
 	inline void AddMaterial(const std::string &name, Material *material) { materials_[name] = material; }
 
-	Scene *currentScene = nullptr;
+	SceneManager* sceneManager = nullptr;
+	
 	Camera *mainCamera = nullptr;
 	ui::UIRoot *ui_root = nullptr;
 	Entity *selected_entity = nullptr;
@@ -45,6 +48,7 @@ class Engine final : public Singleton<Engine>
 	unsigned ui_vertices = 0;
 
   private:
+  	App* app_ = nullptr;
 	GLFWwindow *main_window_;
 	float lastTime = 0.0f;
 	std::map<std::string, Texture *> textures_;

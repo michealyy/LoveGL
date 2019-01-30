@@ -3,7 +3,6 @@
 #include <glm/glm.hpp>
 #include "config.h"
 #include "renderer.h"
-#include "scene/scene_geometry.h"
 #include "ui/font_manager.h"
 #include "obj_loader.h"
 
@@ -18,7 +17,7 @@ Engine::Engine()
 
 Engine::~Engine()
 {
-	SafeDelete(currentScene);
+	SafeDelete(app_);
 	SafeDelete(ui_root);
 }
 
@@ -33,8 +32,15 @@ void Engine::OnSetup()
 
 	Renderer::GetInstance()->Setup();
 
-	this->currentScene = new SceneGeometry();
-	this->currentScene->Setup();
+	if (app_)
+		app_->Setup();
+	else
+		fprintf(stderr, "[Engine]app == nullptr");
+	
+	if (sceneManager)
+		sceneManager->Setup();
+	else
+		fprintf(stderr, "[Engine]sceneManager == nullptr");
 
 	ui_root = new ui::UIRoot();
 	ui_root->Setup();
@@ -46,10 +52,13 @@ void Engine::OnUpdate()
 	float deltaTime = _time - lastTime;
 	lastTime = _time;
 	fps = (int)(1.f / deltaTime);
-
-	if (currentScene)
-		this->currentScene->Update(deltaTime);
-
+	
+	if (sceneManager)
+		sceneManager->Update(deltaTime);
+	
+	if (app_)
+		app_->Update(deltaTime);
+	
 	if (ui_root)
 		this->ui_root->Update(deltaTime);
 

@@ -3,7 +3,6 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include "scene.h"
 #include "engine.h"
 
 using namespace std;
@@ -46,11 +45,6 @@ void Entity::AddChild(Entity *child)
 	}
 	child->parent_ = this;
 	children_.push_back(child);
-
-	if (scene != nullptr)
-	{
-		scene->AddEntity(child);
-	}
 }
 
 Entity *Entity::FindChild(const string &name)
@@ -77,7 +71,7 @@ void Entity::RemoveAllChild()
 	// 	SafeDelete(child);
 	// }
 	// children_.clear();
-	// Remove from Scene
+	// Remove from SceneManager
 }
 
 void Entity::UpdateModelMatrix()
