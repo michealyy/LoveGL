@@ -1,4 +1,5 @@
 ﻿#include "scene_manager.h"
+#include <string>
 #include <glad/glad.h>
 #include <algorithm>
 #include <glm/gtc/matrix_access.hpp>
@@ -121,21 +122,21 @@ void SceneManager::DrawMesh(Camera *camera, Mesh *mesh)
     for(int i = 0; i < pointLights_.size(); i++)
     {
         auto pointLight = pointLights_[i];
-        shader->SetVector3("pointLights[0].color", pointLight->color);
-        shader->SetVector3("pointLights[0].position", pointLight->position);
-        shader->SetFloat("pointLights[0].constant", pointLight->constant);
-        shader->SetFloat("pointLights[0].linear", pointLight->linear);
-        shader->SetFloat("pointLights[0].quadratic", pointLight->quadratic);
+        shader->SetVector3(string("pointLights[0].color").replace(12, 1, to_string(i)).c_str(), pointLight->color);
+        shader->SetVector3(string("pointLights[0].position").replace(12, 1, to_string(i)).c_str(), pointLight->position);
+        shader->SetFloat(string("pointLights[0].constant").replace(12, 1, to_string(i)).c_str(), pointLight->constant);
+        shader->SetFloat(string("pointLights[0].linear").replace(12, 1, to_string(i)).c_str(), pointLight->linear);
+        shader->SetFloat(string("pointLights[0].quadratic").replace(12, 1, to_string(i)).c_str(), pointLight->quadratic);
     }
     //聚光灯源
     shader->SetInt("spotLightsCount", (int)spotLights_.size());
     for(int i = 0; i < spotLights_.size(); i++)
     {
         auto spotLights = spotLights_[i];
-        shader->SetVector3("spotLights[0].color", spotLights->color);
-        shader->SetVector3("spotLights[0].position", spotLights->position);
-        shader->SetVector3("spotLights[0].direction", spotLights->direction);
-        shader->SetFloat("spotLights[0].angle", spotLights->angle);
+        shader->SetVector3(string("spotLights[0].color").replace(11, 1, to_string(i)).c_str(), spotLights->color);
+        shader->SetVector3(string("spotLights[0].position").replace(11, 1, to_string(i)).c_str(), spotLights->position);
+        shader->SetVector3(string("spotLights[0].direction").replace(11, 1, to_string(i)).c_str(), spotLights->direction);
+        shader->SetFloat(string("spotLights[0].angle").replace(11, 1, to_string(i)).c_str(), spotLights->angle);
     }
 
     glBindVertexArray(mesh->vao);

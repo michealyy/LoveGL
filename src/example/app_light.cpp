@@ -37,6 +37,12 @@ void AppLight::Setup()
     pointLight->linear = 0.14f;
     pointLight->quadratic = 0.07f;
     
+    auto pointLight2 = scnMgr->CreateEntity<PointLight>();
+    pointLight2->color = vec3(0, 0, 1);
+    pointLight2->position = vec3(0, 1, -5);
+    pointLight2->linear = 0.14f;
+    pointLight2->quadratic = 0.07f;
+
     auto spotLight = scnMgr->CreateEntity<SpotLight>();
     spotLight->color = vec3(0, 1, 0);
     spotLight->position = vec3(2, 2, 2);
