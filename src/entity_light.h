@@ -35,8 +35,8 @@ public:
   explicit PointLight();
   virtual ~PointLight();
   float constant = 1.f;
-  float linear;
-  float quadratic;
+  float linear = 0.2f;
+  float quadratic = 0.2f;
 
 private:
   DISALLOW_COPY_AND_ASSIGN(PointLight)
@@ -49,7 +49,8 @@ public:
   virtual ~SpotLight();
   glm::vec3 position;
   glm::vec3 direction;
-  float angle;
+  float innerAngle = 0.f;
+  float outerAngle = 0.f;
 
 private:
   DISALLOW_COPY_AND_ASSIGN(SpotLight)

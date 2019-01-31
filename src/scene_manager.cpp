@@ -136,7 +136,8 @@ void SceneManager::DrawMesh(Camera *camera, Mesh *mesh)
         shader->SetVector3(string("spotLights[0].color").replace(11, 1, to_string(i)).c_str(), spotLights->color);
         shader->SetVector3(string("spotLights[0].position").replace(11, 1, to_string(i)).c_str(), spotLights->position);
         shader->SetVector3(string("spotLights[0].direction").replace(11, 1, to_string(i)).c_str(), spotLights->direction);
-        shader->SetFloat(string("spotLights[0].angle").replace(11, 1, to_string(i)).c_str(), spotLights->angle);
+        shader->SetFloat(string("spotLights[0].innerAngle").replace(11, 1, to_string(i)).c_str(), spotLights->innerAngle);
+        shader->SetFloat(string("spotLights[0].outerAngle").replace(11, 1, to_string(i)).c_str(), spotLights->outerAngle);
     }
 
     glBindVertexArray(mesh->vao);

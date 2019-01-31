@@ -41,6 +41,7 @@ int main(int, char **)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
+	//glEnable(GL_FRAMEBUFFER_SRGB);
 
 	Engine::GetInstance()->SetMainWindow(window);
 	Engine::GetInstance()->SetApp(new AppLight());

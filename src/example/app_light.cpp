@@ -44,10 +44,11 @@ void AppLight::Setup()
     pointLight2->quadratic = 0.07f;
 
     auto spotLight = scnMgr->CreateEntity<SpotLight>();
-    spotLight->color = vec3(0, 1, 0);
+    spotLight->color = vec3(1,1,0.5f);
     spotLight->position = vec3(2, 2, 2);
     spotLight->direction = vec3(0, -1, 0);
-    spotLight->angle = cos(radians(15.f));
+    spotLight->innerAngle = cos(radians(12.5f));
+    spotLight->outerAngle = cos(radians(17.5f));
 
     //网格物体
     auto mat1 = new Material("unlit_pos_1");

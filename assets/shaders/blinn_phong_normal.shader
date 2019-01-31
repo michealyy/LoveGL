@@ -127,7 +127,8 @@ vec3 GetSpotLight(SpotLight light, vec3 N, vec3 V, vec3 fragPos)
 
 void main()
 {
-    vec3 N = normalize(_normal);
+    vec3 normal = texture(normalMap, _texCoord).rgb;
+    vec3 N = normalize(normal * 2.0 - 1.0);
     vec3 V = normalize(viewPos - _fragPos);
 
     //平行光

@@ -54,8 +54,7 @@ void Engine::OnUpdate()
 	
 	fps = (int)(1.f / deltaTime);
 	draw_call = 0;
-	ui_draw_call = 0;
-	ui_vertices = 0;
+	
 
 	if (app_)
 		app_->Update(deltaTime);
@@ -66,6 +65,8 @@ void Engine::OnUpdate()
 	if (ui_root)
 		this->ui_root->Update(deltaTime);
 	
+	ui_draw_call = 0;
+	ui_vertices = 0;
 	Renderer::GetInstance()->Render();
 }
 
