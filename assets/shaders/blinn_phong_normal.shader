@@ -9,7 +9,6 @@ layout (location = 1) in vec2 texCoord;
 layout (location = 2) in vec3 normal;
 
 out vec2 _texCoord;
-out vec3 _normal;
 out vec3 _fragPos;
 
 uniform mat4 model;
@@ -18,7 +17,6 @@ uniform mat4 mvp;
 void main()
 {
     _texCoord = texCoord;
-    _normal = normal;
     //世界坐标
     _fragPos = vec3(model * vec4(pos, 1.0));
 
@@ -31,10 +29,10 @@ void main()
 out vec4 FragColor;
 
 in vec2 _texCoord;
-in vec3 _normal;
 in vec3 _fragPos;
 
-uniform sampler2D diffuseTexture;
+uniform sampler2D mainTexture;
+uniform sampler2D normalMap;
 //uniform float ambient;
 //uniform float shininess;
 uniform vec3 color;
@@ -144,5 +142,5 @@ void main()
         result += GetSpotLight(spotLights[i], N, V, _fragPos);
     }
 
-    FragColor = vec4(texture(diffuseTexture, _texCoord).rgb * result, 1.0);// * vec4(color, alpha);
+    FragColor = vec4(texture(mainTexture, _texCoord).rgb * result, 1.0);// * vec4(color, alpha);
 }

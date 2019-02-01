@@ -13,7 +13,7 @@ namespace kd
 
 struct TextureUnit
 {
-	unsigned index;
+	int index;
 	std::string name;
 };
 
@@ -32,6 +32,7 @@ class Material
 	void Bind();
 	void LoadFormFile(const std::string &path);
 
+	void SetInt(const char *name, int value);
 	void SetFloat(const char *name, float value);
 	void SetVector3(const char *name, glm::vec3 vec3);
 	void SetVector4(const char *name, glm::vec4 vec4);
@@ -39,7 +40,7 @@ class Material
 	void SetColor(glm::vec3 color);
 	void SetAlpha(float alpha);
 	void SetShader(const std::string &shader_name);
-	inline void SetTexture(const std::string &texture_name, unsigned index = 0) { textures_.push_back(TextureUnit{index, texture_name}); }
+	void SetTexture(const std::string &texture_name, int index = 0, const char *uniform_name = nullptr);
 
 	inline std::string GetName() { return name_; }
 	inline Shader *GetShader() { return shader_; }

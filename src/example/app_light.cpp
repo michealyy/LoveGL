@@ -28,7 +28,7 @@ void AppLight::Setup()
 
     //灯源
     auto directionalLight = scnMgr->CreateEntity<DirectionalLight>();
-    directionalLight->color = vec3(0.4, 0.4, 0.4);
+    directionalLight->color = vec3(1, 1, 1);
     directionalLight->direction = vec3(0, -1, 0);
 
     auto pointLight = scnMgr->CreateEntity<PointLight>();
@@ -92,14 +92,16 @@ void AppLight::Setup()
 
     //大地面
     auto mat5 = new Material("blinn_phong_2");
-    mat5->SetShader("blinn_phong");
-    mat5->SetTexture("white");
+    mat5->SetShader("blinn_phong_normal");
+    mat5->SetTexture("brickwall", 0, "mainTexture");
+    mat5->SetTexture("brickwall_normal", 1, "normalMap");
     auto plane = scnMgr->CreateEntity<Mesh>();
     plane->material = mat5;
     plane->SetMesh("plane");
     plane->name = "plane";
     plane->position = vec3(0, -1, 0);
-    plane->scale = vec3(10, 1, 10);
+    plane->eulerAngles = vec3(-90,0,0);
+    plane->scale = vec3(10, 10, 10);
 }
 
 void AppLight::Update(float deltaTime)

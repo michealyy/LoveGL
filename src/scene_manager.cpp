@@ -84,7 +84,7 @@ void SceneManager::Render()
             glClearColor(camera->clearColor.x, camera->clearColor.y, camera->clearColor.z, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
-        glEnable(GL_CULL_FACE);
+        //glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         for (auto opaque_mesh : opaque_meshes)
         {

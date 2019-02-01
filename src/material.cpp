@@ -77,6 +77,18 @@ void Material::SetShader(const string &shader_name)
 	uniforms_["alpha"] = ShaderUniform{"float", 1.f};
 }
 
+void Material::SetTexture(const std::string &texture_name, int index, const char *uniform_name)
+{
+	textures_.push_back(TextureUnit{index, texture_name});
+	if (uniform_name)
+		uniforms_[uniform_name] = ShaderUniform{"int", index};
+}
+
+void Material::SetInt(const char *name, int value)
+{
+	uniforms_[name] = ShaderUniform{"int", value};
+}
+
 void Material::SetFloat(const char *name, float value)
 {
 	uniforms_[name] = ShaderUniform{"float", value};
@@ -111,9 +123,12 @@ void Material::TransferUniformsToShader()
 {
 	for (auto iter = uniforms_.begin(); iter != uniforms_.end(); iter++)
 	{
-		if (iter->second.type == "float")
+		if (iter->second.type == "int")
 		{
-			auto a= iter->second.value;
+			shader_->SetInt(iter->first.c_str(), any_cast<int>(iter->second.value));
+		}
+		else if (iter->second.type == "float")
+		{
 			shader_->SetFloat(iter->first.c_str(), any_cast<float>(iter->second.value));
 		}
 		else if (iter->second.type == "vector3")
