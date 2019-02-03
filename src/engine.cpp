@@ -2,7 +2,7 @@
 #include <filesystem>
 #include <glm/glm.hpp>
 #include "config.h"
-#include "renderer.h"
+#include <core/renderer.h>
 #include "ui/font_manager.h"
 #include "obj_loader.h"
 

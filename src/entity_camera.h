@@ -1,8 +1,8 @@
 #pragma once
 
 #include "entity.h"
-#include "ray.h"
-#include "render_target.h"
+#include <physics/ray.h>
+#include <core/render_target.h>
 
 namespace kd
 {

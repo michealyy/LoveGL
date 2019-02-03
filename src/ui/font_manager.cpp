@@ -6,7 +6,7 @@
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb_truetype.h>
 #include "../config.h"
-#include "../texture.h"
+#include <core/texture.h>
 
 using namespace std;
 

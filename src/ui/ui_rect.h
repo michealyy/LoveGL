@@ -4,7 +4,7 @@
 #include <vector>
 #include "../common.h"
 #include "../entity.h"
-#include "../material.h"
+#include <core/material.h>
 
 namespace kd
 {

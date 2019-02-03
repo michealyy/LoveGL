@@ -1,6 +1,6 @@
 #include "ui_rect.h"
 #include <glm/gtc/matrix_transform.hpp>
-#include "../renderer.h"
+#include <core/renderer.h>
 #include "../engine.h"
 #include "ui_button.h"
 

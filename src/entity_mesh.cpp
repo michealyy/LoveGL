@@ -5,7 +5,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/intersect.hpp>
 #include "engine.h"
-#include "renderer.h"
+#include <core/renderer.h>
 #include "config.h"
 #include <tiny_gltf.h>
 

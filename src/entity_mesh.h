@@ -5,8 +5,8 @@
 #include "common.h"
 #include "vertex_attribute.h"
 #include "entity.h"
-#include "material.h"
-#include "ray.h"
+#include <core/material.h>
+#include  <physics/ray.h>
 
 namespace kd
 {

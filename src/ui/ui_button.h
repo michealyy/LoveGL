@@ -2,7 +2,7 @@
 
 #include <functional>
 #include "ui_rect.h"
-#include "../material.h"
+#include <core/material.h>
 
 namespace kd
 {

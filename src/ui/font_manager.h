@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include <stb_truetype.h>
 #include "../common.h"
-#include "../material.h"
+#include <core/material.h>
 
 namespace kd
 {

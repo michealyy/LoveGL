@@ -3,9 +3,8 @@
 #include <string>
 #include <map>
 #include <GLFW/glfw3.h>
-#include "shader.h"
-#include "material.h"
-#include "texture.h"
+#include <core/texture.h>
+#include <core/material.h>
 #include "vertex_attribute.h"
 #include "entity_camera.h"
 #include "ui/ui_root.h"

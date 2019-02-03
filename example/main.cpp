@@ -1,8 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "config.h"
-#include "engine.h"
-#include "example/app_light.h"
+#include <engine.h>
+#include <config.h>
+#include "app_light.h"
 
 int main(int, char **)
 {

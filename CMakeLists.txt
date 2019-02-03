@@ -21,10 +21,14 @@ link_libraries(glfw)
 set(GLAD "glfw/deps/glad.c")
 
 include_directories("deps")
+include_directories("src")
 
 #源代码文件夹
 aux_source_directory(src DIR_SRC)
-aux_source_directory(src/example DIR_SRC_EXAMPLE)
+aux_source_directory(src/core DIR_CORE)
+aux_source_directory(src/component DIR_COMP)
+aux_source_directory(src/physics DIR_PHYSICS)
 aux_source_directory(src/ui DIR_SRC_UI)
+aux_source_directory(example DIR_SRC_EXAMPLE)
 
-add_executable(kdRenderStudio ${GLAD} ${DIR_SRC} ${DIR_SRC_EXAMPLE} ${DIR_SRC_UI})
+add_executable(kdRenderStudio ${GLAD} ${DIR_SRC} ${DIR_CORE} ${DIR_COMP} ${DIR_PHYSICS} ${DIR_SRC_UI} ${DIR_SRC_EXAMPLE})

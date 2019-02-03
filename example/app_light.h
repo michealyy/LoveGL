@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../common.h"
-#include "../app.h"
-#include "../scene_manager.h"
-#include "../render_target.h"
+#include <common.h>
+#include <app.h>
+#include <scene_manager.h>
+#include <core/render_target.h>
 
 class AppLight : public kd::App
 {
