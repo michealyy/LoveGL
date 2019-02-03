@@ -1,11 +1,13 @@
 #include <glad/glad.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-#include "Texture.h"
+#include "texture.h"
 #include "engine.h"
 
 using namespace std;
-using namespace kd;
+
+namespace kd
+{
 
 Texture::Texture(const std::string &name)
 {
@@ -70,4 +72,27 @@ void Texture::LoadFormFile(const std::string &path)
 		fprintf(stderr, "[Texture] Texture File Not Find or Not Support: %s\n", path.c_str());
 	}
 	stbi_image_free(data);
+}
+
+void Texture::LoadFormData(int width, int height, int channels, vector<unsigned char> &data)
+{
+	unsigned texture(0);
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	this->width_ = width;
+	this->height_ = height;
+	this->texture_id_ = texture;
+	
+	if (channels > 3)
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
+	else
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, &data[0]);
+}
+
 }

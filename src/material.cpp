@@ -38,6 +38,11 @@ void Material::Bind()
 		fprintf(stderr, "[Material] bind nil shader");
 	}
 
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 	for (int i = 0; i < textures_.size(); i++)
 	{
 		auto texture_unit = textures_[i];

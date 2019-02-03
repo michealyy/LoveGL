@@ -97,6 +97,11 @@ void SceneManager::LoadGLTF(const std::string &path)
         gltf_vbos_.push_back(vbo);
     }
 
+    //贴图
+
+    //材质
+
+    //场景节点树
     auto scene = model.scenes[model.defaultScene];
     for (int i = 0; i < scene.nodes.size(); i++)
     {
@@ -128,9 +133,9 @@ void SceneManager::LoadGLTFNode(tinygltf::Model &model, tinygltf::Node &node)
 
     //读取mesh的primitives，里面存放顶点和材质信息
     auto mesh = model.meshes[node.mesh];
-    for (int j = 0; j < mesh.primitives.size(); j++)
+    for (int i = 0; i < mesh.primitives.size(); i++)
     {
-        auto primitive = mesh.primitives[j];
+        auto primitive = mesh.primitives[i];
         auto submesh = new SubMesh();
         submesh->SetupFromGLTF(model, primitive);
         _mesh->submeshes.push_back(submesh);
@@ -198,39 +203,45 @@ void SceneManager::DrawMesh(Camera *camera, Mesh *mesh)
     if (camera == nullptr)
         return;
     
-    auto material = mesh->material;
-    if (material == nullptr || material->GetShader() == nullptr)
-        material = Engine::GetInstance()->GetMaterial("miss");
+    for (auto subMesh : mesh->submeshes)
+    {
+        auto material = subMesh->material;
+        if (material == nullptr || material->GetShader() == nullptr)
+            material = Engine::GetInstance()->GetMaterial("miss");
 
-    material->Bind();
-    auto shader = material->GetShader();
-    shader->SetMatrix("mvp", camera->projectMatrix * mesh->localToCameraTransform);
-    shader->SetMatrix("model", mesh->worldTransform);
-    shader->SetVector3("viewPos", camera->worldPosition);
-    //平行光源
-    shader->SetVector3("directionalLight.color", directionalLight_->color);
-    shader->SetVector3("directionalLight.direction", directionalLight_->direction);
-    //点光源
-    shader->SetInt("pointLightsCount", (int)pointLights_.size());
-    for(int i = 0; i < pointLights_.size(); i++)
-    {
-        auto pointLight = pointLights_[i];
-        shader->SetVector3(string("pointLights[0].color").replace(12, 1, to_string(i)).c_str(), pointLight->color);
-        shader->SetVector3(string("pointLights[0].position").replace(12, 1, to_string(i)).c_str(), pointLight->position);
-        shader->SetFloat(string("pointLights[0].constant").replace(12, 1, to_string(i)).c_str(), pointLight->constant);
-        shader->SetFloat(string("pointLights[0].linear").replace(12, 1, to_string(i)).c_str(), pointLight->linear);
-        shader->SetFloat(string("pointLights[0].quadratic").replace(12, 1, to_string(i)).c_str(), pointLight->quadratic);
-    }
-    //聚光灯源
-    shader->SetInt("spotLightsCount", (int)spotLights_.size());
-    for(int i = 0; i < spotLights_.size(); i++)
-    {
-        auto spotLights = spotLights_[i];
-        shader->SetVector3(string("spotLights[0].color").replace(11, 1, to_string(i)).c_str(), spotLights->color);
-        shader->SetVector3(string("spotLights[0].position").replace(11, 1, to_string(i)).c_str(), spotLights->position);
-        shader->SetVector3(string("spotLights[0].direction").replace(11, 1, to_string(i)).c_str(), spotLights->direction);
-        shader->SetFloat(string("spotLights[0].innerAngle").replace(11, 1, to_string(i)).c_str(), spotLights->innerAngle);
-        shader->SetFloat(string("spotLights[0].outerAngle").replace(11, 1, to_string(i)).c_str(), spotLights->outerAngle);
+        material->Bind();
+        auto shader = material->GetShader();
+        shader->SetMatrix("mvp", camera->projectMatrix * mesh->localToCameraTransform);
+        shader->SetMatrix("model", mesh->worldTransform);
+        shader->SetVector3("viewPos", camera->worldPosition);
+        //平行光源
+        shader->SetVector3("directionalLight.color", directionalLight_->color);
+        shader->SetVector3("directionalLight.direction", directionalLight_->direction);
+        //点光源
+        shader->SetInt("pointLightsCount", (int)pointLights_.size());
+        for(int i = 0; i < pointLights_.size(); i++)
+        {
+            auto pointLight = pointLights_[i];
+            shader->SetVector3(string("pointLights[0].color").replace(12, 1, to_string(i)).c_str(), pointLight->color);
+            shader->SetVector3(string("pointLights[0].position").replace(12, 1, to_string(i)).c_str(), pointLight->position);
+            shader->SetFloat(string("pointLights[0].constant").replace(12, 1, to_string(i)).c_str(), pointLight->constant);
+            shader->SetFloat(string("pointLights[0].linear").replace(12, 1, to_string(i)).c_str(), pointLight->linear);
+            shader->SetFloat(string("pointLights[0].quadratic").replace(12, 1, to_string(i)).c_str(), pointLight->quadratic);
+        }
+        //聚光灯源
+        shader->SetInt("spotLightsCount", (int)spotLights_.size());
+        for(int i = 0; i < spotLights_.size(); i++)
+        {
+            auto spotLights = spotLights_[i];
+            shader->SetVector3(string("spotLights[0].color").replace(11, 1, to_string(i)).c_str(), spotLights->color);
+            shader->SetVector3(string("spotLights[0].position").replace(11, 1, to_string(i)).c_str(), spotLights->position);
+            shader->SetVector3(string("spotLights[0].direction").replace(11, 1, to_string(i)).c_str(), spotLights->direction);
+            shader->SetFloat(string("spotLights[0].innerAngle").replace(11, 1, to_string(i)).c_str(), spotLights->innerAngle);
+            shader->SetFloat(string("spotLights[0].outerAngle").replace(11, 1, to_string(i)).c_str(), spotLights->outerAngle);
+        }
+
+        subMesh->Draw();
+        Engine::GetInstance()->draw_call++;
     }
 
     // glBindVertexArray(mesh->vao);
@@ -238,10 +249,7 @@ void SceneManager::DrawMesh(Camera *camera, Mesh *mesh)
     // glDrawElements(GL_TRIANGLES, (int)mesh->indices.size(), GL_UNSIGNED_INT, 0);
     // glBindVertexArray(0);
 
-    for (auto subMesh : mesh->submeshes)
-        subMesh->Draw();
-
-    Engine::GetInstance()->draw_call++;
+    
 }
 
 } // namespace kd

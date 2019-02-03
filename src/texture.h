@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include "common.h"
 
 namespace kd
@@ -14,6 +15,7 @@ class Texture
 
 	void Bind();
 	void LoadFormFile(const std::string &path);
+	void LoadFormData(int width, int height, int channels, std::vector<unsigned char> &data);
 	inline std::string GetName() { return name_; }
 	inline void SetTextureId(unsigned texture_id) { texture_id_ = texture_id; }
 	inline unsigned GetTextureId() { return texture_id_; }

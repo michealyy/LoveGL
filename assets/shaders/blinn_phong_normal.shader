@@ -78,7 +78,7 @@ uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 float GetBlinnPhong(vec3 N, vec3 V, vec3 L)
 {
     //uniform默认变量值
-    float ambient = 0.1;
+    float ambient = 0.2;
     float shininess = 100;
     
     //漫反射强度：平面法线和光源方向夹角相关，角度为0最大亮度1，数学表示cos角度
@@ -142,5 +142,5 @@ void main()
         result += GetSpotLight(spotLights[i], N, V, _fragPos);
     }
 
-    FragColor = vec4(texture(mainTexture, _texCoord).rgb * result, 1.0);// * vec4(color, alpha);
+    FragColor = vec4(texture(mainTexture, _texCoord).rgb * result, 1.0) * vec4(color, alpha);
 }
