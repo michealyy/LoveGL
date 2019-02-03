@@ -18,7 +18,9 @@ void AppLight::Setup()
 {
     scnMgr = new SceneManager();
     Engine::GetInstance()->sceneManager = scnMgr;
-    
+
+    scnMgr->LoadGLTF("assets/tftest/tftest.gltf");
+
     //主摄像机
     auto camera = scnMgr->CreateEntity<Camera>();
     camera->name = "MainCamera";
@@ -50,58 +52,58 @@ void AppLight::Setup()
     spotLight->innerAngle = cos(radians(12.5f));
     spotLight->outerAngle = cos(radians(17.5f));
 
-    //网格物体
-    auto mat1 = new Material("unlit_pos_1");
-    mat1->SetShader("unlit_pos");
-    mat1->SetColor(vec3(1, 0, 0));
-    mat1->SetAlpha(0.5f);
-    auto cylinder1 = scnMgr->CreateEntity<Mesh>();
-    cylinder1->material = mat1;
-    cylinder1->SetMesh("cylinder");
-    cylinder1->name = "cylinder1";
-    cylinder1->position = vec3(-3, 0, 0);
+    // //网格物体
+    // auto mat1 = new Material("unlit_pos_1");
+    // mat1->SetShader("unlit_pos");
+    // mat1->SetColor(vec3(1, 0, 0));
+    // mat1->SetAlpha(0.5f);
+    // auto cylinder1 = scnMgr->CreateEntity<Mesh>();
+    // cylinder1->material = mat1;
+    // cylinder1->SetMesh("cylinder");
+    // cylinder1->name = "cylinder1";
+    // cylinder1->position = vec3(-3, 0, 0);
     
-    auto mat2 = new Material("unlit_pos_2");
-    mat2->SetShader("unlit_pos");
-    mat2->SetColor(vec3(0, 1, 0));
-    mat2->SetAlpha(0.2f);
-    auto cone1 = scnMgr->CreateEntity<Mesh>();
-    cone1->material = mat2;
-    cone1->SetMesh("cone");
-    cone1->name = "cone1";
-    cone1->position = vec3(0, 0, 0);
+    // auto mat2 = new Material("unlit_pos_2");
+    // mat2->SetShader("unlit_pos");
+    // mat2->SetColor(vec3(0, 1, 0));
+    // mat2->SetAlpha(0.2f);
+    // auto cone1 = scnMgr->CreateEntity<Mesh>();
+    // cone1->material = mat2;
+    // cone1->SetMesh("cone");
+    // cone1->name = "cone1";
+    // cone1->position = vec3(0, 0, 0);
 
-    auto mat3 = new Material("unlit_pos_tex_1");
-    mat3->SetShader("unlit_pos_tex");
-    mat3->SetTexture("wood");
-    auto box1 = scnMgr->CreateEntity<Mesh>();
-    box1->material = mat3;
-    box1->SetMesh("box");
-    box1->name = "box1";
-    box1->position = vec3(3, 0, 0);
+    // auto mat3 = new Material("unlit_pos_tex_1");
+    // mat3->SetShader("unlit_pos_tex");
+    // mat3->SetTexture("wood");
+    // auto box1 = scnMgr->CreateEntity<Mesh>();
+    // box1->material = mat3;
+    // box1->SetMesh("box");
+    // box1->name = "box1";
+    // box1->position = vec3(3, 0, 0);
 
-    auto mat4 = new Material("blinn_phong_1");
-    mat4->SetShader("blinn_phong");
-    mat4->SetTexture("white");
-    mat4->SetColor(vec3(1, 0, 0));
-    auto sphere = scnMgr->CreateEntity<Mesh>();
-    sphere->material = mat4;
-    sphere->SetMesh("sphere");
-    sphere->name = "sphere";
-    sphere->position = vec3(6, 0, 0);
+    // auto mat4 = new Material("blinn_phong_1");
+    // mat4->SetShader("blinn_phong");
+    // mat4->SetTexture("white");
+    // mat4->SetColor(vec3(1, 0, 0));
+    // auto sphere = scnMgr->CreateEntity<Mesh>();
+    // sphere->material = mat4;
+    // sphere->SetMesh("sphere");
+    // sphere->name = "sphere";
+    // sphere->position = vec3(6, 0, 0);
 
-    //大地面
-    auto mat5 = new Material("blinn_phong_2");
-    mat5->SetShader("blinn_phong_normal");
-    mat5->SetTexture("brickwall", 0, "mainTexture");
-    mat5->SetTexture("brickwall_normal", 1, "normalMap");
-    auto plane = scnMgr->CreateEntity<Mesh>();
-    plane->material = mat5;
-    plane->SetMesh("plane");
-    plane->name = "plane";
-    plane->position = vec3(0, -1, 0);
-    plane->eulerAngles = vec3(-90,0,0);
-    plane->scale = vec3(10, 10, 10);
+    // //大地面
+    // auto mat5 = new Material("blinn_phong_2");
+    // mat5->SetShader("blinn_phong_normal");
+    // mat5->SetTexture("brickwall", 0, "mainTexture");
+    // mat5->SetTexture("brickwall_normal", 1, "normalMap");
+    // auto plane = scnMgr->CreateEntity<Mesh>();
+    // plane->material = mat5;
+    // plane->SetMesh("plane");
+    // plane->name = "plane";
+    // plane->position = vec3(0, -1, 0);
+    // plane->eulerAngles = vec3(-90,0,0);
+    // plane->scale = vec3(10, 10, 10);
 }
 
 void AppLight::Update(float deltaTime)

@@ -7,12 +7,82 @@
 #include "engine.h"
 #include "renderer.h"
 #include "config.h"
+#include <tiny_gltf.h>
 
 using namespace std;
 using namespace glm;
 
 namespace kd
 {
+
+#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+void SubMesh::SetupFromGLTF(tinygltf::Model &model, tinygltf::Primitive &primitive)
+{
+    //TODO: 材质
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    auto gltf_vbos = Engine::GetInstance()->sceneManager->GetGltfVbos();
+    //顶点属性绑定
+    for (auto attribute : primitive.attributes)
+    {
+        auto accessor = model.accessors[attribute.second];
+
+        //每个顶点数据单元大小
+        int size = 1;
+        if (accessor.type == TINYGLTF_TYPE_SCALAR)
+            size = 1;
+        else if (accessor.type == TINYGLTF_TYPE_VEC2)
+            size = 2;
+        else if (accessor.type == TINYGLTF_TYPE_VEC3)
+            size = 3;
+        else if (accessor.type == TINYGLTF_TYPE_VEC4)
+            size = 4;
+        else
+            fprintf(stderr, "[WARNING][SubMesh]: not support vertex attribute");
+
+        int byteStride = accessor.ByteStride(model.bufferViews[accessor.bufferView]);
+        glBindBuffer(GL_ARRAY_BUFFER, gltf_vbos[accessor.bufferView]);
+        
+        //绑定不同顶点属性到对应通道，让顶点着色器接收到
+        if (attribute.first == "POSITION")
+        {
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, size, accessor.componentType, accessor.normalized ? GL_TRUE : GL_FALSE, byteStride, BUFFER_OFFSET(accessor.byteOffset));
+        }
+        else if (attribute.first == "TEXCOORD_0")
+        {
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, size, accessor.componentType, accessor.normalized ? GL_TRUE : GL_FALSE, byteStride, BUFFER_OFFSET(accessor.byteOffset));
+        }
+        else if (attribute.first == "NORMAL")
+        {
+            glEnableVertexAttribArray(2);
+            glVertexAttribPointer(2, size, accessor.componentType, accessor.normalized ? GL_TRUE : GL_FALSE, byteStride, BUFFER_OFFSET(accessor.byteOffset));
+        }
+        else
+        {
+            fprintf(stderr, "[WARNING][SubMesh]: not support vertex attribute %s", attribute.first.c_str());
+        }
+    }
+    //顶点绘制索引
+    auto indexAccessor = model.accessors[primitive.indices];
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gltf_vbos[indexAccessor.bufferView]);
+    
+    glBindVertexArray(0);
+
+    draw_mode = GL_TRIANGLES;
+    draw_count = (unsigned)indexAccessor.count;
+    draw_type = indexAccessor.componentType;
+}
+
+void SubMesh::Draw()
+{
+    glBindVertexArray(vao);
+    //glDrawElements(mode, indexAccessor.count, indexAccessor.componentType, BUFFER_OFFSET(indexAccessor.byteOffset));
+    glDrawElements(draw_mode, draw_count, draw_type, 0);
+    glBindVertexArray(0);
+}
 
 Mesh::Mesh(Material *mat) : material(mat)
 {

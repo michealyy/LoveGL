@@ -1,8 +1,12 @@
 ﻿#include "scene_manager.h"
-#include <string>
-#include <glad/glad.h>
 #include <algorithm>
+#include <filesystem>
+#include <glad/glad.h>
 #include <glm/gtc/matrix_access.hpp>
+#include <glm/gtc/quaternion.hpp>
+#define TINYGLTF_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <tiny_gltf.h>
 #include "engine.h"
 
 using namespace std;
@@ -47,6 +51,94 @@ void SceneManager::Update(float deltaTime)
     }
 
     Render();
+}
+
+void SceneManager::LoadGLTF(const std::string &path)
+{
+    tinygltf::Model model;
+    tinygltf::TinyGLTF gltf_ctx;
+    std::string err;
+    std::string warn;
+    filesystem::path _path(path);
+
+    bool ret = false;
+    if (_path.extension().string() == "glb")
+        ret = gltf_ctx.LoadBinaryFromFile(&model, &err, &warn, path.c_str());
+    else
+        ret = gltf_ctx.LoadASCIIFromFile(&model, &err, &warn, path.c_str());
+
+    if (!warn.empty())
+        fprintf(stderr, "[WARNING][SceneManager]: %s\n", warn.c_str());
+
+    if (!err.empty())
+        fprintf(stderr, "[ERROR][SceneManager]: %s\n", err.c_str());
+
+    if (!ret)
+    {
+        fprintf(stderr, "[ERROR][SceneManager]: Failed to parse glTF\n");
+        return;
+    }
+
+    for (unsigned i = 0; i < model.bufferViews.size(); i++)
+    {
+        auto bufferView = model.bufferViews[i];
+        if (bufferView.target == 0)
+        {
+            fprintf(stderr, "[WARNING][SceneManager]: bufferView.target is zero");
+            continue;
+        }
+
+        auto buffer = model.buffers[bufferView.buffer];
+        unsigned vbo;
+        glGenBuffers(1, &vbo);
+        glBindBuffer(bufferView.target, vbo);
+        glBufferData(bufferView.target, bufferView.byteLength, &buffer.data.at(0) + bufferView.byteOffset, GL_STATIC_DRAW);
+        glBindBuffer(bufferView.target, 0);
+        gltf_vbos_.push_back(vbo);
+    }
+
+    auto scene = model.scenes[model.defaultScene];
+    for (int i = 0; i < scene.nodes.size(); i++)
+    {
+        LoadGLTFNode(model, model.nodes[scene.nodes[i]]);
+    }
+}
+
+void SceneManager::LoadGLTFNode(tinygltf::Model &model, tinygltf::Node &node)
+{
+    if (node.mesh < 0)
+        return;
+    
+    auto _mesh = new Mesh();
+    entities_.push_back(_mesh);
+    //给一个丢失材质，没有材质信息时候能快速视觉反馈
+    _mesh->material = Engine::GetInstance()->GetMaterial("miss");
+
+    //读取仿射变换信息
+    if (node.translation.size() > 0)
+        _mesh->position = glm::vec3(node.translation[0], node.translation[1], node.translation[2]);
+    if (node.scale.size() > 0)
+        _mesh->scale = glm::vec3(node.scale[0], node.scale[1], node.scale[2]);
+    if (node.rotation.size() > 0)
+    {
+        auto quat = glm::quat((float)node.rotation[0], (float)node.rotation[1], (float)node.rotation[2], (float)node.rotation[3]);
+        auto euler = glm::eulerAngles(quat);
+        _mesh->eulerAngles = glm::vec3(glm::degrees(euler.z), glm::degrees(euler.y), glm::degrees(euler.x));
+    }
+
+    //读取mesh的primitives，里面存放顶点和材质信息
+    auto mesh = model.meshes[node.mesh];
+    for (int j = 0; j < mesh.primitives.size(); j++)
+    {
+        auto primitive = mesh.primitives[j];
+        auto submesh = new SubMesh();
+        submesh->SetupFromGLTF(model, primitive);
+        _mesh->submeshes.push_back(submesh);
+    }
+
+    //递归找子节点
+    for (auto node_index : node.children)
+        LoadGLTFNode(model, model.nodes[node_index]);
 }
 
 //TODO:用BSP树做排序，剔除和碰撞也可以
@@ -103,11 +195,12 @@ void SceneManager::Render()
 
 void SceneManager::DrawMesh(Camera *camera, Mesh *mesh)
 {
-    auto material = mesh->material;
-    if (material == nullptr || camera == nullptr)
-    {
+    if (camera == nullptr)
         return;
-    }
+    
+    auto material = mesh->material;
+    if (material == nullptr || material->GetShader() == nullptr)
+        material = Engine::GetInstance()->GetMaterial("miss");
 
     material->Bind();
     auto shader = material->GetShader();
@@ -140,10 +233,13 @@ void SceneManager::DrawMesh(Camera *camera, Mesh *mesh)
         shader->SetFloat(string("spotLights[0].outerAngle").replace(11, 1, to_string(i)).c_str(), spotLights->outerAngle);
     }
 
-    glBindVertexArray(mesh->vao);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
-    glDrawElements(GL_TRIANGLES, (int)mesh->indices.size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+    // glBindVertexArray(mesh->vao);
+    // //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
+    // glDrawElements(GL_TRIANGLES, (int)mesh->indices.size(), GL_UNSIGNED_INT, 0);
+    // glBindVertexArray(0);
+
+    for (auto subMesh : mesh->submeshes)
+        subMesh->Draw();
 
     Engine::GetInstance()->draw_call++;
 }

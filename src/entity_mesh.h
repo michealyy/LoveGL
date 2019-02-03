@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <tiny_gltf.h>
 #include "common.h"
 #include "vertex_attribute.h"
 #include "entity.h"
@@ -17,6 +18,18 @@ struct RayCastHit
   float distance = 0.f;
 };
 
+class SubMesh
+{
+public:
+  Material *material = nullptr;
+  unsigned vao = 0;
+  int draw_mode = 0;
+  unsigned draw_count = 0;
+  int draw_type = 0;
+  void SetupFromGLTF(tinygltf::Model& model, tinygltf::Primitive & primitive);
+  void Draw();
+};
+
 class Mesh : public Entity
 {
 public:
@@ -27,7 +40,8 @@ public:
   virtual void Update(float deltaTime) override;
   virtual bool Raycast(Ray ray, RayCastHit &rayCastHit);
   void SetMesh(const std::string &name);
-
+  
+  //materials
   Material *material = nullptr;
   unsigned vao = 0;
   unsigned ebo = 0;
@@ -35,6 +49,8 @@ public:
 
 public:
   virtual void AddVertices();
+
+  std::vector<SubMesh*> submeshes;
 
   unsigned vbo = 0;
   std::vector<va::P_T_N_T_B> vertices;
