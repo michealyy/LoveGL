@@ -6,6 +6,7 @@
 #include <glm/gtx/intersect.hpp>
 #include "engine.h"
 #include <core/renderer.h>
+#include <resource_manager.h>
 #include "config.h"
 #include <tiny_gltf.h>
 
@@ -261,7 +262,7 @@ bool Mesh::Raycast(Ray ray, RayCastHit &rayCastHit)
 
 void Mesh::SetMesh(const std::string &name)
 {
-    auto mesh = Engine::GetInstance()->GetMesh(name);
+    auto mesh = ResourceManager::GetInstance()->GetMesh(name);
     if (mesh)
     {
         this->vertices = mesh->vertices;

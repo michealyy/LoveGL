@@ -2,7 +2,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include "texture.h"
-#include "engine.h"
+#include <resource_manager.h>
 
 using namespace std;
 
@@ -11,14 +11,14 @@ namespace kd
 
 Texture::Texture(const std::string &name)
 {
-	auto tex = Engine::GetInstance()->GetTexture(name);
+	auto tex = ResourceManager::GetInstance()->GetTexture(name);
 	if (tex != nullptr)
 	{
 		fprintf(stderr, "[Texture] have same name texture: %s\n", name.c_str());
 		return;
 	}
 	name_ = name;
-	Engine::GetInstance()->AddTexture(name, this);
+	ResourceManager::GetInstance()->AddTexture(name, this);
 }
 
 Texture::~Texture()

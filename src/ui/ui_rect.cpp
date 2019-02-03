@@ -1,7 +1,7 @@
 #include "ui_rect.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <core/renderer.h>
-#include "../engine.h"
+#include <resource_manager.h>
 #include "ui_button.h"
 
 using namespace glm;
@@ -30,7 +30,7 @@ void UIRect::SetImage(const std::string &name)
     std::string mat_name("ui_");
     mat_name.append(name);
 
-    material = Engine::GetInstance()->GetMaterial(mat_name);
+    material = ResourceManager::GetInstance()->GetMaterial(mat_name);
     if (material == nullptr)
     {
         material = new Material(mat_name);
@@ -63,7 +63,7 @@ void UIRect::Update(float deltaTime)
     left_bottom = worldTransform * vec4(0, 0, 0, 1);
 
     if (material == nullptr || material->GetShader() == nullptr)
-        material = Engine::GetInstance()->GetMaterial("ui_default");
+        material = ResourceManager::GetInstance()->GetMaterial("ui_default");
 
     Renderer::GetInstance()->AddUIRect(this);
 }

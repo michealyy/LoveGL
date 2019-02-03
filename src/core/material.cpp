@@ -1,6 +1,6 @@
 ﻿#include <glad/glad.h>
+#include <resource_manager.h>
 #include "material.h"
-#include "engine.h"
 
 using namespace std;
 using namespace glm;
@@ -10,7 +10,7 @@ unsigned Material::MAX_ID = 1;
 
 Material::Material(const string &name)
 {
-	auto mat = Engine::GetInstance()->GetMaterial(name);
+	auto mat = ResourceManager::GetInstance()->GetMaterial(name);
 	if (mat != nullptr)
 	{
 		fprintf(stderr, "[Material] have same name material: %s\n", name.c_str());
@@ -19,7 +19,7 @@ Material::Material(const string &name)
 	name_ = name;
 	current_id_ = MAX_ID;
 	MAX_ID++;
-	Engine::GetInstance()->AddMaterial(name, this);
+	ResourceManager::GetInstance()->AddMaterial(name, this);
 }
 
 Material::~Material()
@@ -47,7 +47,7 @@ void Material::Bind()
 	{
 		auto texture_unit = textures_[i];
 		glActiveTexture(GL_TEXTURE0 + texture_unit.index);
-		auto texture = Engine::GetInstance()->GetTexture(texture_unit.name);
+		auto texture = ResourceManager::GetInstance()->GetTexture(texture_unit.name);
 		if (texture != nullptr)
 		{
 			texture->Bind();
@@ -66,7 +66,7 @@ void Material::LoadFormFile(const string &path)
 
 void Material::SetShader(const string &shader_name)
 {
-	auto shader = Engine::GetInstance()->GetShader(shader_name);
+	auto shader = ResourceManager::GetInstance()->GetShader(shader_name);
 	if (shader == nullptr)
 	{
 		fprintf(stderr, "[Material] can not find shader by name: %s\n", shader_name.c_str());

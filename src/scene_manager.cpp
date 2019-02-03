@@ -7,6 +7,7 @@
 #define TINYGLTF_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <tiny_gltf.h>
+#include <resource_manager.h>
 #include "engine.h"
 
 using namespace std;
@@ -117,7 +118,7 @@ void SceneManager::LoadGLTFNode(tinygltf::Model &model, tinygltf::Node &node)
     auto _mesh = new Mesh();
     entities_.push_back(_mesh);
     //给一个丢失材质，没有材质信息时候能快速视觉反馈
-    _mesh->material = Engine::GetInstance()->GetMaterial("miss");
+    _mesh->material = ResourceManager::GetInstance()->GetMaterial("miss");
 
     //读取仿射变换信息
     if (node.translation.size() > 0)
@@ -207,7 +208,7 @@ void SceneManager::DrawMesh(Camera *camera, Mesh *mesh)
     {
         auto material = subMesh->material;
         if (material == nullptr || material->GetShader() == nullptr)
-            material = Engine::GetInstance()->GetMaterial("miss");
+            material = ResourceManager::GetInstance()->GetMaterial("miss");
 
         material->Bind();
         auto shader = material->GetShader();

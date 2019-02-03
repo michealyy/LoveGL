@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_access.hpp>
+#include <resource_manager.h>
 #include "engine.h"
 #include "config.h"
 
@@ -198,7 +199,7 @@ void Renderer::Render3DObjects()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         //Engine::GetInstance()->GetShader("post_blur")->Bind();
-        Engine::GetInstance()->GetShader("post_normal")->Bind();
+        ResourceManager::GetInstance()->GetShader("post_normal")->Bind();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, post_processing_texture_);
         glBindVertexArray(post_processing_vao_);
@@ -263,7 +264,7 @@ void Renderer::DrawDebugLine(const float vertices[6])
 {
     //TODO:支持多个线段
     auto camera = Engine::GetInstance()->mainCamera;
-    auto shader = Engine::GetInstance()->GetShader("unlit_pos");
+    auto shader = ResourceManager::GetInstance()->GetShader("unlit_pos");
     shader->Bind();
     shader->SetMatrix("mvp", camera->projectMatrix * camera->GetViewMatrix());
     shader->SetFloat("alpha", 1);
