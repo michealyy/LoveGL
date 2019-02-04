@@ -3,7 +3,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include "common.h"
-#include "entity_mesh.h"
+#include <entity/mesh.h>
 #include "vertex_attribute.h"
 #include "ui/ui_rect.h"
 

@@ -17,24 +17,24 @@ namespace kd
 
 SceneManager::SceneManager()
 {
-    root_ = new Entity();
+    root_ = new Node();
     root_->name = "Root";
-    entities_.push_back(root_);
+    nodes_.push_back(root_);
 }
 
 SceneManager::~SceneManager()
 {
-    for (auto entity : entities_)
+    for (auto node : nodes_)
     {
-        SafeDelete(entity);
+        SafeDelete(node);
     }
 }
 
 void SceneManager::Setup()
 {
-    for (auto entity : entities_)
+    for (auto node : nodes_)
     {
-        entity->Setup();
+        node->Setup();
     }
 }
 
@@ -45,10 +45,10 @@ void SceneManager::Update(float deltaTime)
         fprintf(stderr, "not find mainCamera. pls set Engine::GetInstance()->mainCamera!");
     }
 
-    for (auto entity : entities_)
+    for (auto node : nodes_)
     {
-        if (entity->visible)
-            entity->Update(deltaTime);
+        if (node->visible)
+            node->Update(deltaTime);
     }
 
     Render();
@@ -116,7 +116,7 @@ void SceneManager::LoadGLTFNode(tinygltf::Model &model, tinygltf::Node &node)
         return;
     
     auto _mesh = new Mesh();
-    entities_.push_back(_mesh);
+    nodes_.push_back(_mesh);
     //给一个丢失材质，没有材质信息时候能快速视觉反馈
     _mesh->material = ResourceManager::GetInstance()->GetMaterial("miss");
 
@@ -154,9 +154,9 @@ void SceneManager::Render()
     //分开透明和不透明，然后给透明做排序
     vector<Mesh *> opaque_meshes;
     vector<Mesh *> transparent_meshes;
-    for (auto entity : entities_)
+    for (auto node : nodes_)
     {
-        auto mesh = dynamic_cast<Mesh *>(entity);
+        auto mesh = dynamic_cast<Mesh *>(node);
         if (mesh != nullptr && mesh->material != nullptr)
         {
             if (mesh->material->isTransparent)

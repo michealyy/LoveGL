@@ -1,6 +1,6 @@
 #pragma once
 
-#include "entity.h"
+#include <node.h>
 #include <physics/ray.h>
 #include <core/render_target.h>
 
@@ -14,13 +14,13 @@ public:
   virtual ~CameraController();
   virtual void Setup() = 0;
   virtual void Update(float deltaTime) = 0;
-  Entity *camera = nullptr;
+  Node *camera = nullptr;
 
 private:
   DISALLOW_COPY_AND_ASSIGN(CameraController)
 };
 
-class Camera : public Entity
+class Camera : public Node
 {
 public:
   explicit Camera();

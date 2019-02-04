@@ -1,12 +1,12 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include "entity.h"
+#include <node.h>
 
 namespace kd
 {
 
-class Light : public Entity
+class Light : public Node
 {
 public:
   explicit Light();

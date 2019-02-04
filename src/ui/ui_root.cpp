@@ -54,9 +54,9 @@ void UIRoot::Setup()
     AddChild(ui_draw_call_label_);
 
     //选中物体
-    selected_entity_label_ = new Label();
-    selected_entity_label_->position = vec3(width/2, height - 20, 0);
-    AddChild(selected_entity_label_);
+    selected_node_label_ = new Label();
+    selected_node_label_->position = vec3(width/2, height - 20, 0);
+    AddChild(selected_node_label_);
 
     //检视器头
     auto ui_common_tile_mat = new Material("ui_common_tile");
@@ -106,7 +106,7 @@ void UIRoot::Setup()
 
 void UIRoot::Update(float deltaTime)
 {
-    Entity::Update(deltaTime);
+    Node::Update(deltaTime);
     for (auto child : children_)
     {
         if (child->visible)
@@ -120,9 +120,9 @@ void UIRoot::Update(float deltaTime)
         ui_draw_call_label_->SetText(std::string("UI Batch: ").append(std::to_string(Engine::GetInstance()->ui_draw_call)));
     }
 
-    if(Engine::GetInstance()->selected_entity)
+    if(Engine::GetInstance()->selected_node)
     {
-        selected_entity_label_->SetText(std::string("Selected: ").append(Engine::GetInstance()->selected_entity->name));
+        selected_node_label_->SetText(std::string("Selected: ").append(Engine::GetInstance()->selected_node->name));
     }
 }
 

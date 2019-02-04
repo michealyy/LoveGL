@@ -3,10 +3,10 @@
 #include <string>
 #include <vector>
 #include <tiny_gltf.h>
-#include "common.h"
-#include "entity_camera.h"
-#include "entity_light.h"
-#include "entity_mesh.h"
+#include <common.h>
+#include <entity/camera.h>
+#include <entity/light.h>
+#include <entity/mesh.h>
 
 namespace kd
 {
@@ -20,23 +20,22 @@ class SceneManager
 	virtual void Setup();
 	virtual void Update(float deltaTime);
 	void LoadGLTF(const std::string &path);
-	inline Entity *GetRoot() { return root_; }
-	inline std::vector<Entity *> &GetEntities() { return entities_; };
-	//void RemoveEntity();
+	inline Node *GetRoot() { return root_; }
+	inline std::vector<Node *> &GetEntities() { return nodes_; };
+	//void RemoveNode();
 
 	inline std::vector<unsigned> &GetGltfVbos() { return gltf_vbos_; };
 	void Render();
 
   protected:
-	Entity *root_ = nullptr;
-	std::vector<Entity *> entities_;
+	Node *root_ = nullptr;
+	std::vector<Node *> nodes_;
 	std::vector<Camera *> cameras_;
 	DirectionalLight *directionalLight_ = nullptr;
 	std::vector<PointLight *> pointLights_;
 	std::vector<SpotLight *> spotLights_;
 
 	std::vector<unsigned> gltf_vbos_;
-	//tinygltf::Model gltf_model_;
 
   private:
 	void DrawMesh(Camera *camera, Mesh *mesh);
@@ -49,28 +48,28 @@ class SceneManager
 
   public:
 	template <typename ClassType>
-	ClassType *CreateEntity(Entity *parent = nullptr)
+	ClassType *CreateNode(Node *parent = nullptr)
 	{
 		if (parent == nullptr)
 			parent = root_;
 
-		auto entity = new ClassType();
-		parent->AddChild(entity);
-		entities_.push_back(entity);
+		auto node = new ClassType();
+		parent->AddChild(node);
+		nodes_.push_back(node);
 
 		if (typeid(ClassType) == typeid(Camera))
-			cameras_.push_back(dynamic_cast<Camera *>(entity));
+			cameras_.push_back(dynamic_cast<Camera *>(node));
 		else if (typeid(ClassType) == typeid(DirectionalLight))
 		{
 			SafeDelete(directionalLight_);
-			directionalLight_ = dynamic_cast<DirectionalLight *>(entity);
+			directionalLight_ = dynamic_cast<DirectionalLight *>(node);
 		}
 		else if (typeid(ClassType) == typeid(PointLight))
-			pointLights_.push_back(dynamic_cast<PointLight *>(entity));
+			pointLights_.push_back(dynamic_cast<PointLight *>(node));
 		else if (typeid(ClassType) == typeid(SpotLight))
-			spotLights_.push_back(dynamic_cast<SpotLight *>(entity));
+			spotLights_.push_back(dynamic_cast<SpotLight *>(node));
 
-		return entity;
+		return node;
 	}
 };
 

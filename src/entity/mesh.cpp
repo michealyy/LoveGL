@@ -1,10 +1,10 @@
-﻿#include "entity_mesh.h"
+﻿#include "mesh.h"
 #include <filesystem>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/intersect.hpp>
-#include "engine.h"
+#include <engine.h>
 #include <core/renderer.h>
 #include <resource_manager.h>
 #include "config.h"
@@ -140,7 +140,7 @@ Mesh::~Mesh()
 
 void Mesh::Setup()
 {
-    Entity::Setup();
+    Node::Setup();
 
     AddVertices();
 
@@ -212,7 +212,7 @@ void Mesh::Setup()
 
 void Mesh::Update(float deltaTime)
 {
-    Entity::Update(deltaTime);
+    Node::Update(deltaTime);
 
     Renderer::GetInstance()->AddMesh(this);
 }
@@ -242,7 +242,7 @@ bool Mesh::Raycast(Ray ray, RayCastHit &rayCastHit)
         float distance;
         if (intersectRayTriangle(ray.origin, ray.direction, va_1, va_2, va_3, bary_pos, distance))
         {
-            rayCastHit.entity = this;
+            rayCastHit.node = this;
             rayCastHit.point = bary_pos;
             rayCastHit.distance = distance;
             return true;

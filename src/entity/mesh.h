@@ -2,21 +2,13 @@
 
 #include <vector>
 #include <tiny_gltf.h>
-#include "common.h"
-#include "vertex_attribute.h"
-#include "entity.h"
+#include <common.h>
 #include <core/material.h>
-#include  <physics/ray.h>
+#include <core/vertex_attribute.h>
+#include <physics/ray.h>
 
 namespace kd
 {
-
-struct RayCastHit
-{
-  Entity *entity = nullptr;
-  glm::vec2 point;
-  float distance = 0.f;
-};
 
 class SubMesh
 {
@@ -30,7 +22,7 @@ public:
   void Draw();
 };
 
-class Mesh : public Entity
+class Mesh : public Node
 {
 public:
   explicit Mesh(Material *mat = nullptr);

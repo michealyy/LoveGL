@@ -41,7 +41,7 @@ void UIRect::SetImage(const std::string &name)
 
 void UIRect::Setup()
 {
-    Entity::Setup();
+    Node::Setup();
     for (auto child : children_)
     {
         child->Setup();
@@ -50,7 +50,7 @@ void UIRect::Setup()
 
 void UIRect::Update(float deltaTime)
 {
-    Entity::Update(deltaTime);
+    Node::Update(deltaTime);
 
     for (auto child : children_)
     {

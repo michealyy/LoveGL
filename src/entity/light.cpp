@@ -1,4 +1,4 @@
-#include "entity_light.h"
+#include "light.h"
 
 namespace kd
 {

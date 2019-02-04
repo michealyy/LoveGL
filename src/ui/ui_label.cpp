@@ -39,7 +39,7 @@ void Label::Update(float deltaTime)
         is_update_text_ = false;
     }
 
-    Entity::Update(deltaTime);
+    Node::Update(deltaTime);
     for (auto child : children_)
     {
         child->Update(deltaTime);

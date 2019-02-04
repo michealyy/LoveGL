@@ -1,4 +1,4 @@
-#include "entity_camera.h"
+#include "camera.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <GLFW/glfw3.h>
@@ -29,14 +29,14 @@ Camera::~Camera()
 
 void Camera::Setup()
 {
-    Entity::Setup();
+    Node::Setup();
     if (cameraController)
         cameraController->Setup();
 }
 
 void Camera::Update(float deltaTime)
 {
-    Entity::Update(deltaTime);
+    Node::Update(deltaTime);
 
     if (cameraController)
         cameraController->Update(deltaTime);

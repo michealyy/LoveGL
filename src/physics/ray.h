@@ -1,9 +1,17 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <node.h>
 
 namespace kd
 {
+
+struct RayCastHit
+{
+    Node *node = nullptr;
+    glm::vec2 point;
+    float distance = 0.f;
+};
 
 struct Ray
 {
@@ -15,4 +23,4 @@ struct Ray
     }
 };
 
-}
+} // namespace kd

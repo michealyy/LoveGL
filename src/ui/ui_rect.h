@@ -2,8 +2,8 @@
 
 #include <string>
 #include <vector>
-#include "../common.h"
-#include "../entity.h"
+#include <common.h>
+#include <node.h>
 #include <core/material.h>
 
 namespace kd
@@ -13,7 +13,7 @@ namespace ui
 {
 
 //UIRect不添加到场景，添加到ui_root下面
-class UIRect : public Entity
+class UIRect : public Node
 {
 public:
   explicit UIRect(float width = 100.f, float height = 100.f);

@@ -22,30 +22,30 @@ void AppLight::Setup()
     scnMgr->LoadGLTF("assets/tftest/tftest.gltf");
 
     //主摄像机
-    auto camera = scnMgr->CreateEntity<Camera>();
+    auto camera = scnMgr->CreateNode<Camera>();
     camera->name = "MainCamera";
     camera->SetController(new FreeCameraController());
     camera->position = vec3(0, 0, 10);
     Engine::GetInstance()->mainCamera = camera;
 
     //灯源
-    auto directionalLight = scnMgr->CreateEntity<DirectionalLight>();
+    auto directionalLight = scnMgr->CreateNode<DirectionalLight>();
     directionalLight->color = vec3(1, 1, 1);
     directionalLight->direction = vec3(0, -1, 0);
 
-    auto pointLight = scnMgr->CreateEntity<PointLight>();
+    auto pointLight = scnMgr->CreateNode<PointLight>();
     pointLight->color = vec3(1, 0, 0);
     pointLight->position = vec3(-2, 1, 0);
     pointLight->linear = 0.14f;
     pointLight->quadratic = 0.07f;
     
-    auto pointLight2 = scnMgr->CreateEntity<PointLight>();
+    auto pointLight2 = scnMgr->CreateNode<PointLight>();
     pointLight2->color = vec3(0, 0, 1);
     pointLight2->position = vec3(0, 1, -5);
     pointLight2->linear = 0.14f;
     pointLight2->quadratic = 0.07f;
 
-    auto spotLight = scnMgr->CreateEntity<SpotLight>();
+    auto spotLight = scnMgr->CreateNode<SpotLight>();
     spotLight->color = vec3(1,1,0.5f);
     spotLight->position = vec3(2, 2, 2);
     spotLight->direction = vec3(0, -1, 0);
@@ -57,7 +57,7 @@ void AppLight::Setup()
     // mat1->SetShader("unlit_pos");
     // mat1->SetColor(vec3(1, 0, 0));
     // mat1->SetAlpha(0.5f);
-    // auto cylinder1 = scnMgr->CreateEntity<Mesh>();
+    // auto cylinder1 = scnMgr->CreateNode<Mesh>();
     // cylinder1->material = mat1;
     // cylinder1->SetMesh("cylinder");
     // cylinder1->name = "cylinder1";
@@ -67,7 +67,7 @@ void AppLight::Setup()
     // mat2->SetShader("unlit_pos");
     // mat2->SetColor(vec3(0, 1, 0));
     // mat2->SetAlpha(0.2f);
-    // auto cone1 = scnMgr->CreateEntity<Mesh>();
+    // auto cone1 = scnMgr->CreateNode<Mesh>();
     // cone1->material = mat2;
     // cone1->SetMesh("cone");
     // cone1->name = "cone1";
@@ -76,7 +76,7 @@ void AppLight::Setup()
     // auto mat3 = new Material("unlit_pos_tex_1");
     // mat3->SetShader("unlit_pos_tex");
     // mat3->SetTexture("wood");
-    // auto box1 = scnMgr->CreateEntity<Mesh>();
+    // auto box1 = scnMgr->CreateNode<Mesh>();
     // box1->material = mat3;
     // box1->SetMesh("box");
     // box1->name = "box1";
@@ -86,7 +86,7 @@ void AppLight::Setup()
     // mat4->SetShader("blinn_phong");
     // mat4->SetTexture("white");
     // mat4->SetColor(vec3(1, 0, 0));
-    // auto sphere = scnMgr->CreateEntity<Mesh>();
+    // auto sphere = scnMgr->CreateNode<Mesh>();
     // sphere->material = mat4;
     // sphere->SetMesh("sphere");
     // sphere->name = "sphere";
@@ -97,7 +97,7 @@ void AppLight::Setup()
     // mat5->SetShader("blinn_phong_normal");
     // mat5->SetTexture("brickwall", 0, "mainTexture");
     // mat5->SetTexture("brickwall_normal", 1, "normalMap");
-    // auto plane = scnMgr->CreateEntity<Mesh>();
+    // auto plane = scnMgr->CreateNode<Mesh>();
     // plane->material = mat5;
     // plane->SetMesh("plane");
     // plane->name = "plane";
@@ -130,7 +130,7 @@ void AppLight::Update(float deltaTime)
                 RayCastHit rayCastHit;
                 if (mesh->Raycast(ray, rayCastHit))
                 {
-                    Engine::GetInstance()->selected_entity = rayCastHit.entity;
+                    Engine::GetInstance()->selected_node = rayCastHit.node;
                     break;
                 }
             }

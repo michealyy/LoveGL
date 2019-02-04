@@ -1,4 +1,4 @@
-#include "entity.h"
+#include "node.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
@@ -11,20 +11,20 @@ using namespace glm;
 namespace kd
 {
 
-Entity::Entity()
+Node::Node()
 {
 }
 
-Entity::~Entity()
+Node::~Node()
 {
 }
 
-void Entity::Setup()
+void Node::Setup()
 {
 	UpdateModelMatrix();
 }
 
-void Entity::Update(float deltaTime)
+void Node::Update(float deltaTime)
 {
 	if (!isStatic)
 	{
@@ -37,7 +37,7 @@ void Entity::Update(float deltaTime)
 	}
 }
 
-void Entity::AddChild(Entity *child)
+void Node::AddChild(Node *child)
 {
 	if (child == nullptr)
 	{
@@ -47,7 +47,7 @@ void Entity::AddChild(Entity *child)
 	children_.push_back(child);
 }
 
-Entity *Entity::FindChild(const string &name)
+Node *Node::FindChild(const string &name)
 {
 	for (auto child : children_)
 	{
@@ -60,11 +60,11 @@ Entity *Entity::FindChild(const string &name)
 	return nullptr;
 }
 
-void Entity::RemoveChild(const string &name)
+void Node::RemoveChild(const string &name)
 {
 }
 
-void Entity::RemoveAllChild()
+void Node::RemoveAllChild()
 {
 	// for (auto child : children_)
 	// {
@@ -74,7 +74,7 @@ void Entity::RemoveAllChild()
 	// Remove from SceneManager
 }
 
-void Entity::UpdateModelMatrix()
+void Node::UpdateModelMatrix()
 {
 	mat4 temp(1.0f);
 	localTransform = translate(temp, position) * glm::scale(temp, scale) * mat4_cast(quat(glm::radians(-eulerAngles)));

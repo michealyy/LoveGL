@@ -6,7 +6,7 @@
 #include <core/texture.h>
 #include <core/material.h>
 
-#include "entity_camera.h"
+#include <entity/camera.h>
 #include "ui/ui_root.h"
 #include "scene_manager.h"
 #include "app.h"
@@ -31,7 +31,7 @@ class Engine final : public Singleton<Engine>
 	
 	Camera *mainCamera = nullptr;
 	ui::UIRoot *ui_root = nullptr;
-	Entity *selected_entity = nullptr;
+	Node *selected_node = nullptr;
 	//statistics
 	int fps = 0;
 	unsigned draw_call = 0;
