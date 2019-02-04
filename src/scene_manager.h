@@ -35,7 +35,6 @@ class SceneManager
 
 	//加载gltf场景
 	void LoadGLTF(const std::string &path);
-	inline std::vector<unsigned> &GetGltfVbos() { return gltf_vbos_; };
 
   protected:
 	Node *root_ = nullptr;
@@ -44,8 +43,6 @@ class SceneManager
 	DirectionalLight *directionalLight_ = nullptr;
 	std::vector<PointLight *> pointLights_;
 	std::vector<SpotLight *> spotLights_;
-
-	std::vector<unsigned> gltf_vbos_;
 
   private:
 	void DrawMesh(Camera *camera, Mesh *mesh);

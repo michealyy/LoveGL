@@ -19,18 +19,19 @@ void AppLight::Setup()
     scnMgr = new SceneManager();
     Engine::GetInstance()->sceneManager = scnMgr;
 
+    //scnMgr->LoadGLTF("assets/tfsimple/tfsimple.gltf");
     scnMgr->LoadGLTF("assets/tftest/tftest.gltf");
 
     //主摄像机
-    auto camera = scnMgr->GetCamera("Camera_Orientation");
-    camera->AttachController(new FreeCameraController());
-    Engine::GetInstance()->mainCamera = camera;
-
-    // auto camera = scnMgr->CreateNode<Camera>();
-    // camera->name = "MainCamera";
+    // auto camera = scnMgr->GetCamera("Camera_Orientation");
     // camera->AttachController(new FreeCameraController());
-    // camera->position = vec3(0, 0, 10);
     // Engine::GetInstance()->mainCamera = camera;
+
+    auto camera = scnMgr->CreateNode<Camera>();
+    camera->name = "MainCamera";
+    camera->AttachController(new FreeCameraController());
+    camera->position = vec3(0, 0, 10);
+    Engine::GetInstance()->mainCamera = camera;
 
     //灯源
     auto directionalLight = scnMgr->CreateNode<DirectionalLight>();

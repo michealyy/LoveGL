@@ -4,7 +4,7 @@
 #include <core/shader.h>
 #include <core/texture.h>
 #include <core/material.h>
-#include <core/vertex_attribute.h>
+#include <entity/mesh.h>
 
 namespace kd
 {

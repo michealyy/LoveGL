@@ -22,19 +22,15 @@ struct Pos_Tex
 
 struct P_T_N_T_B
 {
-    glm::vec3 Position;
-    glm::vec2 TexCoords;
-    glm::vec3 Normal;
-    glm::vec3 Tangent;
-    glm::vec3 Bitangent;
+    glm::vec3 Position{0};
+    glm::vec2 TexCoords{0};
+    glm::vec3 Normal{0};
+    glm::vec3 Tangent{0};
+    glm::vec3 Bitangent{0};
+    //根据法线计算法切线和副法切线
+    void CalculateTB();
 };
 
 } // namespace va
-
-struct MeshData
-{
-    std::vector<va::P_T_N_T_B> vertices;
-    std::vector<unsigned> indices;
-};
 
 }

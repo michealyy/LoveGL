@@ -90,12 +90,16 @@ void SceneManager::Render()
     for (auto node : nodes_)
     {
         auto mesh = dynamic_cast<Mesh *>(node);
-        if (mesh != nullptr && mesh->material != nullptr)
+        // if (mesh != nullptr && mesh->material != nullptr)
+        // {
+        //     if (mesh->material->isTransparent)
+        //         transparent_meshes.push_back(mesh);
+        //     else
+        //         opaque_meshes.push_back(mesh);
+        // }
+        if (mesh != nullptr)
         {
-            if (mesh->material->isTransparent)
-                transparent_meshes.push_back(mesh);
-            else
-                opaque_meshes.push_back(mesh);
+            opaque_meshes.push_back(mesh);
         }
     }
 
@@ -137,7 +141,7 @@ void SceneManager::DrawMesh(Camera *camera, Mesh *mesh)
     if (camera == nullptr)
         return;
 
-    for (auto subMesh : mesh->submeshes)
+    for (auto subMesh : mesh->subMeshes)
     {
         auto material = subMesh->material;
         if (material == nullptr || material->GetShader() == nullptr)
@@ -177,11 +181,6 @@ void SceneManager::DrawMesh(Camera *camera, Mesh *mesh)
         subMesh->Draw();
         Engine::GetInstance()->draw_call++;
     }
-
-    // glBindVertexArray(mesh->vao);
-    // //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
-    // glDrawElements(GL_TRIANGLES, (int)mesh->indices.size(), GL_UNSIGNED_INT, 0);
-    // glBindVertexArray(0);
 }
 
 void SceneManager::LoadGLTF(const std::string &path)
@@ -208,24 +207,6 @@ void SceneManager::LoadGLTF(const std::string &path)
     {
         fprintf(stderr, "[ERROR][SceneManager]: Failed to parse glTF\n");
         return;
-    }
-
-    for (unsigned i = 0; i < model.bufferViews.size(); i++)
-    {
-        auto bufferView = model.bufferViews[i];
-        if (bufferView.target == 0)
-        {
-            fprintf(stderr, "[WARNING][SceneManager]: bufferView.target is zero");
-            continue;
-        }
-
-        auto buffer = model.buffers[bufferView.buffer];
-        unsigned vbo;
-        glGenBuffers(1, &vbo);
-        glBindBuffer(bufferView.target, vbo);
-        glBufferData(bufferView.target, bufferView.byteLength, &buffer.data.at(0) + bufferView.byteOffset, GL_STATIC_DRAW);
-        glBindBuffer(bufferView.target, 0);
-        gltf_vbos_.push_back(vbo);
     }
 
     //贴图
@@ -333,8 +314,6 @@ void SceneManager::LoadGLTFNode(tinygltf::Model &model, tinygltf::Node &node, No
         auto _mesh = new Mesh();
         _node = _mesh;
 
-        _mesh->material = ResourceManager::GetInstance()->GetMaterial("miss");
-
         //读取mesh的primitives，里面存放顶点和材质信息
         auto mesh = model.meshes[node.mesh];
         for (int i = 0; i < mesh.primitives.size(); i++)
@@ -342,7 +321,7 @@ void SceneManager::LoadGLTFNode(tinygltf::Model &model, tinygltf::Node &node, No
             auto primitive = mesh.primitives[i];
             auto submesh = new SubMesh();
             submesh->SetupFromGLTF(model, primitive);
-            _mesh->submeshes.push_back(submesh);
+            _mesh->AddSubMesh(submesh);
         }
     }
     else

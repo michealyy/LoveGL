@@ -10,47 +10,61 @@
 namespace kd
 {
 
-class SubMesh
+struct MeshData
 {
-public:
-  Material *material = nullptr;
-  unsigned vao = 0;
-  int draw_mode = 0;
-  unsigned draw_count = 0;
-  int draw_type = 0;
-  void SetupFromGLTF(tinygltf::Model& model, tinygltf::Primitive & primitive);
-  void Draw();
+  std::vector<va::P_T_N_T_B> vertices;
+  std::vector<unsigned> indices;
 };
+
+class SubMesh;
 
 class Mesh : public Node
 {
 public:
-  explicit Mesh(Material *mat = nullptr);
+  explicit Mesh();
   virtual ~Mesh();
-
-  virtual void Setup() override;
-  virtual void Update(float deltaTime) override;
-  virtual bool Raycast(Ray ray, RayCastHit &rayCastHit);
+  /*
+  * 优先由算法生成基础集合体：Box Plane Cone
+  * 否则尝试作为文件路径读取obj
+  */
   void SetMesh(const std::string &name);
-  
-  //materials
-  Material *material = nullptr;
-  unsigned vao = 0;
-  unsigned ebo = 0;
-  std::vector<unsigned int> indices;
+  virtual bool Raycast(Ray ray, RayCastHit &rayCastHit);
+  void AddSubMesh(SubMesh *subMesh);
 
-public:
-  virtual void AddVertices();
-
-  std::vector<SubMesh*> submeshes;
-
-  unsigned vbo = 0;
-  std::vector<va::P_T_N_T_B> vertices;
-  std::vector<va::Pos> vertices_pos;
-  std::vector<va::Pos_Tex> vertices_pos_tex;
+  std::vector<SubMesh *> subMeshes;
 
 private:
   DISALLOW_COPY_AND_ASSIGN(Mesh)
+};
+
+/*
+* 1.存放网格数据
+* 2.绑定GL的vao
+* 3.管理对应材质
+*/
+class SubMesh
+{
+public:
+  explicit SubMesh();
+  virtual ~SubMesh();
+  void Setup();
+  //void SetupFromAlgorithm();
+  //void SetupFromObj();
+  void SetupFromGLTF(tinygltf::Model &model, tinygltf::Primitive &primitive);
+  void Draw();
+  bool Raycast(Ray ray, RayCastHit &rayCastHit);
+
+  Mesh *mesh = nullptr;
+  Material *material = nullptr;
+  unsigned vao = 0;
+  std::vector<va::P_T_N_T_B> vertices;
+  std::vector<unsigned short> indices;
+
+private:
+  unsigned vbo_ = 0;
+  unsigned ebo_ = 0;
+
+  DISALLOW_COPY_AND_ASSIGN(SubMesh)
 };
 
 } // namespace kd
