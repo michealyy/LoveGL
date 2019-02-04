@@ -22,35 +22,39 @@ void AppLight::Setup()
     scnMgr->LoadGLTF("assets/tftest/tftest.gltf");
 
     //主摄像机
-    auto camera = scnMgr->CreateNode<Camera>();
-    camera->name = "MainCamera";
-    camera->SetController(new FreeCameraController());
-    camera->position = vec3(0, 0, 10);
+    auto camera = scnMgr->GetCamera("Camera_Orientation");
+    camera->AttachController(new FreeCameraController());
     Engine::GetInstance()->mainCamera = camera;
+
+    // auto camera = scnMgr->CreateNode<Camera>();
+    // camera->name = "MainCamera";
+    // camera->AttachController(new FreeCameraController());
+    // camera->position = vec3(0, 0, 10);
+    // Engine::GetInstance()->mainCamera = camera;
 
     //灯源
     auto directionalLight = scnMgr->CreateNode<DirectionalLight>();
     directionalLight->color = vec3(1, 1, 1);
     directionalLight->direction = vec3(0, -1, 0);
 
-    auto pointLight = scnMgr->CreateNode<PointLight>();
-    pointLight->color = vec3(1, 0, 0);
-    pointLight->position = vec3(-2, 1, 0);
-    pointLight->linear = 0.14f;
-    pointLight->quadratic = 0.07f;
+    // auto pointLight = scnMgr->CreateNode<PointLight>();
+    // pointLight->color = vec3(1, 0, 0);
+    // pointLight->position = vec3(-2, 1, 0);
+    // pointLight->linear = 0.14f;
+    // pointLight->quadratic = 0.07f;
     
-    auto pointLight2 = scnMgr->CreateNode<PointLight>();
-    pointLight2->color = vec3(0, 0, 1);
-    pointLight2->position = vec3(0, 1, -5);
-    pointLight2->linear = 0.14f;
-    pointLight2->quadratic = 0.07f;
+    // auto pointLight2 = scnMgr->CreateNode<PointLight>();
+    // pointLight2->color = vec3(0, 0, 1);
+    // pointLight2->position = vec3(0, 1, -5);
+    // pointLight2->linear = 0.14f;
+    // pointLight2->quadratic = 0.07f;
 
-    auto spotLight = scnMgr->CreateNode<SpotLight>();
-    spotLight->color = vec3(1,1,0.5f);
-    spotLight->position = vec3(2, 2, 2);
-    spotLight->direction = vec3(0, -1, 0);
-    spotLight->innerAngle = cos(radians(12.5f));
-    spotLight->outerAngle = cos(radians(17.5f));
+    // auto spotLight = scnMgr->CreateNode<SpotLight>();
+    // spotLight->color = vec3(1,1,0.5f);
+    // spotLight->position = vec3(2, 2, 2);
+    // spotLight->direction = vec3(0, -1, 0);
+    // spotLight->innerAngle = cos(radians(12.5f));
+    // spotLight->outerAngle = cos(radians(17.5f));
 
     // //网格物体
     // auto mat1 = new Material("unlit_pos_1");
@@ -122,9 +126,9 @@ void AppLight::Update(float deltaTime)
 
     if (glfwGetMouseButton(main_window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS && Engine::GetInstance()->mainCamera)
     {
-        for(auto entities : scnMgr->GetEntities())
+        for(auto nodes : scnMgr->GetNodes())
         {
-            auto mesh = dynamic_cast<Mesh*>(entities);
+            auto mesh = dynamic_cast<Mesh*>(nodes);
             if (mesh)
             {
                 RayCastHit rayCastHit;

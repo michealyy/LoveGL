@@ -77,46 +77,7 @@ void SubMesh::SetupFromGLTF(tinygltf::Model &model, tinygltf::Primitive &primiti
 
     /*****解析材质信息*****/
     auto gltf_mat = model.materials[primitive.material];
-    auto mat = new Material(gltf_mat.name);
-    this->material = mat;
-    mat->SetShader("blinn_phong_normal");
-    mat->SetTexture("miss");
-    if (gltf_mat.values.find("baseColorFactor") != gltf_mat.values.end())
-    {
-        auto baseColor = gltf_mat.values["baseColorFactor"].ColorFactor();
-        if (baseColor.size() >= 3)
-            mat->SetColor(vec3(baseColor[0], baseColor[1], baseColor[2]));
-        if (baseColor.size() == 4)
-            mat->SetAlpha((float)baseColor[3]);
-    }
-    //auto roughness = gltf_mat.values["roughnessFactor"].Factor();
-    
-    /*****解析贴图信息*****/
-    auto baseColorTextureJson = gltf_mat.values["baseColorTexture"].json_double_value;
-    if (baseColorTextureJson.find("index") != baseColorTextureJson.end())
-    {
-        //TODO: 极少情况下，多张贴图拥有独立多个uv，这里固定使用TEXCOORD_0作为所以贴图uv坐标
-        auto uv_channel = baseColorTextureJson.find("texCoord")->second;
-
-        auto gltf_texture = model.textures[(size_t)baseColorTextureJson.find("index")->second];
-        auto image = model.images[gltf_texture.source];
-        auto texture = new Texture(image.name);
-        texture->LoadFormData(image.width, image.height, image.component, image.image);
-        mat->SetTexture(image.name, 0, "mainTexture");
-        //mat->SetTexture("white", 0, "mainTexture");
-        auto image_name = image.name;
-    }
-    auto normalTextureJson = gltf_mat.additionalValues["normalTexture"].json_double_value;
-    if (normalTextureJson.find("index") != normalTextureJson.end())
-    {
-        auto gltf_texture = model.textures[(size_t)normalTextureJson.find("index")->second];
-        auto image = model.images[gltf_texture.source];
-        auto texture = new Texture(image.name);
-        texture->LoadFormData(image.width, image.height, image.component, image.image);
-        mat->SetTexture(image.name, 1, "normalMap");
-    }
-    
-    int a = 0;
+    this->material = ResourceManager::GetInstance()->GetMaterial(gltf_mat.name);
 }
 
 void SubMesh::Draw()

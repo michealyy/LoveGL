@@ -54,97 +54,30 @@ void SceneManager::Update(float deltaTime)
     Render();
 }
 
-void SceneManager::LoadGLTF(const std::string &path)
+void SceneManager::RemoveNode(const std::string &name)
 {
-    tinygltf::Model model;
-    tinygltf::TinyGLTF gltf_ctx;
-    std::string err;
-    std::string warn;
-    filesystem::path _path(path);
-
-    bool ret = false;
-    if (_path.extension().string() == "glb")
-        ret = gltf_ctx.LoadBinaryFromFile(&model, &err, &warn, path.c_str());
-    else
-        ret = gltf_ctx.LoadASCIIFromFile(&model, &err, &warn, path.c_str());
-
-    if (!warn.empty())
-        fprintf(stderr, "[WARNING][SceneManager]: %s\n", warn.c_str());
-
-    if (!err.empty())
-        fprintf(stderr, "[ERROR][SceneManager]: %s\n", err.c_str());
-
-    if (!ret)
-    {
-        fprintf(stderr, "[ERROR][SceneManager]: Failed to parse glTF\n");
-        return;
-    }
-
-    for (unsigned i = 0; i < model.bufferViews.size(); i++)
-    {
-        auto bufferView = model.bufferViews[i];
-        if (bufferView.target == 0)
-        {
-            fprintf(stderr, "[WARNING][SceneManager]: bufferView.target is zero");
-            continue;
-        }
-
-        auto buffer = model.buffers[bufferView.buffer];
-        unsigned vbo;
-        glGenBuffers(1, &vbo);
-        glBindBuffer(bufferView.target, vbo);
-        glBufferData(bufferView.target, bufferView.byteLength, &buffer.data.at(0) + bufferView.byteOffset, GL_STATIC_DRAW);
-        glBindBuffer(bufferView.target, 0);
-        gltf_vbos_.push_back(vbo);
-    }
-
-    //贴图
-
-    //材质
-
-    //场景节点树
-    auto scene = model.scenes[model.defaultScene];
-    for (int i = 0; i < scene.nodes.size(); i++)
-    {
-        LoadGLTFNode(model, model.nodes[scene.nodes[i]]);
-    }
 }
 
-void SceneManager::LoadGLTFNode(tinygltf::Model &model, tinygltf::Node &node)
+Node *SceneManager::GetNode(const std::string &name)
 {
-    if (node.mesh < 0)
-        return;
-    
-    auto _mesh = new Mesh();
-    nodes_.push_back(_mesh);
-    //给一个丢失材质，没有材质信息时候能快速视觉反馈
-    _mesh->material = ResourceManager::GetInstance()->GetMaterial("miss");
-
-    //读取仿射变换信息
-    if (node.translation.size() > 0)
-        _mesh->position = glm::vec3(node.translation[0], node.translation[1], node.translation[2]);
-    if (node.scale.size() > 0)
-        _mesh->scale = glm::vec3(node.scale[0], node.scale[1], node.scale[2]);
-    if (node.rotation.size() > 0)
+    for (auto node : nodes_)
     {
-        auto quat = glm::quat((float)node.rotation[0], (float)node.rotation[1], (float)node.rotation[2], (float)node.rotation[3]);
-        auto euler = glm::eulerAngles(quat);
-        _mesh->eulerAngles = glm::vec3(glm::degrees(euler.z), glm::degrees(euler.y), glm::degrees(euler.x));
+        if (node->name == name)
+            return node;
     }
 
-    //读取mesh的primitives，里面存放顶点和材质信息
-    auto mesh = model.meshes[node.mesh];
-    for (int i = 0; i < mesh.primitives.size(); i++)
+    return nullptr;
+}
+
+Camera *SceneManager::GetCamera(const std::string &name)
+{
+    for (auto camera : cameras_)
     {
-        auto primitive = mesh.primitives[i];
-        auto submesh = new SubMesh();
-        submesh->SetupFromGLTF(model, primitive);
-        _mesh->submeshes.push_back(submesh);
+        if (camera->name == name)
+            return camera;
     }
 
-    //递归找子节点
-    for (auto node_index : node.children)
-        LoadGLTFNode(model, model.nodes[node_index]);
+    return nullptr;
 }
 
 //TODO:用BSP树做排序，剔除和碰撞也可以
@@ -203,7 +136,7 @@ void SceneManager::DrawMesh(Camera *camera, Mesh *mesh)
 {
     if (camera == nullptr)
         return;
-    
+
     for (auto subMesh : mesh->submeshes)
     {
         auto material = subMesh->material;
@@ -220,22 +153,22 @@ void SceneManager::DrawMesh(Camera *camera, Mesh *mesh)
         shader->SetVector3("directionalLight.direction", directionalLight_->direction);
         //点光源
         shader->SetInt("pointLightsCount", (int)pointLights_.size());
-        for(int i = 0; i < pointLights_.size(); i++)
+        for (int i = 0; i < pointLights_.size(); i++)
         {
             auto pointLight = pointLights_[i];
             shader->SetVector3(string("pointLights[0].color").replace(12, 1, to_string(i)).c_str(), pointLight->color);
-            shader->SetVector3(string("pointLights[0].position").replace(12, 1, to_string(i)).c_str(), pointLight->position);
+            shader->SetVector3(string("pointLights[0].position").replace(12, 1, to_string(i)).c_str(), pointLight->worldPosition);
             shader->SetFloat(string("pointLights[0].constant").replace(12, 1, to_string(i)).c_str(), pointLight->constant);
             shader->SetFloat(string("pointLights[0].linear").replace(12, 1, to_string(i)).c_str(), pointLight->linear);
             shader->SetFloat(string("pointLights[0].quadratic").replace(12, 1, to_string(i)).c_str(), pointLight->quadratic);
         }
         //聚光灯源
         shader->SetInt("spotLightsCount", (int)spotLights_.size());
-        for(int i = 0; i < spotLights_.size(); i++)
+        for (int i = 0; i < spotLights_.size(); i++)
         {
             auto spotLights = spotLights_[i];
             shader->SetVector3(string("spotLights[0].color").replace(11, 1, to_string(i)).c_str(), spotLights->color);
-            shader->SetVector3(string("spotLights[0].position").replace(11, 1, to_string(i)).c_str(), spotLights->position);
+            shader->SetVector3(string("spotLights[0].position").replace(11, 1, to_string(i)).c_str(), spotLights->worldPosition);
             shader->SetVector3(string("spotLights[0].direction").replace(11, 1, to_string(i)).c_str(), spotLights->direction);
             shader->SetFloat(string("spotLights[0].innerAngle").replace(11, 1, to_string(i)).c_str(), spotLights->innerAngle);
             shader->SetFloat(string("spotLights[0].outerAngle").replace(11, 1, to_string(i)).c_str(), spotLights->outerAngle);
@@ -249,8 +182,193 @@ void SceneManager::DrawMesh(Camera *camera, Mesh *mesh)
     // //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
     // glDrawElements(GL_TRIANGLES, (int)mesh->indices.size(), GL_UNSIGNED_INT, 0);
     // glBindVertexArray(0);
+}
 
-    
+void SceneManager::LoadGLTF(const std::string &path)
+{
+    tinygltf::Model model;
+    tinygltf::TinyGLTF gltf_ctx;
+    std::string err;
+    std::string warn;
+    filesystem::path _path(path);
+
+    bool ret = false;
+    if (_path.extension().string() == "glb")
+        ret = gltf_ctx.LoadBinaryFromFile(&model, &err, &warn, path.c_str());
+    else
+        ret = gltf_ctx.LoadASCIIFromFile(&model, &err, &warn, path.c_str());
+
+    if (!warn.empty())
+        fprintf(stderr, "[WARNING][SceneManager]: %s\n", warn.c_str());
+
+    if (!err.empty())
+        fprintf(stderr, "[ERROR][SceneManager]: %s\n", err.c_str());
+
+    if (!ret)
+    {
+        fprintf(stderr, "[ERROR][SceneManager]: Failed to parse glTF\n");
+        return;
+    }
+
+    for (unsigned i = 0; i < model.bufferViews.size(); i++)
+    {
+        auto bufferView = model.bufferViews[i];
+        if (bufferView.target == 0)
+        {
+            fprintf(stderr, "[WARNING][SceneManager]: bufferView.target is zero");
+            continue;
+        }
+
+        auto buffer = model.buffers[bufferView.buffer];
+        unsigned vbo;
+        glGenBuffers(1, &vbo);
+        glBindBuffer(bufferView.target, vbo);
+        glBufferData(bufferView.target, bufferView.byteLength, &buffer.data.at(0) + bufferView.byteOffset, GL_STATIC_DRAW);
+        glBindBuffer(bufferView.target, 0);
+        gltf_vbos_.push_back(vbo);
+    }
+
+    //贴图
+    for (auto texture : model.textures)
+    {
+        auto image = model.images[texture.source];
+        auto texture = new Texture(image.name);
+        texture->LoadFormData(image.width, image.height, image.component, image.image);
+    }
+
+    //材质
+    for (auto material : model.materials)
+    {
+        auto mat = new Material(material.name);
+        mat->SetShader("blinn_phong_normal");
+        //给一个丢失材质，没有材质信息时候能快速视觉反馈
+        mat->SetTexture("miss");
+        //基础颜色
+        if (material.values.find("baseColorFactor") != material.values.end())
+        {
+            auto baseColor = material.values["baseColorFactor"].ColorFactor();
+            if (baseColor.size() >= 3)
+                mat->SetColor(glm::vec3(baseColor[0], baseColor[1], baseColor[2]));
+            if (baseColor.size() == 4)
+                mat->SetAlpha((float)baseColor[3]);
+        }
+        //基础贴图
+        auto baseColorTextureJson = material.values["baseColorTexture"].json_double_value;
+        if (baseColorTextureJson.find("index") != baseColorTextureJson.end())
+        {
+            //TODO: 极少情况下，多张贴图拥有独立多个uv，这里固定使用TEXCOORD_0作为所以贴图uv坐标
+            auto uv_channel = baseColorTextureJson.find("texCoord")->second;
+
+            auto texture = model.textures[(size_t)baseColorTextureJson.find("index")->second];
+            auto image = model.images[texture.source];
+            mat->SetTexture(image.name, 0, "mainTexture");
+        }
+        //法线贴图
+        auto normalTextureJson = material.additionalValues["normalTexture"].json_double_value;
+        if (normalTextureJson.find("index") != normalTextureJson.end())
+        {
+            auto texture = model.textures[(size_t)normalTextureJson.find("index")->second];
+            auto image = model.images[texture.source];
+            mat->SetTexture(image.name, 1, "normalMap");
+        }
+    }
+
+    //场景节点树
+    auto scene = model.scenes[model.defaultScene];
+    for (int i = 0; i < scene.nodes.size(); i++)
+    {
+        LoadGLTFNode(model, model.nodes[scene.nodes[i]], root_);
+    }
+}
+
+void SceneManager::LoadGLTFNode(tinygltf::Model &model, tinygltf::Node &node, Node *parent)
+{
+    Node *_node = nullptr;
+
+    /*****解析摄像机*****/
+    if (node.camera >= 0)
+    {
+        auto _camera = new Camera();
+        _node = _camera;
+        cameras_.push_back(_camera);
+
+        //TODO: 解析其他摄像机信息，正交 透视 进远面
+    }
+    /*****解析灯光*****/
+    else if (node.extensions.find("KHR_lights_punctual") != node.extensions.end() && node.extensions["KHR_lights_punctual"].Has("light"))
+    {
+        auto light_index = node.extensions["KHR_lights_punctual"].Get("light").Get<int>();
+        auto light_info = model.extensions["KHR_lights_punctual"].Get("lights").Get(light_index);
+
+        auto light_type = light_info.Get("type").Get<string>();
+        if (light_type == "Spot")
+        {
+        }
+        else //默认点光
+        {
+            auto pointLight = new PointLight();
+            _node = pointLight;
+            pointLights_.push_back(pointLight);
+
+            auto color = light_info.Get("color");
+            float r, g, b;
+            if (color.Get(0).IsInt())
+                r = (float)color.Get(0).Get<int>();
+            else
+                r = (float)color.Get(0).Get<double>();
+            if (color.Get(1).IsInt())
+                g = (float)color.Get(1).Get<int>();
+            else
+                g = (float)color.Get(1).Get<double>();
+            if (color.Get(2).IsInt())
+                b = (float)color.Get(2).Get<int>();
+            else
+                b = (float)color.Get(2).Get<double>();
+            pointLight->color = glm::vec3(r, g, b);
+        }
+    }
+    /*****解析网格*****/
+    else if (node.mesh >= 0)
+    {
+        auto _mesh = new Mesh();
+        _node = _mesh;
+
+        _mesh->material = ResourceManager::GetInstance()->GetMaterial("miss");
+
+        //读取mesh的primitives，里面存放顶点和材质信息
+        auto mesh = model.meshes[node.mesh];
+        for (int i = 0; i < mesh.primitives.size(); i++)
+        {
+            auto primitive = mesh.primitives[i];
+            auto submesh = new SubMesh();
+            submesh->SetupFromGLTF(model, primitive);
+            _mesh->submeshes.push_back(submesh);
+        }
+    }
+    else
+    {
+        _node = new Node();
+    }
+
+    _node->name = node.name;
+    parent->AddChild(_node);
+    nodes_.push_back(_node);
+
+    //读取仿射变换信息
+    if (node.translation.size() > 0)
+        _node->position = glm::vec3(node.translation[0], node.translation[1], node.translation[2]);
+    if (node.scale.size() > 0)
+        _node->scale = glm::vec3(node.scale[0], node.scale[1], node.scale[2]);
+    if (node.rotation.size() > 0)
+    {
+        auto quat = glm::quat((float)node.rotation[0], (float)node.rotation[1], (float)node.rotation[2], (float)node.rotation[3]);
+        auto euler = glm::eulerAngles(quat);
+        _node->eulerAngles = glm::vec3(glm::degrees(euler.z), glm::degrees(euler.y), glm::degrees(euler.x));
+    }
+
+    //递归找子节点
+    for (auto node_index : node.children)
+        LoadGLTFNode(model, model.nodes[node_index], _node);
 }
 
 } // namespace kd

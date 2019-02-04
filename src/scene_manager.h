@@ -11,6 +11,12 @@
 namespace kd
 {
 
+/*
+*	1.管理实体节点
+*	2.场景实体排序
+*	3.绘制场景
+*	4.读取gltf
+*/
 class SceneManager
 {
   public:
@@ -19,13 +25,17 @@ class SceneManager
 
 	virtual void Setup();
 	virtual void Update(float deltaTime);
-	void LoadGLTF(const std::string &path);
-	inline Node *GetRoot() { return root_; }
-	inline std::vector<Node *> &GetEntities() { return nodes_; };
-	//void RemoveNode();
 
-	inline std::vector<unsigned> &GetGltfVbos() { return gltf_vbos_; };
+	inline Node *GetRoot() { return root_; }
+	inline std::vector<Node *> &GetNodes() { return nodes_; };
+	void RemoveNode(const std::string &name);
+	Node *GetNode(const std::string &name);
+	Camera *GetCamera(const std::string &name);
 	void Render();
+
+	//加载gltf场景
+	void LoadGLTF(const std::string &path);
+	inline std::vector<unsigned> &GetGltfVbos() { return gltf_vbos_; };
 
   protected:
 	Node *root_ = nullptr;
@@ -39,10 +49,9 @@ class SceneManager
 
   private:
 	void DrawMesh(Camera *camera, Mesh *mesh);
-	/*
-	 * 递归解析glft节点
-	*/
-	void LoadGLTFNode(tinygltf::Model &model, tinygltf::Node &node);
+
+	// 递归解析glft节点
+	void LoadGLTFNode(tinygltf::Model &model, tinygltf::Node &node, Node *parent);
 
 	DISALLOW_COPY_AND_ASSIGN(SceneManager)
 

@@ -21,7 +21,7 @@ void ResourceManager::Setup()
     LoadTextures();
     LoadShaders();
     LoadMaterials();
-    LoadMeshes();
+    //LoadMeshes();
 }
 void ResourceManager::Update(float deltaTime)
 {

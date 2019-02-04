@@ -34,7 +34,7 @@ public:
   void SetOrtho(glm::vec2 size);
   glm::mat4 GetViewMatrix();
   Ray MousePointToRay(glm::vec2 point);
-  inline void SetController(CameraController *controller)
+  inline void AttachController(CameraController *controller)
   {
     cameraController = controller;
     controller->camera = this;

@@ -35,8 +35,8 @@ public:
   explicit PointLight();
   virtual ~PointLight();
   float constant = 1.f;
-  float linear = 0.2f;
-  float quadratic = 0.2f;
+  float linear = 0.045f;
+  float quadratic = 0.0075f;
 
 private:
   DISALLOW_COPY_AND_ASSIGN(PointLight)
