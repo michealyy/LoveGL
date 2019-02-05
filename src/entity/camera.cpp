@@ -25,6 +25,8 @@ Camera::Camera()
 Camera::~Camera()
 {
     SafeDelete(cameraController);
+    SafeDelete(postProcessing);
+    SafeDelete(renderTarget);
 }
 
 void Camera::Setup()
@@ -32,6 +34,8 @@ void Camera::Setup()
     Node::Setup();
     if (cameraController)
         cameraController->Setup();
+    if (postProcessing)
+        postProcessing->Setup();
 }
 
 void Camera::Update(float deltaTime)
@@ -40,14 +44,6 @@ void Camera::Update(float deltaTime)
 
     if (cameraController)
         cameraController->Update(deltaTime);
-}
-
-void Camera::RenderScene()
-{
-    if (renderTarget)
-        renderTarget->Bind();
-    
-    //Engine::GetInstance()->sceneManager->Re
 }
 
 void Camera::SetPerspective()

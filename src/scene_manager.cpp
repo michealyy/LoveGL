@@ -8,7 +8,8 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <tiny_gltf.h>
 #include <resource_manager.h>
-#include "engine.h"
+#include <config.h>
+#include <engine.h>
 
 using namespace std;
 
@@ -90,16 +91,18 @@ void SceneManager::Render()
     for (auto node : nodes_)
     {
         auto mesh = dynamic_cast<Mesh *>(node);
-        // if (mesh != nullptr && mesh->material != nullptr)
-        // {
-        //     if (mesh->material->isTransparent)
-        //         transparent_meshes.push_back(mesh);
-        //     else
-        //         opaque_meshes.push_back(mesh);
-        // }
         if (mesh != nullptr)
         {
-            opaque_meshes.push_back(mesh);
+            bool isTransparent = false;
+            for (auto subMesh : mesh->subMeshes)
+            {
+                if (subMesh->material->isTransparent)
+                    isTransparent = true;
+            }
+            if (isTransparent)
+                transparent_meshes.push_back(mesh);
+            else
+                opaque_meshes.push_back(mesh);
         }
     }
 
@@ -114,11 +117,30 @@ void SceneManager::Render()
     sort(cameras_.begin(), cameras_.end(), [](Camera *a, Camera *b) -> bool { return a->depth < b->depth; });
     for (auto camera : cameras_)
     {
+        //支持rtt。没有就直接绘制到颜色缓冲区
+        if (camera->renderTarget)
+        {
+            camera->renderTarget->Bind();
+            glClearColor(CLEAR_COLOR.r, CLEAR_COLOR.g, CLEAR_COLOR.b, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        }
+        else
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        //三角面模式，线或者填充
+        if (camera->isLinePolygon)
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        else
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+        //可选择不叠加摄像机渲染结果
         if (!camera->isOverlay)
         {
             glClearColor(camera->clearColor.x, camera->clearColor.y, camera->clearColor.z, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
+        //面剔除
+        //glCullFace(GL_FRONT);
         //glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         for (auto opaque_mesh : opaque_meshes)
@@ -133,6 +155,10 @@ void SceneManager::Render()
         }
         glDisable(GL_BLEND);
         glDisable(GL_DEPTH_TEST);
+
+        //后处理
+        if (camera->postProcessing)
+            camera->postProcessing->Draw();
     }
 }
 

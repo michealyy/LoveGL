@@ -36,12 +36,7 @@ int main(int, char **)
 	{
 		glfwSwapInterval(0);
 	}
-
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	if (Line_Polygon)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
+	
 	//glEnable(GL_FRAMEBUFFER_SRGB);
 
 	Engine::GetInstance()->SetMainWindow(window);
@@ -50,7 +45,7 @@ int main(int, char **)
 	Engine::GetInstance()->Setup();
 	while (!glfwWindowShouldClose(window))
 	{
-		glClearColor(UI_CLEAR_COLOR.r, UI_CLEAR_COLOR.g, UI_CLEAR_COLOR.b, 1.0f);
+		glClearColor(CLEAR_COLOR.r, CLEAR_COLOR.g, CLEAR_COLOR.b, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		Engine::GetInstance()->Update();

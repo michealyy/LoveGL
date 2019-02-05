@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 #include <engine.h>
 #include <core/renderer.h>
+#include <core/post_processing.h>
 
 using namespace kd;
 using namespace glm;
@@ -23,15 +24,16 @@ void AppLight::Setup()
     scnMgr->LoadGLTF("assets/tftest/tftest.gltf");
 
     //主摄像机
-    // auto camera = scnMgr->GetCamera("Camera_Orientation");
-    // camera->AttachController(new FreeCameraController());
-    // Engine::GetInstance()->mainCamera = camera;
-
-    auto camera = scnMgr->CreateNode<Camera>();
-    camera->name = "MainCamera";
+    auto camera = scnMgr->GetCamera("Camera_Orientation");
     camera->AttachController(new FreeCameraController());
-    camera->position = vec3(0, 0, 10);
+    //camera->AttachPostProcessing(new PostGray());
     Engine::GetInstance()->mainCamera = camera;
+
+    // auto camera = scnMgr->CreateNode<Camera>();
+    // camera->name = "MainCamera";
+    // camera->AttachController(new FreeCameraController());
+    // camera->position = vec3(0, 0, 10);
+    // Engine::GetInstance()->mainCamera = camera;
 
     //灯源
     auto directionalLight = scnMgr->CreateNode<DirectionalLight>();

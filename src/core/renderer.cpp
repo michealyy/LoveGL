@@ -18,85 +18,14 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
-    glDeleteFramebuffers(1, &post_processing_framebuffer_);
-    glDeleteTextures(1, &post_processing_texture_);
-    glDeleteRenderbuffers(1, &post_processing_render_buffer_);
-    glDeleteVertexArrays(1, &post_processing_vao_);
-    glDeleteBuffers(1, &post_processing_vbo_);
-
     glDeleteVertexArrays(1, &ui_vao_);
     glDeleteBuffers(2, ui_vbo_);
 }
 
 void Renderer::Setup()
 {
-    SetupPostProcessingRenderTexture();
     SetupUIBatchRender();
     SetupDebugLines();
-}
-
-void Renderer::SetupPostProcessingRenderTexture()
-{
-    int width, height;
-    glfwGetWindowSize(Engine::GetInstance()->GetMainWindow(), &width, &height);
-
-    glGenFramebuffers(1, &post_processing_framebuffer_);
-    glBindFramebuffer(GL_FRAMEBUFFER, post_processing_framebuffer_);
-    //渲染到贴图
-    glGenTextures(1, &post_processing_texture_);
-    glBindTexture(GL_TEXTURE_2D, post_processing_texture_);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, post_processing_texture_, 0);
-    //Renderbuffer作为深度模板缓冲区
-    glGenRenderbuffers(1, &post_processing_render_buffer_);
-    glBindRenderbuffer(GL_RENDERBUFFER, post_processing_render_buffer_);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, post_processing_render_buffer_);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        fprintf(stderr, "[Render] Post Processing Framebuffer is not complete");
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    //屏幕大小的矩形
-    float vertices[] = {
-        -1.0,
-        1.0,
-        0.0,
-        1.0,
-        -1.0,
-        -1.0,
-        0.0,
-        0.0,
-        1.0,
-        -1.0,
-        1.0,
-        0.0,
-        -1.0,
-        1.0,
-        0.0,
-        1.0,
-        1.0,
-        -1.0,
-        1.0,
-        0.0,
-        1.0,
-        1.0,
-        1.0,
-        1.0,
-    };
-    glGenVertexArrays(1, &post_processing_vao_);
-    glBindVertexArray(post_processing_vao_);
-    glGenBuffers(1, &post_processing_vbo_);
-    glBindBuffer(GL_ARRAY_BUFFER, post_processing_vbo_);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void *)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void *)(sizeof(float) * 2));
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void Renderer::SetupUIBatchRender()
@@ -136,128 +65,12 @@ void Renderer::SetupDebugLines()
     glGenBuffers(1, &line_vbo_);
     glBindBuffer(GL_ARRAY_BUFFER, line_vbo_);
     glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
-}
-
-void Renderer::AddMesh(Mesh *mesh)
-{
-    // if (mesh != nullptr && mesh->material != nullptr)
-    // {
-    //     if (mesh->material->isTransparent)
-    //         AddTransparent(mesh);
-    //     else
-    //         AddOpaque(mesh);
-    // }
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 }
 
 void Renderer::Render()
 {
-    RenderSkyBox();    
-    //Render3DObjects();
     BatchRenderUI();
-}
-
-void Renderer::RenderSkyBox()
-{
-}
-
-void Renderer::Render3DObjects()
-{
-    //渲染到后处理贴图 TODO:FBO实现抗锯齿
-    if (open_post_processing)
-    {
-        glBindFramebuffer(GL_FRAMEBUFFER, post_processing_framebuffer_);
-        glClearColor(UI_CLEAR_COLOR.r, UI_CLEAR_COLOR.g, UI_CLEAR_COLOR.b, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    }
-
-    //开启深度测试，自动抛弃离摄像机远的片段
-    glEnable(GL_DEPTH_TEST);
-
-    for (auto opaque_mesh : opaque_meshes_)
-    {
-        DrawMesh(opaque_mesh);
-    }
-
-    //渲染透明物体，开启混合，需要自己处理渲染次序不一样造成不一样的效果
-    SortTransparent();
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    for (auto transparent_mesh : transparent_meshes_)
-    {
-        DrawMesh(transparent_mesh);
-    }
-    glDisable(GL_BLEND);
-
-    glDisable(GL_DEPTH_TEST);
-
-    opaque_meshes_.clear();
-    transparent_meshes_.clear();
-
-    //关闭场景渲染到贴图，开始渲染成品的贴图
-    if (open_post_processing)
-    {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        //Engine::GetInstance()->GetShader("post_blur")->Bind();
-        ResourceManager::GetInstance()->GetShader("post_normal")->Bind();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, post_processing_texture_);
-        glBindVertexArray(post_processing_vao_);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        glBindVertexArray(0);
-    }
-}
-
-void Renderer::DrawMesh(Mesh *mesh)
-{
-    // glEnable(GL_CULL_FACE);
-
-    // auto material = mesh->material;
-    // auto camera = Engine::GetInstance()->mainCamera;
-
-    // if (material == nullptr || camera == nullptr)
-    // {
-    //     return;
-    // }
-
-    // material->Bind();
-    // auto shader = material->GetShader();
-    // shader->SetMatrix("mvp", camera->projectMatrix * mesh->localToCameraTransform);
-    // shader->SetMatrix("model", mesh->worldTransform);
-    // shader->SetVector3("viewPos", camera->worldPosition);
-    // //平行光测试
-    // shader->SetVector3("directionalLight.color", glm::vec3(0.4f, 0.4f, 0.4f));
-    // shader->SetVector3("directionalLight.direction", glm::vec3(0, -1, 0));
-    // //点光测试
-    // shader->SetInt("pointLightsCount", 1);
-    // shader->SetVector3("pointLights[0].color", glm::vec3(1, 0, 0));
-    // shader->SetVector3("pointLights[0].position", glm::vec3(-2, 1, 0));
-    // shader->SetFloat("pointLights[0].constant", 1);
-    // shader->SetFloat("pointLights[0].linear", 0.14f);
-    // shader->SetFloat("pointLights[0].quadratic", 0.07f);
-    // //聚光测试
-    // shader->SetInt("spotLightsCount", 1);
-    // shader->SetVector3("spotLights[0].color", glm::vec3(0, 1, 0));
-    // shader->SetVector3("spotLights[0].position", glm::vec3(2, 2, 2));
-    // shader->SetVector3("spotLights[0].direction", glm::vec3(0, -1, 0));
-    // shader->SetFloat("spotLights[0].angle", glm::cos(glm::radians(15.f)));
-
-    // glBindVertexArray(mesh->vao);
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
-    // glDrawElements(GL_TRIANGLES, (int)mesh->indices.size(), GL_UNSIGNED_INT, 0);
-    // glBindVertexArray(0);
-
-    // Engine::GetInstance()->draw_call++;
-}
-
-void Renderer::SortTransparent()
-{
-    //取离摄像机距离，位移变换的的Z轴作为排序依据
-    sort(transparent_meshes_.begin(), transparent_meshes_.end(), [](Mesh *a, Mesh *b) -> bool {
-        auto a_z = glm::column(a->localToCameraTransform, 3).z;
-        auto b_z = glm::column(b->localToCameraTransform, 3).z;
-        return a_z < b_z;
-    });
 }
 
 void Renderer::DrawDebugLine(const float vertices[6])
@@ -268,13 +81,13 @@ void Renderer::DrawDebugLine(const float vertices[6])
     shader->Bind();
     shader->SetMatrix("mvp", camera->projectMatrix * camera->GetViewMatrix());
     shader->SetFloat("alpha", 1);
-    shader->SetVector3("color", glm::vec3(0,1,0));
-    
+    shader->SetVector3("color", glm::vec3(0, 1, 0));
+
     glBindVertexArray(line_vao_);
 
     //float _vertices[] = {0,0,0, 0,2,0};
     glBindBuffer(GL_ARRAY_BUFFER, line_vbo_);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*6, vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6, vertices, GL_STATIC_DRAW);
 
     glDrawArrays(GL_LINE_LOOP, 0, 2);
 }

@@ -18,35 +18,16 @@ public:
   ~Renderer();
 
   void Setup();
-  void AddMesh(Mesh *mesh);
-  inline void AddOpaque(Mesh *mesh) { opaque_meshes_.push_back(mesh); }
-  inline void AddTransparent(Mesh *mesh) { transparent_meshes_.push_back(mesh); }
   inline void AddUIRect(ui::UIRect *rect) { ui_rect_list_.push_back(rect); }
   void Render();
   void DrawDebugLine(const float vertices[6]);
 
 private:
   void SetupUIBatchRender();
-  void SetupPostProcessingRenderTexture();
   void SetupDebugLines();
-  void RenderSkyBox();
-  void Render3DObjects();
-  void DrawMesh(Mesh *mesh);
-  void SortTransparent();
   void SortUIRectByDepthAndHandleInput();
   void BatchRenderUI();
   void GenerateUIDrawCall(unsigned last_rect_index);
-
-  std::vector<Mesh *> opaque_meshes_;
-  std::vector<Mesh *> transparent_meshes_;
-
-  //post processing
-  bool open_post_processing = false;
-  unsigned post_processing_framebuffer_ = 0;
-  unsigned post_processing_texture_ = 0;
-  unsigned post_processing_render_buffer_ = 0;
-  unsigned post_processing_vao_ = 0;
-  unsigned post_processing_vbo_ = 0;
 
   //ui batch control
   std::vector<ui::UIRect *> ui_rect_list_;

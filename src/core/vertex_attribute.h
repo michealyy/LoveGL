@@ -27,7 +27,7 @@ struct P_T_N_T_B
     glm::vec3 Normal{0};
     glm::vec3 Tangent{0};
     glm::vec3 Bitangent{0};
-    //根据法线计算法切线和副法切线
+    //根据位置纹理计算切线和副切线
     void CalculateTB();
 };
 

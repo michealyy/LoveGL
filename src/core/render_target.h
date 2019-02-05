@@ -1,6 +1,7 @@
 #pragma once
 
-#include "common.h"
+#include <common.h>
+#include <vector>
 
 namespace kd
 {
@@ -19,17 +20,6 @@ private:
 	DISALLOW_COPY_AND_ASSIGN(RenderTarget)
 };
 
-class GLFWRenderWindow : public RenderTarget
-{
-public:
-	explicit GLFWRenderWindow();
-	virtual ~GLFWRenderWindow();
-
-private:
-
-	DISALLOW_COPY_AND_ASSIGN(GLFWRenderWindow)
-};
-
 class RenderTexture : public RenderTarget
 {
 public:
@@ -42,18 +32,20 @@ public:
 	unsigned renderBuffer = 0;
 
 private:
-
 	DISALLOW_COPY_AND_ASSIGN(RenderTexture)
 };
 
 class MultiRenderTarget : public RenderTarget
 {
 public:
-	explicit MultiRenderTarget();
+	explicit MultiRenderTarget(unsigned width, unsigned height, unsigned count);
 	virtual ~MultiRenderTarget();
+	virtual void Bind() override;
+
+	unsigned frameBuffer = 0;
+	std::vector<unsigned> textures;
 
 private:
-
 	DISALLOW_COPY_AND_ASSIGN(MultiRenderTarget)
 };
 
