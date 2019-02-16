@@ -96,7 +96,7 @@ void SceneManager::Render()
             bool isTransparent = false;
             for (auto subMesh : mesh->subMeshes)
             {
-                if (subMesh->material->isTransparent)
+                if (subMesh->material && subMesh->material->isTransparent)
                     isTransparent = true;
             }
             if (isTransparent)

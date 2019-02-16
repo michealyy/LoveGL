@@ -20,41 +20,42 @@ void AppLight::Setup()
     scnMgr = new SceneManager();
     Engine::GetInstance()->sceneManager = scnMgr;
 
-    //scnMgr->LoadGLTF("assets/tfsimple/tfsimple.gltf");
-    scnMgr->LoadGLTF("assets/tftest/tftest.gltf");
+    scnMgr->LoadGLTF("assets/scenes/1.gltf");
+    //scnMgr->LoadGLTF("assets/tftest/tftest.gltf");
 
     //主摄像机
-    auto camera = scnMgr->GetCamera("Camera_Orientation");
-    camera->AttachController(new FreeCameraController());
-    //camera->AttachPostProcessing(new PostGray());
-    Engine::GetInstance()->mainCamera = camera;
-
-    // auto camera = scnMgr->CreateNode<Camera>();
-    // camera->name = "MainCamera";
+    // auto camera = scnMgr->GetCamera("Camera_Orientation");
     // camera->AttachController(new FreeCameraController());
-    // camera->position = vec3(0, 0, 10);
+    // //camera->AttachPostProcessing(new PostGray());
     // Engine::GetInstance()->mainCamera = camera;
+
+    auto camera = scnMgr->CreateNode<Camera>();
+    camera->name = "MainCamera";
+    camera->AttachController(new FreeCameraController());
+    camera->position = vec3(0, 0, 10);
+    Engine::GetInstance()->mainCamera = camera;
 
     //灯源
     auto directionalLight = scnMgr->CreateNode<DirectionalLight>();
-    directionalLight->color = vec3(1, 1, 1);
+    directionalLight->color = vec3(0.5, 0.5, 0.5);
+    //directionalLight->color = vec3(0, 0, 0);
     directionalLight->direction = vec3(0, -1, 0);
 
-    // auto pointLight = scnMgr->CreateNode<PointLight>();
-    // pointLight->color = vec3(1, 0, 0);
-    // pointLight->position = vec3(-2, 1, 0);
-    // pointLight->linear = 0.14f;
-    // pointLight->quadratic = 0.07f;
-    
-    // auto pointLight2 = scnMgr->CreateNode<PointLight>();
-    // pointLight2->color = vec3(0, 0, 1);
-    // pointLight2->position = vec3(0, 1, -5);
-    // pointLight2->linear = 0.14f;
-    // pointLight2->quadratic = 0.07f;
+    auto pointLight = scnMgr->CreateNode<PointLight>();
+    pointLight->color = vec3(1, 0, 0);
+    pointLight->position = vec3(-2, 1, 0);
+    pointLight->linear = 0.14f;
+    pointLight->quadratic = 0.07f;
 
-    // auto spotLight = scnMgr->CreateNode<SpotLight>();
-    // spotLight->color = vec3(1,1,0.5f);
-    // spotLight->position = vec3(2, 2, 2);
+    auto pointLight2 = scnMgr->CreateNode<PointLight>();
+    pointLight2->color = vec3(0, 1, 0);
+    pointLight2->position = vec3(0, 1, -5);
+    pointLight2->linear = 0.14f;
+    pointLight2->quadratic = 0.07f;
+
+    auto spotLight = scnMgr->CreateNode<PointLight>();
+    spotLight->color = vec3(0, 0, 1);
+    spotLight->position = vec3(0, 1, 5);
     // spotLight->direction = vec3(0, -1, 0);
     // spotLight->innerAngle = cos(radians(12.5f));
     // spotLight->outerAngle = cos(radians(17.5f));
@@ -69,7 +70,7 @@ void AppLight::Setup()
     // cylinder1->SetMesh("cylinder");
     // cylinder1->name = "cylinder1";
     // cylinder1->position = vec3(-3, 0, 0);
-    
+
     // auto mat2 = new Material("unlit_pos_2");
     // mat2->SetShader("unlit_pos");
     // mat2->SetColor(vec3(0, 1, 0));
@@ -124,14 +125,14 @@ void AppLight::Update(float deltaTime)
     auto ray = Engine::GetInstance()->mainCamera->MousePointToRay(vec2(x, y));
     //测试屏幕射线是否正确
     auto p1 = ray.GetPoint(1);
-    float line[] = {p1.x, p1.y, p1.z, 0,0,0};
+    float line[] = {p1.x, p1.y, p1.z, 0, 0, 0};
     Renderer::GetInstance()->DrawDebugLine(line);
 
     if (glfwGetMouseButton(main_window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS && Engine::GetInstance()->mainCamera)
     {
-        for(auto nodes : scnMgr->GetNodes())
+        for (auto nodes : scnMgr->GetNodes())
         {
-            auto mesh = dynamic_cast<Mesh*>(nodes);
+            auto mesh = dynamic_cast<Mesh *>(nodes);
             if (mesh)
             {
                 RayCastHit rayCastHit;

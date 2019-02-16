@@ -113,9 +113,13 @@ void ResourceManager::LoadMaterials()
     ui_default->SetShader("unlit_pos_tex");
     ui_default->SetTexture("white");
 
+    // auto miss = new Material("miss");
+    // miss->SetShader("blinn_phong_normal");
+    // miss->SetTexture("miss");
+
     auto miss = new Material("miss");
-    miss->SetShader("blinn_phong_normal");
-    miss->SetTexture("miss");
+    miss->SetShader("blinn_phong");
+    miss->SetTexture("white");
 }
 
 void ResourceManager::LoadMeshes()
