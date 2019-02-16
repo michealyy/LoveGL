@@ -30,8 +30,6 @@ class Shader
 	std::string path_;
 	std::string name_;
 
-	std::map<std::string, std::any> uniforms_;
-
 	unsigned CreateGLShader(int type, const char *source);
 	DISALLOW_COPY_AND_ASSIGN(Shader)
 };

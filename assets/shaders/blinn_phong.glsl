@@ -1,6 +1,3 @@
-#uniform
-shininess float 100
-
 #vertex
 #version 330 core
 

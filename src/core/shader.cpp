@@ -30,35 +30,8 @@ Shader::Shader(const string &name, const string &path)
 	
 	auto vertexIndex = shader.find("#vertex");
 	auto fragmentIndex = shader.find("#fragment");
-	auto uniformsStr = shader.substr(9, vertexIndex - 10);
 	auto vertexStr = shader.substr(vertexIndex + 8, fragmentIndex - vertexIndex - 8);
 	auto fragmentStr = shader.substr(fragmentIndex + 10);
-
-	stringstream uniformsStream(uniformsStr);
-	string uniform;
-	while (std::getline(uniformsStream, uniform))
-	{
-		stringstream _uniform(uniform);
-		string name;
-		_uniform >> name;
-		string type;
-		_uniform >> type;
-		string value;
-		_uniform >> value;
-
-		std::any _value;
-
-		if (type == "float")
-		{
-			_value = std::stof(value);
-		}
-		else if (type == "texture")
-		{
-			_value = value; //StringCast<unsigned int>(value);
-		}
-
-		this->uniforms_[name] = _value;
-	}
 
 	unsigned vertexShader = CreateGLShader(GL_VERTEX_SHADER, vertexStr.c_str());
 	unsigned fragmentShader = CreateGLShader(GL_FRAGMENT_SHADER, fragmentStr.c_str());

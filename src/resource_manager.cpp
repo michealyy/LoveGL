@@ -97,7 +97,7 @@ void ResourceManager::LoadShaders()
             auto _path = entry.path();
             if (!filesystem::is_directory(_path))
             {
-                if (_path.extension().string() == ".shader")
+                if (_path.extension().string() == ".glsl")
                 {
                     auto shader = new Shader(_path.stem().string(), _path.string());
                     shaders_[shader->GetName()] = shader;

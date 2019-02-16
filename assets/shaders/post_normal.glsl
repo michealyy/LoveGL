@@ -1,5 +1,3 @@
-#uniform
-
 #vertex
 #version 330 core
 layout (location = 0) in vec2 aPos;
@@ -23,7 +21,5 @@ uniform sampler2D screenTexture;
 
 void main()
 {
-    vec3 color = texture(screenTexture, texCoords).rgb;
-    float a = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b;
-    FragColor = vec4(a, a, a, 1.0);
+    FragColor = texture(screenTexture, texCoords);
 }
