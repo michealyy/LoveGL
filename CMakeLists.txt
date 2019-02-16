@@ -14,11 +14,12 @@ add_subdirectory(glfw)
 #lovegl为单独库
 add_subdirectory(src)
 
-#例子
 include_directories("glfw/include")
 include_directories("glfw/deps")
 include_directories("deps")
 include_directories("src")
 link_libraries(lovegl)
+
+#例子
 aux_source_directory(example DIR_SRC_EXAMPLE)
 add_executable(loveglexample ${DIR_SRC_EXAMPLE})
