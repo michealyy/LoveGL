@@ -1,8 +1,5 @@
 ﻿#include "app_light.h"
 #include <glm/glm.hpp>
-#include <engine.h>
-#include <core/renderer.h>
-#include <core/post_processing.h>
 
 using namespace kd;
 using namespace glm;

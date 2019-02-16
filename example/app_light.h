@@ -1,9 +1,6 @@
 #pragma once
 
-#include <common.h>
-#include <app.h>
-#include <scene_manager.h>
-#include <core/render_target.h>
+#include <lovegl.h>
 
 class AppLight : public kd::App
 {

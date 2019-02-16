@@ -1,27 +1,25 @@
-cmake_minimum_required(VERSION 3.8.0)
-
-#C++ 17标准
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-#编译成动态库
+#是否编译成动态库
 option(DYNAMIC_LIB "dynamic lib" OFF)
 
-#set(GLFW_DIR "../glfw")
+include_directories("../glfw/deps")
+include_directories("../glfw/include")
+include_directories("../deps")
+include_directories(".")
 
-#glew3
+link_libraries(glfw)
+
 #glad
-set(GLAD "deps/glad.c")
-
-include_directories("deps")
+set(GLAD "../glfw/deps/glad.c")
 
 #源代码文件夹
 aux_source_directory(. DIR_SRC)
-aux_source_directory(example DIR_SRC_EXAMPLE)
+aux_source_directory(core DIR_CORE)
+aux_source_directory(entity DIR_ENTITY)
+aux_source_directory(physics DIR_PHYSICS)
 aux_source_directory(ui DIR_SRC_UI)
 
 #添加静态库  
-ADD_LIBRARY(renderer STATIC ${GLAD} ${DIR_SRC} ${DIR_SRC_EXAMPLE} ${DIR_SRC_UI})  
+ADD_LIBRARY(lovegl STATIC ${GLAD} ${DIR_SRC} ${DIR_CORE} ${DIR_ENTITY} ${DIR_PHYSICS} ${DIR_SRC_UI})  
 
-#将静态库重新命名为renderer
-SET_TARGET_PROPERTIES(renderer PROPERTIES OUTPUT_NAME "renderer")
+#将静态库重新命名
+SET_TARGET_PROPERTIES(lovegl PROPERTIES OUTPUT_NAME "lovegl")
