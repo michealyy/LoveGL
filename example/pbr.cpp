@@ -13,8 +13,8 @@ class AppPBR : public kd::App
 
 		//scnMgr->LoadGLTF("assets/scenes/1.gltf");
 		scnMgr->LoadGLTF("assets/scenes/material/material.gltf");
-		
-		scnMgr->LoadIBL("gym");
+
+		scnMgr->LoadIBL("outdoor");
 
 		//主摄像机
 		// auto camera = scnMgr->GetCamera("Camera_Orientation");
