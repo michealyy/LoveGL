@@ -31,6 +31,7 @@ void Node::Update(float deltaTime)
 		UpdateModelMatrix();
 	}
 
+	//TODO 支持多摄像机
 	if (Engine::GetInstance()->mainCamera)
 	{
     	localToCameraTransform = Engine::GetInstance()->mainCamera->GetViewMatrix() * worldTransform;
@@ -77,7 +78,7 @@ void Node::RemoveAllChild()
 void Node::UpdateModelMatrix()
 {
 	mat4 temp(1.0f);
-	localTransform = translate(temp, position) * glm::scale(temp, scale) * mat4_cast(quat(glm::radians(-eulerAngles)));
+	localTransform = translate(temp, position) * glm::scale(temp, scale) * mat4_cast(quat(glm::radians(eulerAngles)));
 
 	if (parent_ != nullptr)
 	{

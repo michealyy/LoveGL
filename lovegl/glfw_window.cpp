@@ -8,7 +8,7 @@ namespace kd
 GLFWWindow::GLFWWindow()
 {}
 
-GLFWWindow *GLFWWindow::InitWindow(int width, int height)
+GLFWWindow *GLFWWindow::InitWindow(int width, int height, const char *title)
 {
     if (!glfwInit())
         return nullptr;
@@ -19,7 +19,7 @@ GLFWWindow *GLFWWindow::InitWindow(int width, int height)
     glfwWindowHint(GLFW_SAMPLES, 8);
     glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
 
-    window = glfwCreateWindow(width, height, "LoveGL-keddy", NULL, NULL);
+    window = glfwCreateWindow(width, height, title, nullptr, nullptr);
     if (!window)
     {
         glfwTerminate();
@@ -69,7 +69,6 @@ void GLFWWindow::MainLoop()
         Engine::GetInstance()->Update();
 
         glfwSwapBuffers(window);
-
         glfwPollEvents();
     }
 

@@ -113,8 +113,8 @@ void FreeCameraController::Update(float deltaTime)
     {
         double mousePosX, mousePosY;
         glfwGetCursorPos(window, &mousePosX, &mousePosY);
-        float x = (float)(mousePosY - lastMousePosY);
-        float y = (float)(mousePosX - lastMousePosX);
+        float x = (float)(lastMousePosY - mousePosY);
+        float y = (float)(lastMousePosX - mousePosX);
         camera->eulerAngles += vec3(x * rotateSpeed * deltaTime, y * rotateSpeed * deltaTime, 0);
 
         if (glfwGetKey(window, GLFW_KEY_W))

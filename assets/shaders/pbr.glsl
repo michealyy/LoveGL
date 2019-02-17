@@ -31,6 +31,11 @@ in vec2 _texCoord;
 in vec3 _normal;
 in vec3 _worldPos;
 
+//IBL信息
+uniform samplerCube irradianceMap;
+uniform samplerCube prefilterMap;
+uniform sampler2D brdfLUT;
+
 uniform vec3 viewPos;
 uniform vec3 albedo;
 uniform float roughness;
@@ -140,6 +145,7 @@ void main()
 {
     vec3 V = normalize(viewPos - _worldPos);
     vec3 N = normalize(_normal);
+    vec3 R = reflect(-V, N);
 
     //金属度越高，基础反射率高
     vec3 F0 = vec3(0.04); 
@@ -160,8 +166,27 @@ void main()
     //辐射率和光线和法线夹角相关
     float NdotL = max(dot(N, L), 0.0);
 
+    //#IBL
+    vec3 F = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+    
+    vec3 kS = F;
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;	  
+    
+    vec3 irradiance = texture(irradianceMap, N).rgb;
+    vec3 diffuse = irradiance * albedo;
+    
+    const float MAX_REFLECTION_LOD = 3.0;
+    vec3 prefilteredColor = textureLod(prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;    
+    vec2 brdf  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
+    vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
+
+    vec3 ambient = (kD * diffuse + specular);
+    //#IBL
+
     //环境光0.03+反射光
-    vec3 result = vec3(0.1) * albedo + BRDF(N, H, V, L, F0) * radiance * NdotL;
+    //vec3 result = vec3(0.1) * albedo + BRDF(N, H, V, L, F0) * radiance * NdotL;
+    vec3 result = ambient + BRDF(N, H, V, L, F0) * radiance * NdotL;
     
     result = result / (result + vec3(1.0));
     result = pow(result, vec3(1.0/2.2)); 

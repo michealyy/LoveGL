@@ -177,7 +177,7 @@ void SubMesh::SetupFromGLTF(tinygltf::Model &model, tinygltf::Primitive &primiti
     }
 
     /*****解析材质信息*****/
-    if (primitive.material > 0)
+    if (primitive.material >= 0)
     {
         auto gltf_mat = model.materials[primitive.material];
         this->material = ResourceManager::GetInstance()->GetMaterial(gltf_mat.name);

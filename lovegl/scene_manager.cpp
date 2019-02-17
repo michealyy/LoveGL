@@ -26,6 +26,7 @@ SceneManager::SceneManager()
 
 SceneManager::~SceneManager()
 {
+    SafeDelete(skybox_);
     for (auto node : nodes_)
     {
         SafeDelete(node);
@@ -34,24 +35,27 @@ SceneManager::~SceneManager()
 
 void SceneManager::Setup()
 {
+    if (skybox_)
+        skybox_->Setup();
+
     for (auto node : nodes_)
     {
         node->Setup();
     }
+
+    if (Engine::GetInstance()->mainCamera == nullptr)
+        Engine::GetInstance()->mainCamera = cameras_[0];
 }
 
 void SceneManager::Update(float deltaTime)
 {
-    if (Engine::GetInstance()->mainCamera == nullptr)
-    {
-        fprintf(stderr, "not find mainCamera. pls set Engine::GetInstance()->mainCamera!");
-    }
-
     for (auto node : nodes_)
     {
-        if (node->visible)
-            node->Update(deltaTime);
+        node->Update(deltaTime);
     }
+
+    if (skybox_)
+        skybox_->Render();
 
     Render();
 }
@@ -179,6 +183,21 @@ void SceneManager::DrawMesh(Camera *camera, Mesh *mesh)
         shader->SetMatrix("mvp", camera->projectMatrix * mesh->localToCameraTransform);
         shader->SetMatrix("model", mesh->worldTransform);
         shader->SetVector3("viewPos", camera->worldPosition);
+
+        //IBL信息
+        if(shader->GetName() == "pbr")
+        {
+            shader->SetInt("irradianceMap", 0);
+            shader->SetInt("prefilterMap", 1);
+            shader->SetInt("brdfLUT", 2);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, diffuseCubemap_);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, specularCubemap_);
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, brdfLUT_);
+        }
+        
         //平行光源
         shader->SetVector3("directionalLight.color", directionalLight_->color);
         shader->SetVector3("directionalLight.direction", directionalLight_->direction);
@@ -248,18 +267,23 @@ void SceneManager::LoadGLTF(const std::string &path)
     for (auto material : model.materials)
     {
         auto mat = new Material(material.name);
-        mat->SetShader("blinn_phong_normal");
-        //给一个丢失材质，没有材质信息时候能快速视觉反馈
-        mat->SetTexture("miss");
+        mat->SetShader("pbr");
         //基础颜色
         if (material.values.find("baseColorFactor") != material.values.end())
         {
             auto baseColor = material.values["baseColorFactor"].ColorFactor();
             if (baseColor.size() >= 3)
-                mat->SetColor(glm::vec3(baseColor[0], baseColor[1], baseColor[2]));
+                mat->SetVector3("albedo", glm::vec3(baseColor[0], baseColor[1], baseColor[2]));
+                //mat->SetColor(glm::vec3(baseColor[0], baseColor[1], baseColor[2]));
             if (baseColor.size() == 4)
                 mat->SetAlpha((float)baseColor[3]);
         }
+        //粗糙度
+        if (material.values.find("roughnessFactor") != material.values.end())
+            mat->SetFloat("roughness", (float)material.values["roughnessFactor"].number_value);
+        //金属度
+        if (material.values.find("metallicFactor") != material.values.end())
+            mat->SetFloat("metallic", (float)material.values["metallicFactor"].number_value);
         //基础贴图
         auto baseColorTextureJson = material.values["baseColorTexture"].json_double_value;
         if (baseColorTextureJson.find("index") != baseColorTextureJson.end())
@@ -269,7 +293,7 @@ void SceneManager::LoadGLTF(const std::string &path)
 
             auto texture = model.textures[(size_t)baseColorTextureJson.find("index")->second];
             auto image = model.images[texture.source];
-            mat->SetTexture(image.name, 0, "mainTexture");
+            mat->SetTexture(image.name, 3, "mainTexture");
         }
         //法线贴图
         auto normalTextureJson = material.additionalValues["normalTexture"].json_double_value;
@@ -277,7 +301,7 @@ void SceneManager::LoadGLTF(const std::string &path)
         {
             auto texture = model.textures[(size_t)normalTextureJson.find("index")->second];
             auto image = model.images[texture.source];
-            mat->SetTexture(image.name, 1, "normalMap");
+            mat->SetTexture(image.name, 7, "normalMap");
         }
     }
 
@@ -369,7 +393,10 @@ void SceneManager::LoadGLTFNode(tinygltf::Model &model, tinygltf::Node &node, No
     {
         auto quat = glm::quat((float)node.rotation[0], (float)node.rotation[1], (float)node.rotation[2], (float)node.rotation[3]);
         auto euler = glm::eulerAngles(quat);
-        _node->eulerAngles = glm::vec3(glm::degrees(euler.z), glm::degrees(euler.y), glm::degrees(euler.x));
+        auto x = glm::degrees(euler.x);
+        auto y = glm::degrees(euler.y);
+        auto z = glm::degrees(euler.z);
+        _node->eulerAngles = glm::vec3(z, y, x);
     }
 
     //递归找子节点
@@ -379,7 +406,7 @@ void SceneManager::LoadGLTFNode(tinygltf::Model &model, tinygltf::Node &node, No
 
 void SceneManager::LoadIBL(const std::string &path)
 {
-    //glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
     filesystem::path aPath("assets/ibl/");
 
@@ -416,31 +443,16 @@ void SceneManager::LoadIBL(const std::string &path)
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, diffuse.extent().x, diffuse.extent().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, diffuse.data(0, i, 0));
 
     //specular
-    auto specular = gli::load_dds((aPath / path / "specular.dds").string());
-    if (specular.empty())
-    {
-        fprintf(stderr, "[SceneManager] load specular.dds error: %s\n", path.c_str());
-        return;
-    }
-    glGenTextures(1, &specularCubemap_);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, specularCubemap_);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    specularCubemap_ = GLILoadCreateGLTexture((aPath / path / "specular.dds").string());
 
-    GLenum Target = gli::gl(gli::gl::PROFILE_GL33).translate(specular.target());
-    const unsigned MAX_LEVELS = 5;
-    //glTexStorage2D(GL_TEXTURE_CUBE_MAP, MAX_LEVELS, GL_RGBA, specular.extent().x, specular.extent().y);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP, MAX_LEVELS, GL_RGBA, specular.extent().x, specular.extent().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-    for (unsigned i = 0; i < 6; i++)      //cubemap face
-        for (unsigned j = 0; j < MAX_LEVELS; j++) //mipmap level
-            glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, j, 0, 0, specular.extent().x, specular.extent().y, GL_RGBA, GL_UNSIGNED_BYTE, specular.data(0, i, j));
-    //glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, j, GL_RGBA, specular.extent().x, specular.extent().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, specular.data(0, i, j));
-    
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    if (skybox_)
+        SafeDelete(skybox_);
+
+    skybox_ = new SkyBox();
+    skybox_->cubeMap = specularCubemap_;
 }
 
 } // namespace kd

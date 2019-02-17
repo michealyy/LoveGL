@@ -24,6 +24,15 @@ struct ShaderUniform
 };
 
 //TODO: 多pass支持
+/*
+*	PBR材质贴图
+*	0 diffuseCubemap
+*	1 specularCubemap
+*	2 brdfLUT
+*	3 albedo
+*	4 roughness
+*	5 metallic
+*/
 class Material
 {
   public:
@@ -42,6 +51,9 @@ class Material
 	void SetAlpha(float alpha);
 	void SetShader(const std::string &shader_name);
 	void SetTexture(const std::string &texture_name, int index = 0, const char *uniform_name = nullptr);
+
+	//void SetAlbedo()
+	//void SetMetallic
 
 	inline std::string GetName() { return name_; }
 	inline Shader *GetShader() { return shader_; }

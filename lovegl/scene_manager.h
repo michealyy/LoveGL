@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <common.h>
+#include <core/skybox.h>
 #include <entity/camera.h>
 #include <entity/light.h>
 #include <entity/mesh.h>
@@ -11,13 +12,6 @@
 namespace kd
 {
 
-/*
-*	1.管理实体节点
-*	2.场景实体排序
-*	3.绘制场景
-*	4.读取gltf
-*	5.IBL+PBR需要的3张贴图
-*/
 class SceneManager
 {
   public:
@@ -45,6 +39,9 @@ class SceneManager
 	std::vector<PointLight *> pointLights_;
 	std::vector<SpotLight *> spotLights_;
 
+	//skybox
+	SkyBox *skybox_ = nullptr;
+	
 	//IBL
 	unsigned brdfLUT_;
 	unsigned diffuseCubemap_;

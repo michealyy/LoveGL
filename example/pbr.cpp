@@ -11,9 +11,9 @@ class AppPBR : public kd::App
 		scnMgr = new SceneManager();
 		Engine::GetInstance()->sceneManager = scnMgr;
 
-		scnMgr->LoadGLTF("assets/scenes/1.gltf");
-		//scnMgr->LoadGLTF("assets/tftest/tftest.gltf");
-
+		//scnMgr->LoadGLTF("assets/scenes/1.gltf");
+		scnMgr->LoadGLTF("assets/scenes/material/material.gltf");
+		
 		scnMgr->LoadIBL("gym");
 
 		//主摄像机
@@ -53,21 +53,21 @@ class AppPBR : public kd::App
 		// spotLight->innerAngle = cos(radians(12.5f));
 		// spotLight->outerAngle = cos(radians(17.5f));
 
-		auto mat = new Material("pbr_test1");
-		mat->SetShader("pbr");
-		mat->SetVector3("albedo", vec3(1, 0, 0));
-		mat->SetFloat("roughness", 1);
-		mat->SetFloat("metallic", 0);
-		auto mesh = dynamic_cast<Mesh *>(scnMgr->GetNode("Sphere1"));
-		mesh->subMeshes[0]->material = mat;
+		// auto mat = new Material("pbr_test1");
+		// mat->SetShader("pbr");
+		// mat->SetVector3("albedo", vec3(1, 0, 0));
+		// mat->SetFloat("roughness", 1);
+		// mat->SetFloat("metallic", 0);
+		// auto mesh = dynamic_cast<Mesh *>(scnMgr->GetNode("Sphere1"));
+		// mesh->subMeshes[0]->material = mat;
 
-		auto mat2 = new Material("pbr_test2");
-		mat2->SetShader("pbr");
-		mat2->SetVector3("albedo", vec3(1, 0, 0));
-		mat2->SetFloat("roughness", 0);
-		mat2->SetFloat("metallic", 1);
-		auto mesh2 = dynamic_cast<Mesh *>(scnMgr->GetNode("Sphere"));
-		mesh2->subMeshes[0]->material = mat2;
+		// auto mat2 = new Material("pbr_test2");
+		// mat2->SetShader("pbr");
+		// mat2->SetVector3("albedo", vec3(1, 0, 0));
+		// mat2->SetFloat("roughness", 0);
+		// mat2->SetFloat("metallic", 1);
+		// auto mesh2 = dynamic_cast<Mesh *>(scnMgr->GetNode("Sphere"));
+		// mesh2->subMeshes[0]->material = mat2;
 	}
 
 	void Update(float deltaTime) override
@@ -82,7 +82,7 @@ class AppPBR : public kd::App
 		//测试屏幕射线是否正确
 		auto p1 = ray.GetPoint(1);
 		float line[] = {p1.x, p1.y, p1.z, 0, 0, 0};
-		Renderer::GetInstance()->DrawDebugLine(line);
+		//Renderer::GetInstance()->DrawDebugLine(line);
 
 		if (glfwGetMouseButton(main_window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS && Engine::GetInstance()->mainCamera)
 		{
@@ -109,7 +109,7 @@ class AppPBR : public kd::App
 int main(int, char **)
 {
 	kd::GLFWWindow window;
-	window.InitWindow(800, 600)->SetApp(new AppPBR());
+	window.InitWindow(800, 600, "PBR")->SetApp(new AppPBR());
 	window.MainLoop();
 	return 0;
 }

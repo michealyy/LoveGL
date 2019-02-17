@@ -7,9 +7,11 @@
 namespace kd
 {
 
+unsigned GLILoadCreateGLTexture(const std::string &file, bool srgb = false);
+
 class Texture
 {
-  public:
+public:
 	explicit Texture(const std::string &name);
 	virtual ~Texture();
 
@@ -20,7 +22,7 @@ class Texture
 	inline void SetTextureId(unsigned texture_id) { texture_id_ = texture_id; }
 	inline unsigned GetTextureId() { return texture_id_; }
 
-  private:
+private:
 	std::string name_;
 	int width_ = 0;
 	int height_ = 0;
