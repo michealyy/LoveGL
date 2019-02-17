@@ -8,18 +8,18 @@
 namespace kd
 {
 
-class GLFWWindow final
+class Main final
 {
 public:
-  GLFWWindow();
-  GLFWWindow *InitWindow(int width, int height, const char *title);
+  Main();
+  Main *InitWindow(int width, int height, const char *title);
   void SetApp(App *app);
   void MainLoop();
 
   GLFWwindow *window = nullptr;
 
 private:
-  DISALLOW_COPY_AND_ASSIGN(GLFWWindow)
+  DISALLOW_COPY_AND_ASSIGN(Main)
 };
 
 } // namespace kd

@@ -1,14 +1,14 @@
-#include "glfw_window.h"
+#include "main.h"
 #include <config.h>
 #include <engine.h>
 
 namespace kd
 {
 
-GLFWWindow::GLFWWindow()
+Main::Main()
 {}
 
-GLFWWindow *GLFWWindow::InitWindow(int width, int height, const char *title)
+Main *Main::InitWindow(int width, int height, const char *title)
 {
     if (!glfwInit())
         return nullptr;
@@ -17,7 +17,7 @@ GLFWWindow *GLFWWindow::InitWindow(int width, int height, const char *title)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_SAMPLES, 8);
-    glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
+    //glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
 
     window = glfwCreateWindow(width, height, title, nullptr, nullptr);
     if (!window)
@@ -52,14 +52,14 @@ GLFWWindow *GLFWWindow::InitWindow(int width, int height, const char *title)
     return this;
 }
 
-void GLFWWindow::SetApp(App *app)
+void Main::SetApp(App *app)
 {
     Engine::GetInstance()->SetApp(app);
 
     Engine::GetInstance()->Setup();
 }
 
-void GLFWWindow::MainLoop()
+void Main::MainLoop()
 {
     while (!glfwWindowShouldClose(window))
     {

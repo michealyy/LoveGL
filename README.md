@@ -3,6 +3,10 @@
 使用OpenGL实现一些现代实时渲染技术；编程语言为C++17；窗口环境glfw；
 [glTF](https://github.com/KhronosGroup/glTF)作为场景格式读取；
 
+# 截图
+
+![PBR材质球](screenshot/pbr.png)
+
 # 开发环境搭建
 
 1. 安装visual studio code
