@@ -1,6 +1,8 @@
 ﻿#include "app_light.h"
 #include <glm/glm.hpp>
 
+#include <gli/load_dds.hpp>
+
 using namespace kd;
 using namespace glm;
 
@@ -20,6 +22,8 @@ void AppLight::Setup()
     scnMgr->LoadGLTF("assets/scenes/1.gltf");
     //scnMgr->LoadGLTF("assets/tftest/tftest.gltf");
 
+    scnMgr->LoadIBL("gym");
+
     //主摄像机
     // auto camera = scnMgr->GetCamera("Camera_Orientation");
     // camera->AttachController(new FreeCameraController());
@@ -34,8 +38,8 @@ void AppLight::Setup()
 
     //灯源
     auto directionalLight = scnMgr->CreateNode<DirectionalLight>();
-    directionalLight->color = vec3(0.5, 0.5, 0.5);
-    //directionalLight->color = vec3(0, 0, 0);
+    //directionalLight->color = vec3(0.5, 0.5, 0.5);
+    directionalLight->color = vec3(1, 1, 1);
     directionalLight->direction = vec3(0, -1, 0);
 
     auto pointLight = scnMgr->CreateNode<PointLight>();
@@ -56,6 +60,22 @@ void AppLight::Setup()
     // spotLight->direction = vec3(0, -1, 0);
     // spotLight->innerAngle = cos(radians(12.5f));
     // spotLight->outerAngle = cos(radians(17.5f));
+
+    auto mat = new Material("pbr_test1");
+    mat->SetShader("pbr");
+    mat->SetVector3("albedo", vec3(1, 0, 0));
+    mat->SetFloat("roughness", 1);
+    mat->SetFloat("metallic", 0);
+    auto mesh = dynamic_cast<Mesh*>(scnMgr->GetNode("Sphere1"));
+    mesh->subMeshes[0]->material = mat;
+
+    auto mat2 = new Material("pbr_test2");
+    mat2->SetShader("pbr");
+    mat2->SetVector3("albedo", vec3(1, 0, 0));
+    mat2->SetFloat("roughness", 0);
+    mat2->SetFloat("metallic", 1);
+    auto mesh2 = dynamic_cast<Mesh *>(scnMgr->GetNode("Sphere"));
+    mesh2->subMeshes[0]->material = mat2;
 }
 
 void AppLight::Update(float deltaTime)

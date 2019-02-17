@@ -1,9 +1,10 @@
 ﻿#include "scene_manager.h"
 #include <algorithm>
 #include <filesystem>
-#include <glad/glad.h>
+#include <gli/gli.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <glad/glad.h>
 #define TINYGLTF_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <tiny_gltf.h>
@@ -374,6 +375,72 @@ void SceneManager::LoadGLTFNode(tinygltf::Model &model, tinygltf::Node &node, No
     //递归找子节点
     for (auto node_index : node.children)
         LoadGLTFNode(model, model.nodes[node_index], _node);
+}
+
+void SceneManager::LoadIBL(const std::string &path)
+{
+    //glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+    filesystem::path aPath("assets/ibl/");
+
+    //brdfLUT
+    auto brdfLUT = gli::load_dds((aPath / path / "brdf.dds").string());
+    if (brdfLUT.empty())
+    {
+        fprintf(stderr, "[SceneManager] load brdf.dds error: %s\n", path.c_str());
+        return;
+    }
+    glGenTextures(1, &brdfLUT_);
+    glBindTexture(GL_TEXTURE_2D, brdfLUT_);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, brdfLUT.extent().x, brdfLUT.extent().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, brdfLUT.data());
+
+    //diffuse
+    auto diffuse = gli::load_dds((aPath / path / "diffuse.dds").string());
+    if (diffuse.empty())
+    {
+        fprintf(stderr, "[SceneManager] load diffuse.dds error: %s\n", path.c_str());
+        return;
+    }
+    glGenTextures(1, &diffuseCubemap_);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, diffuseCubemap_);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    for (unsigned i = 0; i < 6; i++)
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, diffuse.extent().x, diffuse.extent().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, diffuse.data(0, i, 0));
+
+    //specular
+    auto specular = gli::load_dds((aPath / path / "specular.dds").string());
+    if (specular.empty())
+    {
+        fprintf(stderr, "[SceneManager] load specular.dds error: %s\n", path.c_str());
+        return;
+    }
+    glGenTextures(1, &specularCubemap_);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, specularCubemap_);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    GLenum Target = gli::gl(gli::gl::PROFILE_GL33).translate(specular.target());
+    const unsigned MAX_LEVELS = 5;
+    //glTexStorage2D(GL_TEXTURE_CUBE_MAP, MAX_LEVELS, GL_RGBA, specular.extent().x, specular.extent().y);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP, MAX_LEVELS, GL_RGBA, specular.extent().x, specular.extent().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    for (unsigned i = 0; i < 6; i++)      //cubemap face
+        for (unsigned j = 0; j < MAX_LEVELS; j++) //mipmap level
+            glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, j, 0, 0, specular.extent().x, specular.extent().y, GL_RGBA, GL_UNSIGNED_BYTE, specular.data(0, i, j));
+    //glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, j, GL_RGBA, specular.extent().x, specular.extent().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, specular.data(0, i, j));
+    
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
 } // namespace kd

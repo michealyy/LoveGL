@@ -27,6 +27,8 @@ private:
   Label *fps_label_;
   Label *draw_call_label_;
   Label *ui_draw_call_label_;
+  Label *gl_renderer_label_;
+  Label *gl_version_label_;
   Label *selected_node_label_;
 
   DISALLOW_COPY_AND_ASSIGN(UIRoot)

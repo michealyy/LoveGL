@@ -37,8 +37,6 @@ void Texture::Bind()
 
 void Texture::LoadFormFile(const std::string &path)
 {
-	//stbi_set_flip_vertically_on_load(true);
-
 	unsigned texture(0);
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -65,7 +63,6 @@ void Texture::LoadFormFile(const std::string &path)
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 			//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, bits);
 		}
-		//glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
 	{

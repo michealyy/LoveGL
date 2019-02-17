@@ -209,9 +209,9 @@ bool SubMesh::Raycast(Ray ray, RayCastHit &rayCastHit)
         vec3 va_2 = mesh->worldTransform * vec4(vertices[va_index_2].Position, 1.f);
         vec3 va_3 = mesh->worldTransform * vec4(vertices[va_index_3].Position, 1.f);
 
-        vec2 bary_pos;
-        float distance;
-        if (intersectRayTriangle(ray.origin, ray.direction, va_1, va_2, va_3, bary_pos, distance))
+        vec3 bary_pos;
+        float distance = 0;
+        if (intersectRayTriangle(ray.origin, ray.direction, va_1, va_2, va_3, bary_pos))
         {
             rayCastHit.node = mesh;
             rayCastHit.point = bary_pos;

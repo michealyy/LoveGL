@@ -1,5 +1,6 @@
 ﻿#include "ui_root.h"
 #include <glm/glm.hpp>
+#include <glad/glad.h>
 #include "font_manager.h"
 #include "ui_button.h"
 #include "ui_label.h"
@@ -42,6 +43,9 @@ void UIRoot::Setup()
     // font_texture->material = FontManager::GetInstance()->GetMaterial(0);
     // AddChild(font_texture);
 
+    // auto test = new UIRect();
+    // test
+
     //fps状态等
     fps_label_ = new Label();
     fps_label_->position = vec3(width - 80, height - 12, 0);
@@ -52,10 +56,16 @@ void UIRoot::Setup()
     ui_draw_call_label_ = new Label();
     ui_draw_call_label_->position = vec3(width - 80, height - 45, 0);
     AddChild(ui_draw_call_label_);
+    gl_renderer_label_ = new Label();
+    gl_renderer_label_->position = vec3(width - 200, height - 62, 0);
+    AddChild(gl_renderer_label_);
+    gl_version_label_ = new Label();
+    gl_version_label_->position = vec3(width - 150, height - 80, 0);
+    AddChild(gl_version_label_);
 
     //选中物体
     selected_node_label_ = new Label();
-    selected_node_label_->position = vec3(width/2, height - 20, 0);
+    selected_node_label_->position = vec3(width / 2, height - 20, 0);
     AddChild(selected_node_label_);
 
     //检视器头
@@ -118,9 +128,12 @@ void UIRoot::Update(float deltaTime)
         fps_label_->SetText(std::string("FPS: ").append(std::to_string(Engine::GetInstance()->fps)));
         draw_call_label_->SetText(std::string("Draw call: ").append(std::to_string(Engine::GetInstance()->draw_call)));
         ui_draw_call_label_->SetText(std::string("UI Batch: ").append(std::to_string(Engine::GetInstance()->ui_draw_call)));
+
+        gl_renderer_label_->SetText((char *)glGetString(GL_RENDERER));
+        gl_version_label_->SetText((char *)glGetString(GL_VERSION));
     }
 
-    if(Engine::GetInstance()->selected_node)
+    if (Engine::GetInstance()->selected_node)
     {
         selected_node_label_->SetText(std::string("Selected: ").append(Engine::GetInstance()->selected_node->name));
     }

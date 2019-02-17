@@ -81,6 +81,11 @@ vec3 FresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
+//IBL不是单一光线，无法算出中间向量，替代为受粗糙度影响的方程
+vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+{
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
+} 
 
 //粗糙度来估算微平面对某个向量遮蔽
 float GeometrySchlickGGX(float NdotV, float roughness)
@@ -149,13 +154,17 @@ void main()
     vec3 L = normalize(-directionalLight.direction);
     vec3 H = normalize(V + L);
     //辐射度
-    vec3 radiance = directionalLight.color;
+    vec3 radiance = directionalLight.color * 4;
     //#多光源
 
     //辐射率和光线和法线夹角相关
     float NdotL = max(dot(N, L), 0.0);
 
     //环境光0.03+反射光
-    vec3 result = vec3(0.03) * albedo + BRDF(N, H, V, L, F0) * radiance * NdotL;
+    vec3 result = vec3(0.1) * albedo + BRDF(N, H, V, L, F0) * radiance * NdotL;
+    
+    result = result / (result + vec3(1.0));
+    result = pow(result, vec3(1.0/2.2)); 
+
     FragColor = vec4(result, 1.0);
 }

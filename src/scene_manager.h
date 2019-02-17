@@ -1,12 +1,12 @@
-#pragma once
+﻿#pragma once
 
 #include <string>
 #include <vector>
-#include <tiny_gltf.h>
 #include <common.h>
 #include <entity/camera.h>
 #include <entity/light.h>
 #include <entity/mesh.h>
+#include <tiny_gltf.h>
 
 namespace kd
 {
@@ -16,6 +16,7 @@ namespace kd
 *	2.场景实体排序
 *	3.绘制场景
 *	4.读取gltf
+*	5.IBL+PBR需要的3张贴图
 */
 class SceneManager
 {
@@ -33,8 +34,8 @@ class SceneManager
 	Camera *GetCamera(const std::string &name);
 	void Render();
 
-	//加载gltf场景
 	void LoadGLTF(const std::string &path);
+	void LoadIBL(const std::string &path);
 
   protected:
 	Node *root_ = nullptr;
@@ -43,6 +44,11 @@ class SceneManager
 	DirectionalLight *directionalLight_ = nullptr;
 	std::vector<PointLight *> pointLights_;
 	std::vector<SpotLight *> spotLights_;
+
+	//IBL
+	unsigned brdfLUT_;
+	unsigned diffuseCubemap_;
+	unsigned specularCubemap_;
 
   private:
 	void DrawMesh(Camera *camera, Mesh *mesh);
