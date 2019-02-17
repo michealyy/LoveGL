@@ -4,9 +4,9 @@
             "name": "Win32",
             "includePath": [
                 "deps",
-                "src",
-                "glfw/include",
-                "glfw/deps"
+                "lovegl",
+                "glew/include",
+                "glfw/include"
             ],
             "defines": [
                 "_DEBUG",

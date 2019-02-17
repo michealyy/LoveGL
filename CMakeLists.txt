@@ -6,20 +6,27 @@ if (MINGW AND WIN32)
     message("MINGW可能不支持filesystem")
 endif()
 
+if (MSVC AND WIN32)
+    add_definitions(-D _CRT_SECURE_NO_WARNINGS -D _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
+endif()
+
 #C++ 17标准
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_subdirectory(glfw)
-#lovegl为单独库
-add_subdirectory(src)
+add_definitions(-D GLEW_STATIC)
 
-include_directories("glfw/include")
-include_directories("glfw/deps")
 include_directories("deps")
-include_directories("src")
+include_directories("deps/glew/include")
+include_directories("deps/glfw/include")
+include_directories("lovegl")
+
+add_subdirectory(deps/glew)
+add_subdirectory(deps/glfw)
+add_subdirectory(lovegl)
+
+####下面是可执行程序
 link_libraries(lovegl)
 
 #例子
-aux_source_directory(example DIR_SRC_EXAMPLE)
-add_executable(loveglexample ${DIR_SRC_EXAMPLE})
+add_executable(example_pbr example/pbr.cpp)
