@@ -177,14 +177,14 @@ void SceneManager::DrawMesh(Camera *camera, Mesh *mesh)
         auto material = subMesh->material;
         if (material == nullptr || material->GetShader() == nullptr)
             material = ResourceManager::GetInstance()->GetMaterial("miss");
-
+        
         material->Bind();
         auto shader = material->GetShader();
         shader->SetMatrix("mvp", camera->projectMatrix * mesh->localToCameraTransform);
         shader->SetMatrix("model", mesh->worldTransform);
         shader->SetVector3("viewPos", camera->worldPosition);
 
-        //IBL信息
+        //给pbr shader传送IBL信息
         if(shader->GetName() == "pbr")
         {
             shader->SetInt("irradianceMap", 0);
@@ -197,7 +197,7 @@ void SceneManager::DrawMesh(Camera *camera, Mesh *mesh)
             glActiveTexture(GL_TEXTURE2);
             glBindTexture(GL_TEXTURE_2D, brdfLUT_);
         }
-        
+
         //平行光源
         shader->SetVector3("directionalLight.color", directionalLight_->color);
         shader->SetVector3("directionalLight.direction", directionalLight_->direction);
@@ -268,13 +268,15 @@ void SceneManager::LoadGLTF(const std::string &path)
     {
         auto mat = new Material(material.name);
         mat->SetShader("pbr");
+        mat->SetVector3("albedo", glm::vec3(0.f, 0.f, 0.f));
+        mat->SetFloat("roughness", 0.f);
+        mat->SetFloat("metallic", 0.f);
         //基础颜色
         if (material.values.find("baseColorFactor") != material.values.end())
         {
             auto baseColor = material.values["baseColorFactor"].ColorFactor();
             if (baseColor.size() >= 3)
                 mat->SetVector3("albedo", glm::vec3(baseColor[0], baseColor[1], baseColor[2]));
-                //mat->SetColor(glm::vec3(baseColor[0], baseColor[1], baseColor[2]));
             if (baseColor.size() == 4)
                 mat->SetAlpha((float)baseColor[3]);
         }
@@ -293,7 +295,15 @@ void SceneManager::LoadGLTF(const std::string &path)
 
             auto texture = model.textures[(size_t)baseColorTextureJson.find("index")->second];
             auto image = model.images[texture.source];
-            mat->SetTexture(image.name, 3, "mainTexture");
+            mat->SetTexture(image.name, 3, "albedoTexture");
+        }
+        //金属度B通道+粗糙度G通道贴图
+        auto metallicRoughnessTextureJson = material.values["metallicRoughnessTexture"].json_double_value;
+        if (metallicRoughnessTextureJson.find("index") != metallicRoughnessTextureJson.end())
+        {
+            auto texture = model.textures[(size_t)metallicRoughnessTextureJson.find("index")->second];
+            auto image = model.images[texture.source];
+            mat->SetTexture(image.name, 4, "metallicRoughnessTexture");
         }
         //法线贴图
         auto normalTextureJson = material.additionalValues["normalTexture"].json_double_value;
@@ -301,7 +311,7 @@ void SceneManager::LoadGLTF(const std::string &path)
         {
             auto texture = model.textures[(size_t)normalTextureJson.find("index")->second];
             auto image = model.images[texture.source];
-            mat->SetTexture(image.name, 7, "normalMap");
+            //mat->SetTexture(image.name, 7, "normalMap");
         }
     }
 

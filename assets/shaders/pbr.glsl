@@ -37,9 +37,13 @@ uniform samplerCube prefilterMap;
 uniform sampler2D brdfLUT;
 
 uniform vec3 viewPos;
+uniform float alpha;
+
 uniform vec3 albedo;
 uniform float roughness;
 uniform float metallic;
+uniform sampler2D albedoTexture;
+uniform sampler2D metallicRoughnessTexture;
 
 //平行光
 struct DirectionalLight
@@ -119,7 +123,7 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 }
 
 //Cook-Torrance BRDF
-vec3 BRDF(vec3 N, vec3 H, vec3 V, vec3 L, vec3 F0)
+vec3 BRDF(vec3 N, vec3 H, vec3 V, vec3 L, vec3 F0, vec3 albedo, float roughness)
 {
     //镜面反射
     float D = DistributionGGX(N, H, roughness);   
@@ -143,6 +147,11 @@ vec3 BRDF(vec3 N, vec3 H, vec3 V, vec3 L, vec3 F0)
 
 void main()
 {
+    vec3 albedo = albedo + texture(albedoTexture, _texCoord).rgb;
+    vec4 mrt_ = texture(metallicRoughnessTexture, _texCoord);
+    float roughness = roughness + mrt_.g;
+    float metallic = metallic + mrt_.b;
+    
     vec3 V = normalize(viewPos - _worldPos);
     vec3 N = normalize(_normal);
     vec3 R = reflect(-V, N);
@@ -184,12 +193,12 @@ void main()
     vec3 ambient = (kD * diffuse + specular);
     //#IBL
 
-    //环境光0.03+反射光
+    //环境光固定0.1+反射光
     //vec3 result = vec3(0.1) * albedo + BRDF(N, H, V, L, F0) * radiance * NdotL;
-    vec3 result = ambient + BRDF(N, H, V, L, F0) * radiance * NdotL;
+    vec3 result = ambient + BRDF(N, H, V, L, F0, albedo, roughness) * radiance * NdotL;
     
     result = result / (result + vec3(1.0));
     result = pow(result, vec3(1.0/2.2)); 
 
-    FragColor = vec4(result, 1.0);
+    FragColor = vec4(result, alpha);
 }

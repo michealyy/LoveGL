@@ -30,8 +30,7 @@ struct ShaderUniform
 *	1 specularCubemap
 *	2 brdfLUT
 *	3 albedo
-*	4 roughness
-*	5 metallic
+*	4 metallicRoughnessTexture
 */
 class Material
 {
