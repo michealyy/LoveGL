@@ -48,6 +48,13 @@ class AppPBR : public kd::App
 		// auto spotLight = scnMgr->CreateNode<PointLight>();
 		// spotLight->color = vec3(0, 0, 1);
 		// spotLight->position = vec3(0, 1, 5);
+
+		
+		// auto mesh = dynamic_cast<Mesh *>(scnMgr->GetNode("Sphere"));
+		// mesh->eulerAngles = vec3(0, 90, 0);
+		// auto mat = mesh->subMeshes[0]->material;
+		// mat->SetFloat("roughness", 0);
+		// mat->SetFloat("metallic", 1);
 	}
 
 	void Update(float deltaTime) override

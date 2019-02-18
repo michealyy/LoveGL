@@ -15,7 +15,7 @@ uniform mat4 mvp;
 void main()
 {
     _texCoord = texCoord;
-    _normal = normal;
+    _normal = mat3(model) * normal;
     //世界坐标
     _fragPos = vec3(model * vec4(pos, 1.0));
 

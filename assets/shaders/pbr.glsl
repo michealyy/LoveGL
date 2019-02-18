@@ -15,7 +15,7 @@ uniform mat4 mvp;
 void main()
 {
     _texCoord = texCoord;
-    _normal = normal;
+    _normal = mat3(model) * normal;
     _worldPos = vec3(model * vec4(pos, 1.0));
 
     gl_Position = mvp * vec4(pos, 1.0);
@@ -24,8 +24,7 @@ void main()
 #fragment
 #version 330 core
 
-//layout (location = 0) out vec4 FragColor;
-out vec4 FragColor;
+layout (location = 0) out vec4 FragColor;
 
 in vec2 _texCoord;
 in vec3 _normal;
