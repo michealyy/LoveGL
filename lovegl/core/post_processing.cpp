@@ -90,4 +90,43 @@ void PostGray::Setup()
     texture = renderTexture->texture;
 }
 
+Bloom::Bloom()
+{}
+
+Bloom::~Bloom()
+{}
+
+void Bloom::Setup()
+{
+    if (camera == nullptr)
+        return;
+
+    int width, height;
+    glfwGetWindowSize(Engine::GetInstance()->GetMainWindow(), &width, &height);
+
+    auto multiRenderTarget = new MultiRenderTarget(width, height, 2);
+    camera->renderTarget = multiRenderTarget;
+
+    // shader = ResourceManager::GetInstance()->GetShader("post_gray");
+    // texture = renderTexture->texture;
+}
+
+void Bloom::Draw()
+{
+    // bind blur shader
+    //Draw
+
+    // combin shader
+
+    // glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // if (shader)
+    //     shader->Bind();
+    // glActiveTexture(GL_TEXTURE0);
+    // glBindTexture(GL_TEXTURE_2D, texture);
+    // glBindVertexArray(vao_);
+    // glDrawArrays(GL_TRIANGLES, 0, 6);
+    
+    glBindVertexArray(0);
+}
+
 } // namespace kd

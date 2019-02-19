@@ -96,7 +96,7 @@ class AppPBR : public kd::App
 int main(int, char **)
 {
 	kd::Main main;
-	main.InitWindow(1200, 900, "PBR")->SetApp(new AppPBR());
+	main.InitWindow(800, 600, "PBR")->SetApp(new AppPBR());
 	main.MainLoop();
 	return 0;
 }

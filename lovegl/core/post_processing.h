@@ -34,4 +34,16 @@ public:
   virtual void Setup() override;
 };
 
+class Bloom : public PostProcessing
+{
+public:
+  explicit Bloom();
+  virtual ~Bloom();
+
+  virtual void Setup() override;
+  virtual void Draw() override;
+private:
+  DISALLOW_COPY_AND_ASSIGN(Bloom)
+};
+
 } // namespace kd
