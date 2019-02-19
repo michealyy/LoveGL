@@ -162,8 +162,8 @@ void SceneManager::Render()
         glDisable(GL_DEPTH_TEST);
 
         //后处理
-        if (camera->postProcessing)
-            camera->postProcessing->Draw();
+        if (camera->GetPostProcessing())
+            camera->GetPostProcessing()->Draw();
     }
 }
 

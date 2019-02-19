@@ -1,6 +1,7 @@
 #pragma once
 
 #include <common.h>
+#include <core/render_target.h>
 
 namespace kd
 {
@@ -42,7 +43,11 @@ public:
 
   virtual void Setup() override;
   virtual void Draw() override;
+
 private:
+  MultiRenderTarget *multiRenderTarget_ = nullptr;
+  RenderTexture *blur_rtt_ = nullptr;
+
   DISALLOW_COPY_AND_ASSIGN(Bloom)
 };
 

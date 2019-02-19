@@ -1,4 +1,4 @@
-#include "post_processing.h"
+﻿#include "post_processing.h"
 #include <GL/glew.h>
 #include <engine.h>
 #include <core/render_target.h>
@@ -104,29 +104,47 @@ void Bloom::Setup()
     int width, height;
     glfwGetWindowSize(Engine::GetInstance()->GetMainWindow(), &width, &height);
 
-    auto multiRenderTarget = new MultiRenderTarget(width, height, 2);
-    camera->renderTarget = multiRenderTarget;
+    multiRenderTarget_ = new MultiRenderTarget(width, height, 2);
+    camera->renderTarget = multiRenderTarget_;
 
-    // shader = ResourceManager::GetInstance()->GetShader("post_gray");
-    // texture = renderTexture->texture;
+    blur_rtt_ = new RenderTexture(width, height);
 }
 
 void Bloom::Draw()
 {
-    // bind blur shader
-    //Draw
+    if (camera == nullptr || multiRenderTarget_ == nullptr)
+        return;
 
-    // combin shader
+    auto mrt = multiRenderTarget_->textures;
+    assert(mrt.size() == 2);
 
-    // glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    // if (shader)
-    //     shader->Bind();
-    // glActiveTexture(GL_TEXTURE0);
-    // glBindTexture(GL_TEXTURE_2D, texture);
-    // glBindVertexArray(vao_);
-    // glDrawArrays(GL_TRIANGLES, 0, 6);
-    
-    glBindVertexArray(0);
+    //低亮度
+    auto lowTexture = mrt[0];
+    //高亮度
+    auto highTexture = mrt[1];
+
+    //高亮度贴图模糊
+    glBindFramebuffer(GL_FRAMEBUFFER, blur_rtt_->frameBuffer);
+    auto blurShader = ResourceManager::GetInstance()->GetShader("bloom_blur");
+    blurShader->Bind();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, highTexture);
+    glBindVertexArray(vao_);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    //合并低亮度和模糊高亮度图
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    auto shader = ResourceManager::GetInstance()->GetShader("bloom");
+    shader->Bind();
+    shader->SetFloat("exposure", camera->exposure);
+    shader->SetInt("image", 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, lowTexture);
+    shader->SetInt("blur", 1);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, blur_rtt_->texture);
+    glBindVertexArray(vao_);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 } // namespace kd

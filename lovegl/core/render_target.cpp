@@ -24,6 +24,7 @@ RenderTexture::RenderTexture(unsigned width, unsigned height)
 
     glGenFramebuffers(1, &frameBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    
     //渲染到贴图
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -31,11 +32,12 @@ RenderTexture::RenderTexture(unsigned width, unsigned height)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
-    //Renderbuffer作为深度模板缓冲区
-    glGenRenderbuffers(1, &renderBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, renderBuffer);
+    
+    //Renderbuffer作为深度缓冲区。暂时没有用到模板，不需要模板缓冲区
+    glGenRenderbuffers(1, &depth_rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, depth_rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rbo);
 
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -47,7 +49,7 @@ RenderTexture::~RenderTexture()
 {
     glDeleteFramebuffers(1, &frameBuffer);
     glDeleteTextures(1, &texture);
-    glDeleteRenderbuffers(1, &renderBuffer);
+    glDeleteRenderbuffers(1, &depth_rbo);
 }
 
 void RenderTexture::Bind()
@@ -63,7 +65,7 @@ MultiRenderTarget::MultiRenderTarget(unsigned width, unsigned height, unsigned c
     glGenFramebuffers(1, &frameBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
-    std::vector<unsigned> attachments;
+    unsigned attachments[2] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
     for (unsigned i = 0; i < count; i++)
     {
         unsigned texture;
@@ -74,10 +76,16 @@ MultiRenderTarget::MultiRenderTarget(unsigned width, unsigned height, unsigned c
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, texture, 0);
 
-        attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
+        textures.push_back(texture);
     }
     //必须调用，默认只会渲染到一个
     glDrawBuffers(count, &attachments[0]);
+
+    //深度缓冲区
+    glGenRenderbuffers(1, &depth_rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, depth_rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rbo);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         fprintf(stderr, "[Render] Post Processing Framebuffer is not complete");
@@ -89,6 +97,7 @@ MultiRenderTarget::~MultiRenderTarget()
     glDeleteFramebuffers(1, &frameBuffer);
     for (auto texture : textures)
         glDeleteTextures(1, &texture);
+    glDeleteRenderbuffers(1, &depth_rbo);
 }
 
 void MultiRenderTarget::Bind()
