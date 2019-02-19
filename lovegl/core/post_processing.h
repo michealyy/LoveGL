@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <common.h>
 #include <core/render_target.h>
@@ -43,10 +43,16 @@ public:
 
   virtual void Setup() override;
   virtual void Draw() override;
+  
+  //混合因子
+  float factor = 0.6f;
+  //必须为偶数
+  unsigned blurCount = 10;
 
 private:
   MultiRenderTarget *multiRenderTarget_ = nullptr;
   RenderTexture *blur_rtt_ = nullptr;
+  RenderTexture *blur_temp_rtt_ = nullptr;
 
   DISALLOW_COPY_AND_ASSIGN(Bloom)
 };

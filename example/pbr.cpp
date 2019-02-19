@@ -25,9 +25,9 @@ class AppPBR : public kd::App
 		auto camera = scnMgr->CreateNode<Camera>();
 		camera->name = "MainCamera";
 		camera->position = vec3(0, 0, 10);
-		//camera->AttachPostProcessing(new PostGray());
-		camera->AttachPostProcessing(new Bloom());
+		//camera->AttachPostProcessing(new Bloom());
 		camera->AttachController(new FreeCameraController());
+		//camera->exposure = 0.1f;
 		Engine::GetInstance()->mainCamera = camera;
 		
 		//灯源
@@ -98,7 +98,7 @@ class AppPBR : public kd::App
 int main(int, char **)
 {
 	kd::Main main;
-	main.InitWindow(800, 600, "PBR")->SetApp(new AppPBR());
+	main.InitWindow(1200, 900, "PBR")->SetApp(new AppPBR());
 	main.MainLoop();
 	return 0;
 }

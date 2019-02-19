@@ -2,6 +2,7 @@
 #include <GL/glew.h>
 #include <engine.h>
 #include <resource_manager.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace kd
 {
@@ -73,13 +74,12 @@ void SkyBox::Setup()
 
 void SkyBox::Render()
 {
-    glDepthFunc(GL_LEQUAL);
     auto shader = ResourceManager::GetInstance()->GetShader("skybox");
     shader->Bind();
     auto camera = Engine::GetInstance()->mainCamera;
     //移除位移
     auto viewMat = glm::mat4(glm::mat3(camera->GetViewMatrix()));
-    shader->SetMatrix("vp", camera->projectMatrix * viewMat);
+    shader->SetMatrix("mvp", camera->projectMatrix * glm::scale(viewMat, glm::vec3(100.f, 100.f, 100.f)));
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
@@ -87,7 +87,6 @@ void SkyBox::Render()
     glBindVertexArray(vao_);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
-    glDepthFunc(GL_LESS);
 }
 
 } // namespace kd

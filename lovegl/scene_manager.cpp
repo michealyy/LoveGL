@@ -54,9 +54,6 @@ void SceneManager::Update(float deltaTime)
         node->Update(deltaTime);
     }
 
-    if (skybox_)
-        skybox_->Render();
-
     Render();
 }
 
@@ -146,8 +143,12 @@ void SceneManager::Render()
         }
         //面剔除
         //glCullFace(GL_FRONT);
-        //glEnable(GL_CULL_FACE);
+        glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
+
+        if (skybox_)
+            skybox_->Render();
+        
         for (auto opaque_mesh : opaque_meshes)
         {
             DrawMesh(camera, opaque_mesh);
