@@ -123,7 +123,7 @@ void SceneManager::Render()
         if (camera->renderTarget)
         {
             camera->renderTarget->Bind();
-            glClearColor(CLEAR_COLOR.r, CLEAR_COLOR.g, CLEAR_COLOR.b, 1.0f);
+            glClearColor(0, 0, 0, 0);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
         else
@@ -146,8 +146,9 @@ void SceneManager::Render()
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
 
-        if (skybox_)
-            skybox_->Render();
+        //TODO: 解决bloom分离
+        // if (skybox_)
+        //     skybox_->Render();
         
         for (auto opaque_mesh : opaque_meshes)
         {

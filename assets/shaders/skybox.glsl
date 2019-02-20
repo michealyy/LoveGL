@@ -22,5 +22,5 @@ uniform samplerCube skybox;
 
 void main()
 {
-    FragColor = textureLod(skybox, texCoord, 1);
+    FragColor = textureLod(skybox, texCoord, 0);
 } 

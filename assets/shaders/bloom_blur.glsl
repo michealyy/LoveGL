@@ -20,27 +20,26 @@ in vec2 TexCoords;
 uniform sampler2D image;
 
 uniform bool horizontal;
-uniform float weight[5] = float[] (0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162);
+uniform float weight[11] = float[] (0.035822, 0.05879, 0.086425, 0.113806, 0.13424, 0.141836, 0.13424, 0.113806, 0.086425, 0.05879, 0.035822);
 
 void main()
 {             
-     vec2 tex_offset = 1.0 / textureSize(image, 0);
-     vec3 result = texture(image, TexCoords).rgb * weight[0];
-     if(horizontal)
-     {
-         for(int i = 1; i < 5; ++i)
-         {
-            result += texture(image, TexCoords + vec2(tex_offset.x * i, 0.0)).rgb * weight[i];
-            result += texture(image, TexCoords - vec2(tex_offset.x * i, 0.0)).rgb * weight[i];
-         }
-     }
-     else
-     {
-         for(int i = 1; i < 5; ++i)
-         {
-             result += texture(image, TexCoords + vec2(0.0, tex_offset.y * i)).rgb * weight[i];
-             result += texture(image, TexCoords - vec2(0.0, tex_offset.y * i)).rgb * weight[i];
-         }
-     }
-     FragColor = vec4(result, 1.0);
+    vec3 result = vec3(0.0f, 0.0f, 0.0f);
+    vec2 pixelSize = 1.0f / textureSize(image, 0);
+
+    if(horizontal)
+    {
+        for (int i = -5; i <= 5; ++i)
+        {
+            result += texture(image, TexCoords + vec2(pixelSize.x * i, 0.0)).rgb * weight[i + 5];
+        }
+    }
+    else
+    {
+        for (int i = -5; i <= 5; ++i)
+        {
+            result += texture(image, TexCoords + vec2(0.0, pixelSize.y * i)).rgb * weight[i + 5];
+        }
+    }
+    FragColor = vec4(result, 1.0);
 }

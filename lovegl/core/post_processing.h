@@ -45,9 +45,9 @@ public:
   virtual void Draw() override;
   
   //混合因子
-  float factor = 0.6f;
+  float factor = 1.f;
   //必须为偶数
-  unsigned blurCount = 10;
+  unsigned blurCount = 80;
 
 private:
   MultiRenderTarget *multiRenderTarget_ = nullptr;
