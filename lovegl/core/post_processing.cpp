@@ -75,7 +75,13 @@ void PostProcessing::Draw()
     glBindVertexArray(0);
 }
 
-void PostGray::Setup()
+ToneMapping::ToneMapping()
+{}
+
+ToneMapping::~ToneMapping()
+{}
+
+void ToneMapping::Setup()
 {
     if (camera == nullptr)
         return;
@@ -86,8 +92,24 @@ void PostGray::Setup()
     auto renderTexture = new RenderTexture(width, height);
     camera->renderTarget = renderTexture;
 
-    shader = ResourceManager::GetInstance()->GetShader("post_normal");
+    shader = ResourceManager::GetInstance()->GetShader("tone_mapping");
     texture = renderTexture->texture;
+}
+
+void ToneMapping::Draw()
+{
+    if (camera == nullptr || shader == nullptr)
+        return;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    shader->Bind();
+    shader->SetFloat("exposure", camera->exposure);
+    shader->SetInt("image", 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glBindVertexArray(vao_);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(0);
 }
 
 Bloom::Bloom()

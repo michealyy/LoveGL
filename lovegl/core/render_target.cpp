@@ -27,12 +27,22 @@ RenderTexture::RenderTexture(unsigned width, unsigned height)
     
     //渲染到贴图
     glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    //HDR GL_RGB16F
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+    if (msaaSample == 0)
+    {
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        //HDR GL_RGB16F
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+    }
+    else
+    {
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture);
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, msaaSample, GL_RGB, width, height, GL_TRUE);
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, texture, 0);
+    }
     
     //Renderbuffer作为深度缓冲区。暂时没有用到模板，不需要模板缓冲区
     glGenRenderbuffers(1, &depth_rbo);
@@ -55,7 +65,14 @@ RenderTexture::~RenderTexture()
 
 void RenderTexture::Bind()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    if (msaaSample == 0)
+        glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    else
+    {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, frameBuffer);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    } 
 }
 
 MultiRenderTarget::MultiRenderTarget(unsigned width, unsigned height, unsigned count)

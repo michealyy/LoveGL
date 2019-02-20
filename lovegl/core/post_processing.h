@@ -29,10 +29,16 @@ private:
   DISALLOW_COPY_AND_ASSIGN(PostProcessing)
 };
 
-class PostGray : public PostProcessing
+class ToneMapping : public PostProcessing
 {
 public:
+  explicit ToneMapping();
+  virtual ~ToneMapping();
   virtual void Setup() override;
+  virtual void Draw() override;
+
+private:
+  DISALLOW_COPY_AND_ASSIGN(ToneMapping)
 };
 
 class Bloom : public PostProcessing
@@ -43,11 +49,11 @@ public:
 
   virtual void Setup() override;
   virtual void Draw() override;
-  
+
   //混合因子
   float factor = 1.f;
   //必须为偶数
-  unsigned blurCount = 80;
+  unsigned blurCount = 10;
 
 private:
   MultiRenderTarget *multiRenderTarget_ = nullptr;

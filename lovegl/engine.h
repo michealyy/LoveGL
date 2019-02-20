@@ -16,7 +16,6 @@ namespace kd
 
 class Engine final : public Singleton<Engine>
 {
-	//friend Singleton<Engine>;
   public:
 	explicit Engine();
 	~Engine();
@@ -27,11 +26,16 @@ class Engine final : public Singleton<Engine>
 	void Setup();
 	void Update();
 
-	SceneManager* sceneManager = nullptr;
-	
+	SceneManager *sceneManager = nullptr;
+
 	Camera *mainCamera = nullptr;
 	ui::UIRoot *ui_root = nullptr;
 	Node *selected_node = nullptr;
+	//global setting
+	float gamma = 2.2f;
+	float exposure = 1.f;
+	unsigned msaaSample = 8;
+	
 	//statistics
 	int fps = 0;
 	unsigned draw_call = 0;
@@ -39,7 +43,7 @@ class Engine final : public Singleton<Engine>
 	unsigned ui_vertices = 0;
 
   private:
-  	App* app_ = nullptr;
+	App *app_ = nullptr;
 	GLFWwindow *main_window_;
 	float lastTime = 0.0f;
 

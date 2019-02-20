@@ -30,6 +30,8 @@ class RenderTexture : public RenderTarget
 	unsigned frameBuffer = 0;
 	unsigned texture = 0;
 	unsigned depth_rbo = 0;
+	
+	unsigned msaaSample = 0;
 
   private:
 	DISALLOW_COPY_AND_ASSIGN(RenderTexture)
