@@ -12,7 +12,7 @@ class Main final
 {
 public:
   Main();
-  Main *InitWindow(int width, int height, const char *title);
+  Main *InitWindow(int width, int height);
   void SetApp(App *app);
   void MainLoop();
 

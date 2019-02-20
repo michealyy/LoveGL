@@ -1,4 +1,4 @@
-#include "ui_label.h"
+#include "label.h"
 #include "font_manager.h"
 #include <glm/glm.hpp>
 

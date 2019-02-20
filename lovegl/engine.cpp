@@ -63,6 +63,9 @@ void Engine::Update()
 	UIBatchRenderer::GetInstance()->Render();
 
 	PickEntity();
+
+	auto title = std::string("FPS:").append(to_string(fps)).append(" ").append((char *)glGetString(GL_RENDERER));
+	glfwSetWindowTitle(main_window_, title.c_str());
 }
 
 void Engine::PickEntity()
@@ -81,7 +84,7 @@ void Engine::PickEntity()
 	float line[] = {p1.x, p1.y, p1.z, 0, 0, 0};
 	LineRenderer::GetInstance()->DrawDebugLine(line);
 
-	if (glfwGetMouseButton(main_window_, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS && mainCamera)
+	if (glfwGetMouseButton(main_window_, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
 	{
 		for (auto nodes : sceneManager->GetNodes())
 		{
@@ -92,10 +95,11 @@ void Engine::PickEntity()
 				if (mesh->Raycast(ray, rayCastHit))
 				{
 					selectedEntity = rayCastHit.node;
-					break;
+					return;
 				}
 			}
 		}
+		selectedEntity = nullptr;
 	}
 }
 

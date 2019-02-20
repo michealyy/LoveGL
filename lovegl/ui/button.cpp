@@ -1,5 +1,5 @@
-#include "ui_button.h"
-#include "../engine.h"
+#include "button.h"
+#include <engine.h>
 
 namespace kd
 {
@@ -19,7 +19,7 @@ void Button::Setup()
 {
 	UIRect::Setup();
 
-	width = 80;
+	width = 100;
 	height = 30;
 
 	normal_material = Engine::GetInstance()->uiRoot->ui_button_normal_mat;

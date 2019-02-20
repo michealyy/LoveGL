@@ -1,10 +1,11 @@
 ﻿#include "ui_root.h"
 #include <glm/glm.hpp>
 #include <GL/glew.h>
-#include "font_manager.h"
-#include "ui_button.h"
-#include "ui_label.h"
 #include "../engine.h"
+#include "font_manager.h"
+#include "button.h"
+#include "label.h"
+#include "checkbox.h"
 
 using namespace glm;
 
@@ -22,6 +23,13 @@ UIRoot::UIRoot()
     ui_button_hover_mat = new Material("ui_button_hover");
     ui_button_hover_mat->SetShader("unlit_pos_tex");
     ui_button_hover_mat->SetTexture("white");
+    //选择框用
+    ui_checkbox_rect_bg_mat = new Material("ui_checkbox_rect_bg");
+    ui_checkbox_rect_bg_mat->SetShader("unlit_pos_tex");
+    ui_checkbox_rect_bg_mat->SetTexture("white");
+    ui_checkbox_rect_mat = new Material("ui_checkbox_rect");
+    ui_checkbox_rect_mat->SetShader("unlit_pos_tex");
+    ui_checkbox_rect_mat->SetTexture("white");
 }
 
 UIRoot::~UIRoot()
@@ -45,19 +53,19 @@ void UIRoot::Setup()
 
     //fps状态等
     fps_label_ = new Label();
-    fps_label_->position = vec3(width - 80, height - 12, 0);
+    fps_label_->position = vec3(0, height - 12, 0);
     AddChild(fps_label_);
     draw_call_label_ = new Label();
-    draw_call_label_->position = vec3(width - 80, height - 28, 0);
+    draw_call_label_->position = vec3(0, height - 28, 0);
     AddChild(draw_call_label_);
     ui_draw_call_label_ = new Label();
-    ui_draw_call_label_->position = vec3(width - 80, height - 45, 0);
+    ui_draw_call_label_->position = vec3(0, height - 45, 0);
     AddChild(ui_draw_call_label_);
     gl_renderer_label_ = new Label();
-    gl_renderer_label_->position = vec3(width - 200, height - 62, 0);
+    gl_renderer_label_->position = vec3(0, height - 62, 0);
     AddChild(gl_renderer_label_);
     gl_version_label_ = new Label();
-    gl_version_label_->position = vec3(width - 150, height - 80, 0);
+    gl_version_label_->position = vec3(0, height - 80, 0);
     AddChild(gl_version_label_);
 
     //选中物体
@@ -65,48 +73,64 @@ void UIRoot::Setup()
     selected_node_label_->position = vec3(width / 2, height - 20, 0);
     AddChild(selected_node_label_);
 
-    //检视器头
+    //标题材质
     auto ui_common_tile_mat = new Material("ui_common_tile");
     ui_common_tile_mat->SetShader("unlit_pos_tex");
     ui_common_tile_mat->SetTexture("white");
+    //标题1
     auto title = new UIRect();
     title->material = ui_common_tile_mat;
-    title->width = 100;
+    title->width = 130;
     title->height = 30;
-    title->position = vec3(0, height - 30, 0);
-    title->color = vec3(0.2, 0.2, 0.2);
+    title->position = vec3(width - title->width, height - 30, 0);
+    title->color = vec3(0.9, 0.133, 0.415);
     AddChild(title);
-    auto inspector_label = new Label();
-    inspector_label->SetText("Inspector");
-    inspector_label->position = vec3(20, 10, 1);
-    inspector_label->depth = 1;
-    title->AddChild(inspector_label);
+    auto title_label = new Label();
+    title_label->SetText("Render"); //Inspector
+    title_label->position = vec3(45, 10, 1);
+    title_label->depth = 1;
+    title->AddChild(title_label);
+    //标题2
+    auto title2 = new UIRect();
+    title2->material = ui_common_tile_mat;
+    title2->width = title->width;
+    title2->height = title->height;
+    title2->position = vec3(width - title2->width, height - 300, 0);
+    title2->color = vec3(0.9, 0.133, 0.415);
+    AddChild(title2);
+    auto title2_label = new Label();
+    title2_label->SetText("Entity");
+    title2_label->position = vec3(45, 10, 1);
+    title2_label->depth = 1;
+    title2->AddChild(title2_label);
 
-    //左背景
+    //背景
     auto ui_common_bg_mat = new Material("ui_common_bg");
     ui_common_bg_mat->SetShader("unlit_pos_tex");
     ui_common_bg_mat->SetTexture("white");
     auto bg = new UIRect();
     bg->material = ui_common_bg_mat;
-    bg->width = 100;
+    bg->width = title->width;
     bg->height = (float)height;
+    bg->position = vec3(width - bg->width, 0, 0);
     bg->color = vec3(0, 0, 0);
-    bg->alpha = 0.8f;
+    bg->alpha = 0.5f;
     bg->depth = -1;
     AddChild(bg);
 
+    //选择框
+    auto bloomCheckBox = new CheckBox("bloom", true);
+    bloomCheckBox->position = vec3(10, height - 80, 0);
+    bg->AddChild(bloomCheckBox);
+
+    auto postProcessingCheckBox = new CheckBox("PostProcessing", true);
+    postProcessingCheckBox->position = vec3(10, height - 120, 0);
+    bg->AddChild(postProcessingCheckBox);
+
     //测试按钮
     auto btn_1 = new Button();
-    btn_1->position = vec3(10, height - 100, -1);
-    AddChild(btn_1);
-
-    auto btn_2 = new Button();
-    btn_2->position = vec3(10, height - 150, 0);
-    AddChild(btn_2);
-
-    auto btn_3 = new Button();
-    btn_3->position = vec3(10, height - 200, 0);
-    AddChild(btn_3);
+    btn_1->position = vec3(15, height - 180, 0);
+    bg->AddChild(btn_1);
 
     UIRect::Setup();
 }
@@ -127,12 +151,16 @@ void UIRoot::Update(float deltaTime)
         ui_draw_call_label_->SetText(std::string("UI Batch: ").append(std::to_string(Engine::GetInstance()->uiDrawCall)));
 
         gl_renderer_label_->SetText((char *)glGetString(GL_RENDERER));
-        gl_version_label_->SetText((char *)glGetString(GL_VERSION));
+        gl_version_label_->SetText(std::string("OpenGL ").append((char *) glGetString(GL_VERSION)));
     }
 
     if (Engine::GetInstance()->selectedEntity)
     {
         selected_node_label_->SetText(std::string("Selected: ").append(Engine::GetInstance()->selectedEntity->name));
+    }
+    else
+    {
+        selected_node_label_->SetText("");
     }
 }
 

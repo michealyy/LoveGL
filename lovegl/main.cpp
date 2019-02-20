@@ -8,7 +8,7 @@ namespace kd
 Main::Main()
 {}
 
-Main *Main::InitWindow(int width, int height, const char *title)
+Main *Main::InitWindow(int width, int height)
 {
     if (!glfwInit())
         return nullptr;
@@ -19,7 +19,7 @@ Main *Main::InitWindow(int width, int height, const char *title)
     glfwWindowHint(GLFW_SAMPLES, 8);
     //glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
 
-    window = glfwCreateWindow(width, height, title, nullptr, nullptr);
+    window = glfwCreateWindow(width, height, "", nullptr, nullptr);
     if (!window)
     {
         glfwTerminate();
