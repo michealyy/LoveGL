@@ -1,7 +1,8 @@
 #include "engine.h"
-#include <core/renderer.h>
 #include <resource_manager.h>
-#include "ui/font_manager.h"
+#include <core/ui_batch_renderer.h>
+#include <core/line_renderer.h>
+#include <ui/font_manager.h>
 
 using namespace std;
 
@@ -15,14 +16,15 @@ Engine::Engine()
 Engine::~Engine()
 {
 	SafeDelete(app_);
-	SafeDelete(ui_root);
+	SafeDelete(uiRoot);
 }
 
 void Engine::Setup()
 {
 	ResourceManager::GetInstance()->Setup();
 	FontManager::GetInstance()->Setup("FreeSans.ttf");
-	Renderer::GetInstance()->Setup();
+	UIBatchRenderer::GetInstance()->Setup();
+	LineRenderer::GetInstance()->Setup();
 
 	if (app_)
 		app_->Setup();
@@ -34,8 +36,8 @@ void Engine::Setup()
 	else
 		fprintf(stderr, "[Engine]sceneManager == nullptr");
 
-	ui_root = new ui::UIRoot();
-	ui_root->Setup();
+	uiRoot = new ui::UIRoot();
+	uiRoot->Setup();
 }
 
 void Engine::Update()
@@ -45,21 +47,56 @@ void Engine::Update()
 	lastTime = _time;
 	
 	fps = (int)(1.f / deltaTime);
-	draw_call = 0;
+	drawCall = 0;
 	
-
 	if (app_)
 		app_->Update(deltaTime);
 	
 	if (sceneManager)
 		sceneManager->Update(deltaTime);
 	
-	if (ui_root)
-		this->ui_root->Update(deltaTime);
+	if (uiRoot)
+		uiRoot->Update(deltaTime);
 	
-	ui_draw_call = 0;
-	ui_vertices = 0;
-	Renderer::GetInstance()->Render();
+	uiDrawCall = 0;
+	uiVertices = 0;
+	UIBatchRenderer::GetInstance()->Render();
+
+	PickEntity();
+}
+
+void Engine::PickEntity()
+{
+	if (!mainCamera || !sceneManager)
+		return;
+	
+	//场景拾取
+	double x, y;
+	glfwGetCursorPos(main_window_, &x, &y);
+
+	//主摄像机鼠标点转换到世界空间射线
+	auto ray = mainCamera->MousePointToRay(glm::vec2(x, y));
+	//测试屏幕射线是否正确
+	auto p1 = ray.GetPoint(1);
+	float line[] = {p1.x, p1.y, p1.z, 0, 0, 0};
+	LineRenderer::GetInstance()->DrawDebugLine(line);
+
+	if (glfwGetMouseButton(main_window_, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS && mainCamera)
+	{
+		for (auto nodes : sceneManager->GetNodes())
+		{
+			auto mesh = dynamic_cast<Mesh *>(nodes);
+			if (mesh)
+			{
+				RayCastHit rayCastHit;
+				if (mesh->Raycast(ray, rayCastHit))
+				{
+					selectedEntity = rayCastHit.node;
+					break;
+				}
+			}
+		}
+	}
 }
 
 } // namespace kd

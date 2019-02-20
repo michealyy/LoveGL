@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <glm/glm.hpp>
-#include "common.h"
 #include <entity/mesh.h>
 #include "vertex_attribute.h"
 #include "ui/ui_rect.h"
@@ -10,23 +9,18 @@
 namespace kd
 {
 
-class Renderer final : public Singleton<Renderer>
+class UIBatchRenderer final : public Singleton<UIBatchRenderer>
 {
-  //friend Singleton<Renderer>;
 public:
-  explicit Renderer();
-  ~Renderer();
+  explicit UIBatchRenderer();
+  ~UIBatchRenderer();
 
   void Setup();
   inline void AddUIRect(ui::UIRect *rect) { ui_rect_list_.push_back(rect); }
   void Render();
-  void DrawDebugLine(const float vertices[6]);
 
 private:
-  void SetupUIBatchRender();
-  void SetupDebugLines();
   void SortUIRectByDepthAndHandleInput();
-  void BatchRenderUI();
   void GenerateUIDrawCall(unsigned last_rect_index);
 
   //ui batch control
@@ -45,11 +39,7 @@ private:
   //ui input control
   bool is_left_mouse_btn_press = false;
 
-  //debug line
-  unsigned line_vao_ = 0;
-  unsigned line_vbo_ = 0;
-
-  DISALLOW_COPY_AND_ASSIGN(Renderer)
+  DISALLOW_COPY_AND_ASSIGN(UIBatchRenderer)
 };
 
 } // namespace kd

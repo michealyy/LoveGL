@@ -147,8 +147,8 @@ void SceneManager::Render()
         glEnable(GL_DEPTH_TEST);
 
         //TODO: 解决bloom分离
-        // if (skybox_)
-        //     skybox_->Render();
+        if (skybox_)
+            skybox_->Render();
         
         for (auto opaque_mesh : opaque_meshes)
         {
@@ -231,7 +231,7 @@ void SceneManager::DrawMesh(Camera *camera, Mesh *mesh)
         }
 
         subMesh->Draw();
-        Engine::GetInstance()->draw_call++;
+        Engine::GetInstance()->drawCall++;
     }
 }
 

@@ -22,8 +22,8 @@ void Button::Setup()
 	width = 80;
 	height = 30;
 
-	normal_material = Engine::GetInstance()->ui_root->ui_button_normal_mat;
-	hover_material = Engine::GetInstance()->ui_root->ui_button_hover_mat;
+	normal_material = Engine::GetInstance()->uiRoot->ui_button_normal_mat;
+	hover_material = Engine::GetInstance()->uiRoot->ui_button_hover_mat;
 }
 
 void Button::Update(float deltaTime)

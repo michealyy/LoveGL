@@ -28,7 +28,7 @@ class AppPBR : public kd::App
 		camera->name = "MainCamera";
 		camera->position = vec3(0, 0, 10);
 		camera->AttachPostProcessing(new ToneMapping());
-		camera->AttachPostProcessing(new Bloom());
+		//camera->AttachPostProcessing(new Bloom());
 		camera->AttachController(new FreeCameraController());
 		Engine::GetInstance()->mainCamera = camera;
 		
@@ -63,34 +63,6 @@ class AppPBR : public kd::App
 
 	void Update(float deltaTime) override
 	{
-		//场景拾取
-		auto main_window = Engine::GetInstance()->GetMainWindow();
-		double x, y;
-		glfwGetCursorPos(main_window, &x, &y);
-
-		//主摄像机鼠标点转换到世界空间射线
-		auto ray = Engine::GetInstance()->mainCamera->MousePointToRay(vec2(x, y));
-		//测试屏幕射线是否正确
-		auto p1 = ray.GetPoint(1);
-		float line[] = {p1.x, p1.y, p1.z, 0, 0, 0};
-		//Renderer::GetInstance()->DrawDebugLine(line);
-
-		if (glfwGetMouseButton(main_window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS && Engine::GetInstance()->mainCamera)
-		{
-			for (auto nodes : scnMgr->GetNodes())
-			{
-				auto mesh = dynamic_cast<Mesh *>(nodes);
-				if (mesh)
-				{
-					RayCastHit rayCastHit;
-					if (mesh->Raycast(ray, rayCastHit))
-					{
-						Engine::GetInstance()->selected_node = rayCastHit.node;
-						break;
-					}
-				}
-			}
-		}
 	}
 
   private:

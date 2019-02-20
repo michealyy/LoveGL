@@ -43,9 +43,6 @@ void UIRoot::Setup()
     // font_texture->material = FontManager::GetInstance()->GetMaterial(0);
     // AddChild(font_texture);
 
-    // auto test = new UIRect();
-    // test
-
     //fps状态等
     fps_label_ = new Label();
     fps_label_->position = vec3(width - 80, height - 12, 0);
@@ -126,16 +123,16 @@ void UIRoot::Update(float deltaTime)
     if (show_stat_label)
     {
         fps_label_->SetText(std::string("FPS: ").append(std::to_string(Engine::GetInstance()->fps)));
-        draw_call_label_->SetText(std::string("Draw call: ").append(std::to_string(Engine::GetInstance()->draw_call)));
-        ui_draw_call_label_->SetText(std::string("UI Batch: ").append(std::to_string(Engine::GetInstance()->ui_draw_call)));
+        draw_call_label_->SetText(std::string("Draw call: ").append(std::to_string(Engine::GetInstance()->drawCall)));
+        ui_draw_call_label_->SetText(std::string("UI Batch: ").append(std::to_string(Engine::GetInstance()->uiDrawCall)));
 
         gl_renderer_label_->SetText((char *)glGetString(GL_RENDERER));
         gl_version_label_->SetText((char *)glGetString(GL_VERSION));
     }
 
-    if (Engine::GetInstance()->selected_node)
+    if (Engine::GetInstance()->selectedEntity)
     {
-        selected_node_label_->SetText(std::string("Selected: ").append(Engine::GetInstance()->selected_node->name));
+        selected_node_label_->SetText(std::string("Selected: ").append(Engine::GetInstance()->selectedEntity->name));
     }
 }
 

@@ -5,7 +5,6 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/intersect.hpp>
 #include <engine.h>
-#include <core/renderer.h>
 #include <resource_manager.h>
 #include "config.h"
 #include <tiny_gltf.h>
@@ -215,6 +214,7 @@ bool SubMesh::Raycast(Ray ray, RayCastHit &rayCastHit)
         {
             rayCastHit.node = mesh;
             rayCastHit.point = bary_pos;
+            //TODO:换了glm老版本不提供距离计算
             rayCastHit.distance = distance;
             return true;
         }

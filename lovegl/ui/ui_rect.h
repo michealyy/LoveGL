@@ -12,7 +12,7 @@ namespace kd
 namespace ui
 {
 
-//UIRect不添加到场景，添加到ui_root下面
+//UIRect不添加到场景，添加到uiRoot下面
 class UIRect : public Node
 {
 public:

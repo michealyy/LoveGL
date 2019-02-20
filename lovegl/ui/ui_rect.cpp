@@ -1,6 +1,6 @@
 #include "ui_rect.h"
 #include <glm/gtc/matrix_transform.hpp>
-#include <core/renderer.h>
+#include <core/ui_batch_renderer.h>
 #include <resource_manager.h>
 #include "ui_button.h"
 
@@ -65,7 +65,7 @@ void UIRect::Update(float deltaTime)
     if (material == nullptr || material->GetShader() == nullptr)
         material = ResourceManager::GetInstance()->GetMaterial("ui_default");
 
-    Renderer::GetInstance()->AddUIRect(this);
+    UIBatchRenderer::GetInstance()->AddUIRect(this);
 }
 
 void UIRect::OnMouseLeftButtonPress()

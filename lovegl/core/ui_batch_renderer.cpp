@@ -1,4 +1,4 @@
-﻿#include "renderer.h"
+﻿#include "ui_batch_renderer.h"
 #include <algorithm>
 #include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
@@ -12,23 +12,17 @@ using namespace std;
 namespace kd
 {
 
-Renderer::Renderer()
+UIBatchRenderer::UIBatchRenderer()
 {
 }
 
-Renderer::~Renderer()
+UIBatchRenderer::~UIBatchRenderer()
 {
     glDeleteVertexArrays(1, &ui_vao_);
     glDeleteBuffers(2, ui_vbo_);
 }
 
-void Renderer::Setup()
-{
-    SetupUIBatchRender();
-    SetupDebugLines();
-}
-
-void Renderer::SetupUIBatchRender()
+void UIBatchRenderer::Setup()
 {
     //2DUI投影矩阵
     int width, height;
@@ -58,93 +52,7 @@ void Renderer::SetupUIBatchRender()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Renderer::SetupDebugLines()
-{
-    glGenVertexArrays(1, &line_vao_);
-    glBindVertexArray(line_vao_);
-    glGenBuffers(1, &line_vbo_);
-    glBindBuffer(GL_ARRAY_BUFFER, line_vbo_);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
-}
-
-void Renderer::Render()
-{
-    BatchRenderUI();
-}
-
-void Renderer::DrawDebugLine(const float vertices[6])
-{
-    //TODO:支持多个线段
-    auto camera = Engine::GetInstance()->mainCamera;
-    auto shader = ResourceManager::GetInstance()->GetShader("unlit_pos");
-    shader->Bind();
-    shader->SetMatrix("mvp", camera->projectMatrix * camera->GetViewMatrix());
-    shader->SetFloat("alpha", 1);
-    shader->SetVector3("color", glm::vec3(0, 1, 0));
-
-    glBindVertexArray(line_vao_);
-
-    //float _vertices[] = {0,0,0, 0,2,0};
-    glBindBuffer(GL_ARRAY_BUFFER, line_vbo_);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6, vertices, GL_STATIC_DRAW);
-
-    glDrawArrays(GL_LINE_LOOP, 0, 2);
-}
-
-void Renderer::SortUIRectByDepthAndHandleInput()
-{
-    //按z轴排序。影响渲染和事件响应先后
-    sort(ui_rect_list_.begin(), ui_rect_list_.end(), [](ui::UIRect *a, ui::UIRect *b) -> bool {
-        return a->depth < b->depth;
-    });
-
-    //处理UI事件 TODO:解耦render负责渲染
-    auto main_window = Engine::GetInstance()->GetMainWindow();
-    double x, y;
-    glfwGetCursorPos(main_window, &x, &y);
-    int width, height;
-    glfwGetWindowSize(main_window, &width, &height);
-    float mouseX = static_cast<float>(x);
-    float mouseY = static_cast<float>(height - y);
-    //反向遍历，z越近越早接受事件
-    ui::UIRect *first_rect = nullptr;
-    for (auto iter = ui_rect_list_.rbegin(); iter != ui_rect_list_.rend(); ++iter)
-    {
-        auto ui_rect = *iter;
-        auto posX = ui_rect->worldPosition.x;
-        auto posY = ui_rect->worldPosition.y;
-        auto width = ui_rect->width * ui_rect->worldScale.x;
-        auto height = ui_rect->height * ui_rect->worldScale.y;
-        if (mouseX > posX && mouseX < posX + width && mouseY > posY && mouseY < posY + height)
-        {
-            first_rect = ui_rect;
-            break;
-        }
-    }
-    if (first_rect)
-    {
-        if (glfwGetMouseButton(main_window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
-        {
-            is_left_mouse_btn_press = true;
-            first_rect->OnMouseLeftButtonPress();
-        }
-        else
-        {
-            if (is_left_mouse_btn_press)
-            {
-                is_left_mouse_btn_press = false;
-                first_rect->OnMouseLeftButtonRelease();
-            }
-            else
-            {
-                first_rect->OnMouseHover();
-            }
-        }
-    }
-}
-
-void Renderer::BatchRenderUI()
+void UIBatchRenderer::Render()
 {
     SortUIRectByDepthAndHandleInput();
 
@@ -202,7 +110,59 @@ void Renderer::BatchRenderUI()
     glDisable(GL_BLEND);
 }
 
-void Renderer::GenerateUIDrawCall(unsigned last_rect_index)
+void UIBatchRenderer::SortUIRectByDepthAndHandleInput()
+{
+    //按z轴排序。影响渲染和事件响应先后
+    sort(ui_rect_list_.begin(), ui_rect_list_.end(), [](ui::UIRect *a, ui::UIRect *b) -> bool {
+        return a->depth < b->depth;
+    });
+
+    //处理UI事件 TODO:解耦render负责渲染
+    auto main_window = Engine::GetInstance()->GetMainWindow();
+    double x, y;
+    glfwGetCursorPos(main_window, &x, &y);
+    int width, height;
+    glfwGetWindowSize(main_window, &width, &height);
+    float mouseX = static_cast<float>(x);
+    float mouseY = static_cast<float>(height - y);
+    //反向遍历，z越近越早接受事件
+    ui::UIRect *first_rect = nullptr;
+    for (auto iter = ui_rect_list_.rbegin(); iter != ui_rect_list_.rend(); ++iter)
+    {
+        auto ui_rect = *iter;
+        auto posX = ui_rect->worldPosition.x;
+        auto posY = ui_rect->worldPosition.y;
+        auto width = ui_rect->width * ui_rect->worldScale.x;
+        auto height = ui_rect->height * ui_rect->worldScale.y;
+        if (mouseX > posX && mouseX < posX + width && mouseY > posY && mouseY < posY + height)
+        {
+            first_rect = ui_rect;
+            break;
+        }
+    }
+    if (first_rect)
+    {
+        if (glfwGetMouseButton(main_window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
+        {
+            is_left_mouse_btn_press = true;
+            first_rect->OnMouseLeftButtonPress();
+        }
+        else
+        {
+            if (is_left_mouse_btn_press)
+            {
+                is_left_mouse_btn_press = false;
+                first_rect->OnMouseLeftButtonRelease();
+            }
+            else
+            {
+                first_rect->OnMouseHover();
+            }
+        }
+    }
+}
+
+void UIBatchRenderer::GenerateUIDrawCall(unsigned last_rect_index)
 {
     //取累积最后rect的材质
     auto rect = ui_rect_list_[last_rect_index];
@@ -227,8 +187,8 @@ void Renderer::GenerateUIDrawCall(unsigned last_rect_index)
     glDrawElements(GL_TRIANGLES, ui_element_index_, GL_UNSIGNED_SHORT, 0);
     glBindVertexArray(0);
 
-    Engine::GetInstance()->ui_vertices = Engine::GetInstance()->ui_vertices + ui_vertex_index_;
-    Engine::GetInstance()->ui_draw_call++;
+    Engine::GetInstance()->uiVertices = Engine::GetInstance()->uiVertices + ui_vertex_index_;
+    Engine::GetInstance()->uiDrawCall++;
 
     ui_vertex_index_ = 0;
     ui_element_index_ = 0;
