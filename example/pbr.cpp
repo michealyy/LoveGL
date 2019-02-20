@@ -9,7 +9,9 @@ class AppPBR : public kd::App
 	void Setup() override
 	{
 		scnMgr = new SceneManager();
-		Engine::GetInstance()->sceneManager = scnMgr;
+		auto engine = Engine::GetInstance();
+		engine->sceneManager = scnMgr;
+		engine->exposure = 0.6f;
 
 		//scnMgr->LoadGLTF("assets/scenes/1.gltf");
 		scnMgr->LoadGLTF("assets/scenes/material/material.gltf");
@@ -28,7 +30,6 @@ class AppPBR : public kd::App
 		camera->AttachPostProcessing(new ToneMapping());
 		camera->AttachPostProcessing(new Bloom());
 		camera->AttachController(new FreeCameraController());
-		camera->exposure = 0.6f;
 		Engine::GetInstance()->mainCamera = camera;
 		
 		//灯源

@@ -19,6 +19,7 @@ in vec2 texCoords;
 
 uniform sampler2D image;
 uniform float exposure;
+uniform float gamma = 2.2;
 
 vec3 Uncharted2Tonemap(vec3 x)
 {
@@ -53,7 +54,7 @@ void main()
     //vec3 result = vec3(1.0) - exp(-hdrColor * exposure);
 
     //gamma correct 
-    result = pow(result, vec3(1.0 / 2.2));
+    result = pow(result, vec3(1.0 / gamma));
     
     fragColor = vec4(result, 1.0);
 }

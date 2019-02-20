@@ -163,6 +163,10 @@ void SceneManager::Render()
         glDisable(GL_BLEND);
         glDisable(GL_DEPTH_TEST);
 
+        //支持msaa fbo
+        if (camera->renderTarget)
+            camera->renderTarget->BlitMSAAFBO();
+        
         //后处理
         if (camera->GetPostProcessing())
             camera->GetPostProcessing()->Draw();

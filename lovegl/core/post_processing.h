@@ -51,7 +51,7 @@ public:
   virtual void Draw() override;
 
   //混合因子
-  float factor = 1.f;
+  float factor = 0.8f;
   //必须为偶数
   unsigned blurCount = 10;
 

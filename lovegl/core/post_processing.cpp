@@ -89,7 +89,7 @@ void ToneMapping::Setup()
     int width, height;
     glfwGetWindowSize(Engine::GetInstance()->GetMainWindow(), &width, &height);
 
-    auto renderTexture = new RenderTexture(width, height);
+    auto renderTexture = new RenderTexture(width, height, Engine::GetInstance()->msaaSample);
     camera->renderTarget = renderTexture;
 
     shader = ResourceManager::GetInstance()->GetShader("tone_mapping");
@@ -103,7 +103,8 @@ void ToneMapping::Draw()
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     shader->Bind();
-    shader->SetFloat("exposure", camera->exposure);
+    shader->SetFloat("exposure", Engine::GetInstance()->exposure);
+    shader->SetFloat("gamma", Engine::GetInstance()->gamma);
     shader->SetInt("image", 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -130,9 +131,9 @@ void Bloom::Setup()
     int width, height;
     glfwGetWindowSize(Engine::GetInstance()->GetMainWindow(), &width, &height);
 
-    multiRenderTarget_ = new MultiRenderTarget(width, height, 2);
+    multiRenderTarget_ = new MultiRenderTarget(width, height, 2, Engine::GetInstance()->msaaSample);
     camera->renderTarget = multiRenderTarget_;
-
+    
     blur_rtt_ = new RenderTexture(width, height);
     blur_temp_rtt_ = new RenderTexture(width, height);
 }
@@ -190,7 +191,8 @@ void Bloom::Draw()
     auto shader = ResourceManager::GetInstance()->GetShader("bloom");
     shader->Bind();
     shader->SetFloat("factor", factor);
-    shader->SetFloat("exposure", camera->exposure);
+    shader->SetFloat("exposure", Engine::GetInstance()->exposure);
+    shader->SetFloat("gamma", Engine::GetInstance()->gamma);
     shader->SetInt("image", 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, lowTexture);

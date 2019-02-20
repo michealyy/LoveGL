@@ -21,6 +21,7 @@ uniform sampler2D image;
 uniform sampler2D blur;
 uniform float factor;
 uniform float exposure;
+uniform float gamma = 2.2;
 
 vec3 ACESToneMapping(vec3 color, float adapted_lum)
 {
@@ -42,6 +43,6 @@ void main()
     hdrColor += bloomColor * factor;
     
     vec3 result = ACESToneMapping(hdrColor, exposure);
-    result = pow(result, vec3(1.0 / 2.2));
+    result = pow(result, vec3(1.0 / gamma));
     FragColor = vec4(result, 1.0);
 }

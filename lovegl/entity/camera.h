@@ -47,8 +47,6 @@ class Camera : public Node
     inline PostProcessing *GetPostProcessing() { return postProcessing; }
 
     RenderTarget *renderTarget = nullptr;
-    //hdr色彩映射 曝光度
-    float exposure = 1.f;
     int depth = 0;
     bool isOverlay = true;
     glm::vec3 clearColor{1};
