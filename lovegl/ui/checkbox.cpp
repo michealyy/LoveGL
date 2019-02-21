@@ -39,7 +39,7 @@ CheckBox::CheckBox(const std::string &str, bool _selected) : selected(_selected)
 
     label_ = new Label();
     label_->SetText(str);
-    label_->position = vec3(40, 8, 0);
+    label_->position = vec3(35, 8, 0);
     AddChild(label_);
 }
 

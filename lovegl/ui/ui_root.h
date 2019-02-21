@@ -24,6 +24,7 @@ class UIRoot : public UIRect
     Material *ui_button_hover_mat = nullptr;
     Material *ui_checkbox_rect_bg_mat = nullptr;
     Material *ui_checkbox_rect_mat = nullptr;
+    Material *ui_slider_bg_mat = nullptr;
     
   private:
     Label *fps_label_;

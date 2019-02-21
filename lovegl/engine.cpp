@@ -82,7 +82,7 @@ void Engine::PickEntity()
 	//测试屏幕射线是否正确
 	auto p1 = ray.GetPoint(1);
 	float line[] = {p1.x, p1.y, p1.z, 0, 0, 0};
-	LineRenderer::GetInstance()->DrawDebugLine(line);
+	//LineRenderer::GetInstance()->DrawDebugLine(line);
 
 	if (glfwGetMouseButton(main_window_, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
 	{

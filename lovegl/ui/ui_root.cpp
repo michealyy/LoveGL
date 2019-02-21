@@ -6,6 +6,7 @@
 #include "button.h"
 #include "label.h"
 #include "checkbox.h"
+#include "slider.h"
 
 using namespace glm;
 
@@ -30,6 +31,10 @@ UIRoot::UIRoot()
     ui_checkbox_rect_mat = new Material("ui_checkbox_rect");
     ui_checkbox_rect_mat->SetShader("unlit_pos_tex");
     ui_checkbox_rect_mat->SetTexture("white");
+    //滑动条用
+    ui_slider_bg_mat = new Material("ui_checkbox_rect");
+    ui_slider_bg_mat->SetShader("unlit_pos_tex");
+    ui_slider_bg_mat->SetTexture("white");
 }
 
 UIRoot::~UIRoot()
@@ -119,17 +124,23 @@ void UIRoot::Setup()
     AddChild(bg);
 
     //选择框
-    auto bloomCheckBox = new CheckBox("bloom", true);
+    auto bloomCheckBox = new CheckBox("Bloom", true);
     bloomCheckBox->position = vec3(10, height - 80, 0);
     bg->AddChild(bloomCheckBox);
 
-    auto postProcessingCheckBox = new CheckBox("PostProcessing", true);
+    auto postProcessingCheckBox = new CheckBox("PostProcess", true);
     postProcessingCheckBox->position = vec3(10, height - 120, 0);
     bg->AddChild(postProcessingCheckBox);
 
+    auto slider = new Slider();
+    slider->width = 110;
+    slider->height = 20;
+    slider->position = vec3(10, height - 160, 0);
+    AddChild(slider);
+
     //测试按钮
     auto btn_1 = new Button();
-    btn_1->position = vec3(15, height - 180, 0);
+    btn_1->position = vec3(15, height - 200, 0);
     bg->AddChild(btn_1);
 
     UIRect::Setup();
