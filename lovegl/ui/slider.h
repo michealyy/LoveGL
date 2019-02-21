@@ -1,6 +1,7 @@
 #pragma once
 #include "ui_rect.h"
 #include <functional>
+#include <glm/glm.hpp>
 #include "simple_button.h"
 
 namespace kd
@@ -20,6 +21,9 @@ class Slider : public UIRect
     virtual void OnMouseLeftButtonRelease() override;
     virtual void OnMouseHover() override;
     inline void SetClickCallback(const std::function<void(void)> &func) { click_callback_ = func; }
+
+    float rectWidth = 14.f;
+    float rectPadding = 3.f;
 
   private:
     SimpleButton *rect_ = nullptr;

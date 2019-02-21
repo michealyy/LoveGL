@@ -1,5 +1,5 @@
 #include "slider.h"
-#include <glm/glm.hpp>
+
 #include "../engine.h"
 
 using namespace glm;
@@ -26,10 +26,10 @@ void Slider::Setup()
 
 	rect_ = new SimpleButton();
     rect_->material = Engine::GetInstance()->uiRoot->ui_slider_bg_mat;
-    rect_->width = 10;
-    rect_->height = this->height - 6;
-	rect_->alpha = 0.8f;
-    rect_->position = vec3(0, 3, 0);
+    rect_->width = rectWidth;
+    rect_->height = this->height - rectPadding * 2;
+    rect_->alpha = 0.8f;
+    rect_->position = vec3(rectPadding, rectPadding, 0);
     AddChild(rect_);
     // rect_->SetClickCallback([this]() {
     //     selected = !selected;
@@ -52,12 +52,17 @@ void Slider::OnMouseLeftButtonPress()
     glfwGetCursorPos(main_window, &x, &y);
     int width, height;
     glfwGetWindowSize(main_window, &width, &height);
-    float mouseX = static_cast<float>(x);
+    float _mouseX = static_cast<float>(x);
     float mouseY = static_cast<float>(height - y);
 
-	rect_->position = vec3(mouseX, 3, 0);
-	
-	if (!is_pressed_)
+    //if (rect_->parent)
+
+    auto mousePos = inverse(rect_->parent->worldTransform) * vec4(_mouseX, 0, 0, 1);
+    auto mouseX = mousePos.x;
+    if (mouseX > rectPadding && mouseX < (this->width - rectPadding - rect_->width))
+        rect_->position = vec3(mouseX, rectPadding, 0);
+
+    if (!is_pressed_)
 	{
 		// if (click_callback_)
 		// {

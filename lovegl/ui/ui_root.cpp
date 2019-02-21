@@ -134,9 +134,9 @@ void UIRoot::Setup()
 
     auto slider = new Slider();
     slider->width = 110;
-    slider->height = 20;
+    slider->height = 25;
     slider->position = vec3(10, height - 160, 0);
-    AddChild(slider);
+    bg->AddChild(slider);
 
     //测试按钮
     auto btn_1 = new Button();

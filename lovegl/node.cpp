@@ -44,7 +44,7 @@ void Node::AddChild(Node *child)
 	{
 		return;
 	}
-	child->parent_ = this;
+	child->parent = this;
 	children_.push_back(child);
 }
 
@@ -80,9 +80,9 @@ void Node::UpdateModelMatrix()
 	mat4 temp(1.0f);
 	localTransform = translate(temp, position) * glm::scale(temp, scale) * mat4_cast(quat(glm::radians(eulerAngles)));
 
-	if (parent_ != nullptr)
+	if (parent != nullptr)
 	{
-		worldTransform = parent_->worldTransform * localTransform;
+		worldTransform = parent->worldTransform * localTransform;
 	}
 	else
 	{
