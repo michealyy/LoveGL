@@ -6,6 +6,7 @@
 #include "button.h"
 #include "slider.h"
 
+using namespace std;
 using namespace glm;
 
 namespace kd
@@ -71,11 +72,6 @@ void UIRoot::Setup()
     gl_version_label_->position = vec3(0, height - 80, 0);
     AddChild(gl_version_label_);
 
-    //选中物体
-    selected_node_label_ = new Label();
-    selected_node_label_->position = vec3(width / 2, height - 20, 0);
-    AddChild(selected_node_label_);
-
     //标题材质
     auto ui_common_tile_mat = new Material("ui_common_tile");
     ui_common_tile_mat->SetShader("unlit_pos_tex");
@@ -101,11 +97,15 @@ void UIRoot::Setup()
     title2->position = vec3(width - title2->width, height - 300, 0);
     title2->color = vec3(0.9, 0.133, 0.415);
     AddChild(title2);
-    auto title2_label = new Label();
-    title2_label->SetText("Entity");
-    title2_label->position = vec3(45, 10, 1);
-    title2_label->depth = 1;
-    title2->AddChild(title2_label);
+    nodeNameLabel = new Label();
+    nodeNameLabel->SetText("Selected Entity");
+    nodeNameLabel->position = vec3(20, 10, 1);
+    nodeNameLabel->depth = 1;
+    title2->AddChild(nodeNameLabel);
+    //选中物体信息
+    nodePosXLabel = new Label();
+    nodePosXLabel->position = vec3(20, -20, 0);
+    title2->AddChild(nodePosXLabel);
 
     //背景
     auto ui_common_bg_mat = new Material("ui_common_bg");
@@ -132,12 +132,17 @@ void UIRoot::Setup()
     auto slider = new Slider();
     slider->width = 110;
     slider->height = 25;
-    slider->position = vec3(10, height - 160, 0);
+    slider->position = vec3(10, height - 180, 0);
     bg->AddChild(slider);
+    auto exposure_label = new Label();
+    exposure_label->SetText("Exposure:");
+    exposure_label->position = vec3(10, height - 150, 0);
+    exposure_label->depth = 1;
+    bg->AddChild(exposure_label);
 
     //测试按钮
     auto btn_1 = new Button();
-    btn_1->position = vec3(15, height - 200, 0);
+    btn_1->position = vec3(15, height - 240, 0);
     bg->AddChild(btn_1);
 
     UIRect::Setup();
@@ -162,18 +167,22 @@ void UIRoot::Update(float deltaTime)
         gl_version_label_->SetText(std::string("OpenGL ").append((char *) glGetString(GL_VERSION)));
     }
 
-    if (Engine::GetInstance()->selectedEntity)
-    {
-        selected_node_label_->SetText(std::string("Selected: ").append(Engine::GetInstance()->selectedEntity->name));
-    }
-    else
-    {
-        selected_node_label_->SetText("");
-    }
-
     auto engine = Engine::GetInstance();
     auto scnMgr = engine->sceneManager;
     scnMgr->showSkyBox = skyboxCheckBox->selected;
+
+    auto selectedEntity = Engine::GetInstance()->selectedEntity;
+    if (selectedEntity)
+    {
+        nodeNameLabel->SetText(selectedEntity->name);
+        nodePosXLabel->SetText(string("PosX: ").append(to_string(selectedEntity->position.x)));
+        //.append(to_string(selectedEntity->position.y)).append(" ").append(to_string(selectedEntity->position.z))
+    }
+    else
+    {
+        nodeNameLabel->SetText("Selected Entity");
+        nodePosXLabel->SetText("");
+    }
 }
 
 } // namespace ui

@@ -339,9 +339,9 @@ void SceneManager::LoadGLTFNode(tinygltf::Model &model, tinygltf::Node &node, No
     /*****解析摄像机*****/
     if (node.camera >= 0)
     {
-        auto _camera = new Camera();
-        _node = _camera;
-        cameras_.push_back(_camera);
+        // auto _camera = new Camera();
+        // _node = _camera;
+        // cameras_.push_back(_camera);
 
         //TODO: 解析其他摄像机信息，正交 透视 进远面
     }

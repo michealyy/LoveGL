@@ -17,13 +17,13 @@ class AppSSR : public kd::App
         scnMgr->LoadIBL("night");
 
         //主摄像机
-        // auto CameraNode = scnMgr->GetNode("Camera");
-        // auto camera = scnMgr->CreateNode<Camera>(CameraNode);
         auto camera = scnMgr->CreateNode<Camera>();
         camera->name = "MainCamera";
         camera->AttachPostProcessing(new Bloom());
         //camera->AttachPostProcessing(new ToneMapping());
         camera->AttachController(new FreeCameraController());
+        camera->position = vec3(6, 7.3, 2.8);
+        camera->eulerAngles = vec3(-37, 67, 0);
         Engine::GetInstance()->mainCamera = camera;
     }
 

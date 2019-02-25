@@ -28,6 +28,8 @@ class UIRoot : public UIRect
     Material *ui_slider_bg_mat = nullptr;
 
     CheckBox *skyboxCheckBox = nullptr;
+    Label *nodeNameLabel = nullptr;
+    Label *nodePosXLabel = nullptr;
 
   private:
     Label *fps_label_;
@@ -35,8 +37,6 @@ class UIRoot : public UIRect
     Label *ui_draw_call_label_;
     Label *gl_renderer_label_;
     Label *gl_version_label_;
-    Label *selected_node_label_;
-
     
     DISALLOW_COPY_AND_ASSIGN(UIRoot)
 };

@@ -77,7 +77,7 @@ class FreeCameraController : public CameraController
     virtual void Setup() override;
     virtual void Update(float deltaTime) override;
 
-    float moveSpeed = 0.1f;
+    float moveSpeed = 0.2f;
     float rotateSpeed = 10.f;
 
   private:
