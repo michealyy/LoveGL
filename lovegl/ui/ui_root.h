@@ -2,6 +2,7 @@
 
 #include "ui_rect.h"
 #include "label.h"
+#include "checkbox.h"
 #include <core/material.h>
 
 namespace kd
@@ -25,7 +26,9 @@ class UIRoot : public UIRect
     Material *ui_checkbox_rect_bg_mat = nullptr;
     Material *ui_checkbox_rect_mat = nullptr;
     Material *ui_slider_bg_mat = nullptr;
-    
+
+    CheckBox *skyboxCheckBox = nullptr;
+
   private:
     Label *fps_label_;
     Label *draw_call_label_;
@@ -34,6 +37,7 @@ class UIRoot : public UIRect
     Label *gl_version_label_;
     Label *selected_node_label_;
 
+    
     DISALLOW_COPY_AND_ASSIGN(UIRoot)
 };
 

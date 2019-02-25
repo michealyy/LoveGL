@@ -30,6 +30,8 @@ class SceneManager
 
 	void LoadGLTF(const std::string &path);
 	void LoadIBL(const std::string &path);
+	
+	bool showSkyBox = false;
 
   protected:
 	Node *root_ = nullptr;

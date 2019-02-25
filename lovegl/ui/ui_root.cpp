@@ -4,8 +4,6 @@
 #include "../engine.h"
 #include "font_manager.h"
 #include "button.h"
-#include "label.h"
-#include "checkbox.h"
 #include "slider.h"
 
 using namespace glm;
@@ -32,7 +30,7 @@ UIRoot::UIRoot()
     ui_checkbox_rect_mat->SetShader("unlit_pos_tex");
     ui_checkbox_rect_mat->SetTexture("white");
     //滑动条用
-    ui_slider_bg_mat = new Material("ui_checkbox_rect");
+    ui_slider_bg_mat = new Material("ui_slider_bg");
     ui_slider_bg_mat->SetShader("unlit_pos_tex");
     ui_slider_bg_mat->SetTexture("white");
 }
@@ -123,14 +121,13 @@ void UIRoot::Setup()
     bg->depth = -1;
     AddChild(bg);
 
-    //选择框
-    auto bloomCheckBox = new CheckBox("Bloom", true);
-    bloomCheckBox->position = vec3(10, height - 80, 0);
-    bg->AddChild(bloomCheckBox);
+    skyboxCheckBox = new CheckBox("SkyBox", false);
+    skyboxCheckBox->position = vec3(10, height - 80, 0);
+    bg->AddChild(skyboxCheckBox);
 
-    auto postProcessingCheckBox = new CheckBox("PostProcess", true);
-    postProcessingCheckBox->position = vec3(10, height - 120, 0);
-    bg->AddChild(postProcessingCheckBox);
+    auto bloomCheckBox = new CheckBox("Bloom", true);
+    bloomCheckBox->position = vec3(10, height - 120, 0);
+    bg->AddChild(bloomCheckBox);    
 
     auto slider = new Slider();
     slider->width = 110;
@@ -173,6 +170,10 @@ void UIRoot::Update(float deltaTime)
     {
         selected_node_label_->SetText("");
     }
+
+    auto engine = Engine::GetInstance();
+    auto scnMgr = engine->sceneManager;
+    scnMgr->showSkyBox = skyboxCheckBox->selected;
 }
 
 } // namespace ui

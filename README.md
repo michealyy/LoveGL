@@ -5,7 +5,8 @@
 
 # 截图
 
-![PBR材质球](screenshot/pbr.png)
+![PBR](screenshot/pbr.png)
+![SSR](screenshot/ssr.png)
 
 # 开发环境搭建
 

@@ -45,16 +45,8 @@ uniform float metallic;
 uniform sampler2D albedoTexture;
 uniform sampler2D metallicRoughnessTexture;
 
-//平行光
-struct DirectionalLight
-{
-    vec3 color;
-    vec3 direction;
-};  
-uniform DirectionalLight directionalLight;
-
-//点光
-#define MAX_POINT_LIGHTS 4
+//暂时只实现点光，参考blinn_phong
+#define MAX_POINT_LIGHTS 8
 uniform int pointLightsCount;
 struct PointLight
 {
@@ -63,6 +55,7 @@ struct PointLight
     float constant;
     float linear;
     float quadratic;
+    float intensity;
 };
 uniform PointLight pointLights[MAX_POINT_LIGHTS];
 
@@ -148,9 +141,10 @@ vec3 BRDF(vec3 N, vec3 H, vec3 V, vec3 L, vec3 F0, vec3 albedo, float roughness)
 void main()
 {
     vec3 albedo = albedo + texture(albedoTexture, _texCoord).rgb;
-    vec4 mrt_ = texture(metallicRoughnessTexture, _texCoord);
-    float roughness = roughness + mrt_.g;
-    float metallic = metallic + mrt_.b;
+    vec4 omrt_ = texture(metallicRoughnessTexture, _texCoord);
+    //r是AO(TODO:一般没有搞个开关) g是粗糙度 b是金属度
+    float roughness = roughness + omrt_.g;
+    float metallic = metallic + omrt_.b;
     
     vec3 V = normalize(viewPos - _worldPos);
     vec3 N = normalize(_normal);
@@ -160,22 +154,26 @@ void main()
     vec3 F0 = vec3(0.04); 
     F0 = mix(F0, albedo, metallic);
     
-    //#多光源
-    // vec3 L = normalize(pointLights[0].position - _worldPos);
-    // vec3 H = normalize(V + L);
-    // float distance = length(pointLights[0].position - _worldPos);
-    // float attenuation = 1.0 / (distance * distance);
-    // vec3 radiance = pointLights[0].color * attenuation;
-    vec3 L = normalize(-directionalLight.direction);
-    vec3 H = normalize(V + L);
-    //辐射度
-    vec3 radiance = directionalLight.color * 4;
-    //#多光源
+    //#无限小多点光源 Start
+    vec3 lightsRadiance = vec3(0.0);
+    for(int i = 0; i < clamp(pointLightsCount, 0, MAX_POINT_LIGHTS); i++)
+    {
+        vec3 L = normalize(pointLights[i].position - _worldPos);
+        vec3 H = normalize(V + L);
+        float distance = length(pointLights[i].position - _worldPos);
+        float attenuation = 1.0 / (distance * distance);
+        vec3 radiance = pointLights[i].color * attenuation * pointLights[i].intensity;
+        // //效果不好抛弃
+        // float distance = length(pointLights[i].position - _worldPos);
+        // float attenuation = 1.0 / (pointLights[i].constant + pointLights[i].linear * distance + pointLights[i].quadratic * (distance * distance));
+        // vec3 radiance = pointLights[i].color * attenuation;
+        //辐射率和光线和法线夹角相关
+        float NdotL = max(dot(N, L), 0.0);
+        lightsRadiance += BRDF(N, H, V, L, F0, albedo, roughness) * radiance * NdotL;
+    }
+    //#无限小多点光源 End
 
-    //辐射率和光线和法线夹角相关
-    float NdotL = max(dot(N, L), 0.0);
-
-    //#IBL
+    //#IBL Start
     vec3 F = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
     
     vec3 kS = F;
@@ -191,11 +189,13 @@ void main()
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
     vec3 ambient = (kD * diffuse + specular);
-    //#IBL
+    //#IBL End
+    //vec3 ambient = vec3(0.1) * albedo
+    
+    vec3 result = ambient + lightsRadiance;
 
-    //环境光固定0.1+反射光
-    //vec3 result = vec3(0.1) * albedo + BRDF(N, H, V, L, F0) * radiance * NdotL;
-    vec3 result = ambient + BRDF(N, H, V, L, F0, albedo, roughness) * radiance * NdotL;
+    //TODO:搞个自发光贴图开关
+    //result = result + emissive
 
     //bloom需要超出一定亮度得区域
     float brightness = dot(result, vec3(0.2126, 0.7152, 0.0722));

@@ -143,10 +143,4 @@ void main()
     }
 
     FragColor = vec4(texture(diffuseTexture, _texCoord).rgb * result, 1.0);// * vec4(color, alpha);
-    
-    //[HDR] 曝光色调映射
-    // float exposure = 1.0;
-    // vec3 hdrColor = texture(diffuseTexture, _texCoord).rgb * result;
-    // vec3 mapped = vec3(1.0) - exp(-hdrColor * exposure);
-    // FragColor = vec4(mapped, 1.0);
 }

@@ -147,7 +147,7 @@ void SceneManager::Render()
         glEnable(GL_DEPTH_TEST);
 
         //TODO: 解决bloom分离
-        if (skybox_)
+        if (skybox_ && showSkyBox)
             skybox_->Render();
         
         for (auto opaque_mesh : opaque_meshes)
@@ -203,10 +203,12 @@ void SceneManager::DrawMesh(Camera *camera, Mesh *mesh)
             glActiveTexture(GL_TEXTURE2);
             glBindTexture(GL_TEXTURE_2D, brdfLUT_);
         }
-
         //平行光源
-        shader->SetVector3("directionalLight.color", directionalLight_->color);
-        shader->SetVector3("directionalLight.direction", directionalLight_->direction);
+        if (directionalLight_)
+        {
+            shader->SetVector3("directionalLight.color", directionalLight_->color);
+            shader->SetVector3("directionalLight.direction", directionalLight_->direction);
+        }
         //点光源
         shader->SetInt("pointLightsCount", (int)pointLights_.size());
         for (int i = 0; i < pointLights_.size(); i++)
@@ -217,6 +219,7 @@ void SceneManager::DrawMesh(Camera *camera, Mesh *mesh)
             shader->SetFloat(string("pointLights[0].constant").replace(12, 1, to_string(i)).c_str(), pointLight->constant);
             shader->SetFloat(string("pointLights[0].linear").replace(12, 1, to_string(i)).c_str(), pointLight->linear);
             shader->SetFloat(string("pointLights[0].quadratic").replace(12, 1, to_string(i)).c_str(), pointLight->quadratic);
+            shader->SetFloat(string("pointLights[0].intensity").replace(12, 1, to_string(i)).c_str(), pointLight->intensity);
         }
         //聚光灯源
         shader->SetInt("spotLightsCount", (int)spotLights_.size());
@@ -373,6 +376,8 @@ void SceneManager::LoadGLTFNode(tinygltf::Model &model, tinygltf::Node &node, No
             else
                 b = (float)color.Get(2).Get<double>();
             pointLight->color = glm::vec3(r, g, b);
+
+            pointLight->intensity = (float)light_info.Get("intensity").Get<int>();
         }
     }
     /*****解析网格*****/

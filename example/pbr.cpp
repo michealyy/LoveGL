@@ -13,9 +13,7 @@ class AppPBR : public kd::App
 		engine->sceneManager = scnMgr;
 		engine->exposure = 0.6f;
 
-		//scnMgr->LoadGLTF("assets/scenes/1.gltf");
 		scnMgr->LoadGLTF("assets/scenes/material/material.gltf");
-
 		scnMgr->LoadIBL("outdoor");
 
 		//主摄像机
@@ -33,9 +31,9 @@ class AppPBR : public kd::App
 		Engine::GetInstance()->mainCamera = camera;
 		
 		//灯源
-		auto directionalLight = scnMgr->CreateNode<DirectionalLight>();
-		directionalLight->color = vec3(1, 1, 1);
-		directionalLight->direction = vec3(0, -1, 0);
+		// auto directionalLight = scnMgr->CreateNode<DirectionalLight>();
+		// directionalLight->color = vec3(1, 1, 1);
+		// directionalLight->direction = vec3(0, -1, 0);
 
 		// auto pointLight = scnMgr->CreateNode<PointLight>();
 		// pointLight->color = vec3(1, 0, 0);
@@ -72,7 +70,7 @@ class AppPBR : public kd::App
 int main(int, char **)
 {
 	kd::Main main;
-	main.InitWindow(800, 600)->SetApp(new AppPBR());
+	main.InitWindow(1200, 900)->SetApp(new AppPBR());
 	main.MainLoop();
 	return 0;
 }
