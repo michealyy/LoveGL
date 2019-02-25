@@ -131,7 +131,7 @@ void SubMesh::SetupFromGLTF(tinygltf::Model &model, tinygltf::Primitive &primiti
     auto normal_index = normal_bufferView.byteOffset;
     assert(normal_accessor.byteOffset == 0);
 
-    assert(pos_accessor.count == uv_accessor.count && pos_accessor.count == normal_accessor.count);
+    //assert(pos_accessor.count == uv_accessor.count && pos_accessor.count == normal_accessor.count);
     for (unsigned i = 0; i < pos_accessor.count; i++)
     {
         va::P_T_N_T_B vertex;
