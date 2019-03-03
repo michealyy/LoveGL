@@ -13,7 +13,8 @@ class RayTracingFinalPass : public PostProcessing
     RayTracingFinalPass(unsigned tex)
     {
         texture = tex;
-        shader = ResourceManager::GetInstance()->GetShader("tone_mapping");
+        //shader = ResourceManager::GetInstance()->GetShader("tone_mapping");
+        shader = ResourceManager::GetInstance()->GetShader("image");
     }
     void Draw() override
     {
@@ -44,7 +45,7 @@ public:
     {
         Engine::GetInstance()->uiRoot->show_inspector = false;
 
-        shader = new ComputeShader("cs", "assets/raytracing/cs.glsl");
+        shader = new ComputeShader("raytracing", "assets/raytracing/raytracing.glsl");
         auto shaderId = shader->GetGLProgramId();
         glUseProgram(shaderId);
         int workGroupSize[3];
@@ -64,6 +65,7 @@ public:
         camera = new Camera();
         camera->Setup();
         camera->position = vec3(0, 0, 5);
+        camera->eulerAngles = vec3(-12, 20, 0);
         camera->AttachController(new FreeCameraController());
     }
 
@@ -76,11 +78,11 @@ public:
         auto renderTargetImage = shader->GetImageUnit("RenderTarget");
         glBindImageTexture(renderTargetImage, finalPass->texture, 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);
 
-        //   vec3 cameraPosition = vec3(0.0f, 0.0f, 5.0f);
-        //   auto viewMat = lookAt(cameraPosition, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-        //   auto projectMat = perspective(radians(60.f), (float)Width / Height, 0.1f, 1000.f);
-        //   shader->SetVector3("cameraPosition", cameraPosition);
-        //   shader->SetMatrix("unProject", inverse(projectMat * viewMat));
+        // vec3 cameraPosition = vec3(0.0f, 0.0f, 5.0f);
+        // auto viewMat = lookAt(cameraPosition, vec3(-3.0f, -2.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+        // auto projectMat = perspective(radians(60.f), (float)Width / Height, 0.1f, 1000.f);
+        // shader->SetVector3("cameraPosition", cameraPosition);
+        // shader->SetMatrix("unProject", inverse(projectMat * viewMat));
         shader->SetVector3("cameraPosition", camera->position);
         shader->SetMatrix("unProject", camera->GetUnProjectMatrix());
 

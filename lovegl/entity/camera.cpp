@@ -69,7 +69,8 @@ mat4 Camera::GetViewMatrix()
 
 mat4 Camera::GetUnProjectMatrix()
 {
-    return inverse(projectMatrix * GetViewMatrix());// inverse(worldTransform);
+    return inverse(projectMatrix * inverse(worldTransform));
+    //return worldTransform * inverse(projectMatrix);
 }
 
 Ray Camera::MousePointToRay(vec2 point)
