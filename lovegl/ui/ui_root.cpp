@@ -72,6 +72,12 @@ void UIRoot::Setup()
     gl_version_label_->position = vec3(0, height - 80, 0);
     AddChild(gl_version_label_);
 
+    if (!show_inspector)
+    {
+        UIRect::Setup();
+        return;
+    }
+
     //标题材质
     auto ui_common_tile_mat = new Material("ui_common_tile");
     ui_common_tile_mat->SetShader("unlit_pos_tex");
@@ -167,8 +173,13 @@ void UIRoot::Update(float deltaTime)
         gl_version_label_->SetText(std::string("OpenGL ").append((char *) glGetString(GL_VERSION)));
     }
 
+    if (!show_inspector)
+        return;
+
     auto engine = Engine::GetInstance();
     auto scnMgr = engine->sceneManager;
+    if (scnMgr == nullptr)
+        return;
     scnMgr->showSkyBox = skyboxCheckBox->selected;
 
     auto selectedEntity = Engine::GetInstance()->selectedEntity;

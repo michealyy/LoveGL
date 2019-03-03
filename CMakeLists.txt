@@ -31,3 +31,4 @@ link_libraries(lovegl)
 #例子
 add_executable(example_pbr example/pbr.cpp)
 add_executable(example_ssr example/ssr.cpp)
+add_executable(raytracing example/raytracing.cpp)

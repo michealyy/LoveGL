@@ -61,9 +61,6 @@ void PostProcessing::Setup()
 
 void PostProcessing::Draw()
 {
-    if (camera == nullptr)
-        return;
-
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     if (shader)
         shader->Bind();

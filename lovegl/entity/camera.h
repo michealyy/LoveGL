@@ -33,6 +33,7 @@ class Camera : public Node
     void SetPerspective();
     void SetOrtho(glm::vec2 size);
     glm::mat4 GetViewMatrix();
+    glm::mat4 GetUnProjectMatrix();
     Ray MousePointToRay(glm::vec2 point);
     inline void AttachController(CameraController *controller)
     {

@@ -17,6 +17,7 @@ Main *Main::InitWindow(int width, int height)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_SAMPLES, 8);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     //glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
 
     window = glfwCreateWindow(width, height, "", nullptr, nullptr);

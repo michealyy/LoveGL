@@ -3,4 +3,6 @@
 #include "main.h"
 #include "app.h"
 #include "engine.h"
+#include "resource_manager.h"
 #include "core/line_renderer.h"
+#include "raytracing/compute_shader.h"

@@ -20,6 +20,7 @@ class UIRoot : public UIRect
     virtual void Update(float deltaTime) override;
     
     bool show_stat_label = true;
+    bool show_inspector = true;
 
     Material *ui_button_normal_mat = nullptr;
     Material *ui_button_hover_mat = nullptr;

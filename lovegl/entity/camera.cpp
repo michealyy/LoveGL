@@ -67,6 +67,11 @@ mat4 Camera::GetViewMatrix()
     return inverse(worldTransform);
 }
 
+mat4 Camera::GetUnProjectMatrix()
+{
+    return inverse(projectMatrix * GetViewMatrix());// inverse(worldTransform);
+}
+
 Ray Camera::MousePointToRay(vec2 point)
 {
     int width, height;

@@ -26,6 +26,8 @@ void Engine::Setup()
 	UIBatchRenderer::GetInstance()->Setup();
 	LineRenderer::GetInstance()->Setup();
 
+	uiRoot = new ui::UIRoot();
+
 	if (app_)
 		app_->Setup();
 	else
@@ -33,10 +35,7 @@ void Engine::Setup()
 	
 	if (sceneManager)
 		sceneManager->Setup();
-	else
-		fprintf(stderr, "[Engine]sceneManager == nullptr");
-
-	uiRoot = new ui::UIRoot();
+	
 	uiRoot->Setup();
 }
 
