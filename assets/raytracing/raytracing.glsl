@@ -1,4 +1,5 @@
 #version 430 core
+#define PI 3.14159265359
 layout (local_size_x = 32, local_size_y = 32) in;
 
 layout(binding = 0, rgba32f) uniform image2D RenderTarget;
@@ -21,18 +22,20 @@ struct Sphere
 {
     vec3 center;
     float radius;
+    vec3 color;
 };
 
 struct SphereHitInfo
 {
+    int index;
     vec3 point;
     vec3 normal;
 };
 
 /*
-*   球标准方程，射线某点存在球上
+*  射线相交于球。射线上存某点在球上，带入球标准方程
 */
-float intersectSphere(vec3 origin, vec3 direction, vec3 center, float radius)
+float IntersectSphere(vec3 origin, vec3 direction, vec3 center, float radius)
 {
     vec3 oc = origin - center;
     float a = dot(direction, direction);
@@ -46,7 +49,7 @@ float intersectSphere(vec3 origin, vec3 direction, vec3 center, float radius)
         return (-b - sqrt(discriminant)) / (2 * a);
 }
 
-void Hit(inout Payload payload, in SphereHitInfo info)
+void AnyHit(inout Payload payload, in SphereHitInfo info)
 {
     //可视化法线
     vec3 n = info.normal;
@@ -65,26 +68,49 @@ void Miss(inout Payload payload)
     payload.color = mix(vec4(1, 1, 1, 1), vec4(0.5, 0.7, 1, 1), payload.pos.y);
 }
 
-void TraceRay(in Sphere[3] scene, in Ray ray, inout Payload payload)
+uniform int MaxRecursionDepth = 3;
+void TraceRay(in Sphere[3] scene, in Ray _ray, inout Payload payload)
 {
-    bool isHit = false;
-    
-    for (int i = 0; i < scene.length(); i++)
+    Ray ray = _ray;
+    vec3 attenuation = vec3(1);
+    //把递归改成了循环
+    for (int depth = 0; depth < MaxRecursionDepth; depth++)
     {
-        float t = intersectSphere(ray.origin, ray.direction, scene[i].center, scene[i].radius);
-        if (t > 0)
+        bool isHit = false;
+        
+        SphereHitInfo sphereHitInfo;
+        for (int i = 0; i < scene.length(); i++)
         {
-            isHit = true;
+            float t = IntersectSphere(ray.origin, ray.direction, scene[i].center, scene[i].radius);
+            if (t > 0)
+            {
+                isHit = true;
+                sphereHitInfo.index = i;
+                sphereHitInfo.point = ray.origin + t * ray.direction;
+                sphereHitInfo.normal = normalize(sphereHitInfo.point - scene[i].center);
+                //AnyHit(payload, sphereHitInfo);
+            }
+        }
+        
+        if (isHit)
+        {
+            // attenuation *= dot(ray.direction, sphereHitInfo.normal);
+            attenuation *= scene[sphereHitInfo.index].color;
 
-            SphereHitInfo sphereHitInfo;
-            sphereHitInfo.point = ray.origin + t * ray.direction;
-            sphereHitInfo.normal = normalize(sphereHitInfo.point - scene[i].center);
-            Hit(payload, sphereHitInfo);
+            //取当前反射射线，下次循环使用
+            ray.origin = sphereHitInfo.point;
+            ray.direction = reflect(ray.direction, sphereHitInfo.normal);
+            
+            //ClosestHit
+        }
+        else
+        {
+            payload.color = mix(vec4(1, 1, 1, 1), vec4(0.5, 0.7, 1, 1), payload.pos.y) * vec4(attenuation, 1);
+            //Miss(payload);
+            return;
         }
     }
-
-    if (!isHit)
-        Miss(payload);
+    payload.color = vec4(0.1, 0.1, 0.1, 1);
 }
 
 /*
@@ -112,10 +138,13 @@ void main()
     GenerateCameraRay(ray, payload);
 
     Sphere spheres[3];
+    spheres[0].color = vec3(0.5, 0.5, 0.5);
     spheres[0].center = vec3(0, -100.5, -1);
     spheres[0].radius = 100;
+    spheres[1].color = vec3(0.8, 0, 0.4);
     spheres[1].center = vec3(-0.8, 0, 0);
     spheres[1].radius = 0.5;
+    spheres[2].color = vec3(0.8, 0.4, 0);
     spheres[2].center = vec3(0.8, 0, 0);
     spheres[2].radius = 0.5;
     TraceRay(spheres, ray, payload);

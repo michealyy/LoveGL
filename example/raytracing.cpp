@@ -38,8 +38,8 @@ class AppRayTracing : public kd::App
 public:
     int numGroupsX = 32;
     int numGroupsY = 32;
-    static const unsigned Width = 1280;
-    static const unsigned Height = 720;
+    static const unsigned Width = 1200;
+    static const unsigned Height = 900;
 
     void Setup() override
     {
